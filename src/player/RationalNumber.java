@@ -4,22 +4,16 @@ package player;
  * ADT used to represent the rational number durations of notes
  */
 public class RationalNumber {
-    private Integer numerator = 1;
-    private Integer denominator = 2; //default values for notes
-    
-    /**
-     * Creates a new RationalNumber object with default values
-     */
-    public RationalNumber() {
-        
-    }
-    
+    private int numerator;
+    private int denominator;
+       
     /**
      * Creates a new RationalNumber object
+     * Reduces the number to its lowest terms
      * @param numerator the numerator
      * @param denominator the denominator
      */
-    public RationalNumber(Integer numerator, Integer denominator) {
+    public RationalNumber(int numerator, int denominator) {        
         this.numerator = numerator;
         this.denominator = denominator;
     }
@@ -28,7 +22,7 @@ public class RationalNumber {
      * Gets the numerator of the RationalNumber
      * @return the numerator
      */
-    public Integer getNumerator() {
+    public int getNumerator() {
         return this.numerator;
     }
     
@@ -36,16 +30,51 @@ public class RationalNumber {
      * Gets the denominator of the RationalNumber
      * @return the denominator
      */
-    public Integer getDenominator() {
+    public int getDenominator() {
         return this.denominator;
     }
     
     /**
-     * Gets the Double value of the RationalNumber
+     * Gets the double value of the RationalNumber
      * @return the evaluated value of the RationalNumber
      */
-    public Double getValue() {
-        return new Double(numerator.doubleValue() / denominator.doubleValue());
+    public double getValue() {
+        return (double)numerator/denominator;
+    }
+    
+    /**
+     * Creates a new RationalNumber that is the result from the addition of two RationalNumbers
+     * @param other the other RationalNumber to add
+     * @return a new RationalNumber, the result of the addition of two RationalNumbers
+     */
+    public RationalNumber add(RationalNumber other) {
+        if (this.denominator == other.denominator) {
+            return new RationalNumber(this.numerator + other.numerator, this.denominator);
+        } else {
+            int lcm = lcm(this.denominator,other.denominator);
+            
+            int firstNumerator = this.numerator*lcm/this.denominator;
+            int secondNumerator = other.numerator*lcm/other.denominator;
+            return new RationalNumber(firstNumerator + secondNumerator, lcm);
+        }
+    }
+    
+    /**
+     * Creates a new RationalNumber that is the result from the multiplication of a RationalNumber and a constant
+     * @param c the constant
+     * @return a new RationalNumber, the result of the multiplication by a constant
+     */
+    public RationalNumber mulC(int c) {
+        return new RationalNumber(this.numerator*c, this.denominator);
+    }
+    
+    /**
+     * Creates a new RationalNumber that is the result from multiplying two RationalNumbers
+     * @param other the other RationalNumber to multiply
+     * @return a new RationalNumber, the result of the multiplication of two RationalNumbers
+     */
+    public RationalNumber mul(RationalNumber other) {
+        return new RationalNumber(this.numerator * other.numerator, this.denominator * other.denominator);
     }
     
     /**
@@ -74,6 +103,36 @@ public class RationalNumber {
 
         RationalNumber other = (RationalNumber)o;
         
-        return this.numerator.equals(other.numerator) && this.denominator.equals(other.denominator);
+        return this.numerator == other.numerator && this.denominator == other.denominator;
+    }
+    
+    /**
+     * Computes the gcd (greatest common divisor) of two numbers
+     * @param a the first number
+     * @param b the second number
+     * @return the gcd of two numbers
+     */
+    private int gcd(int a, int b) {
+        if (a<b) {
+            int temp = a;
+            a = b;
+            b = temp;
+        }
+        
+        if (b == 0) {
+            return a;
+        }
+        
+        return gcd(b,a % b);
+    }
+    
+    /**
+     * Computes the lcm (lowest common multiple) of two numbers
+     * @param a the first number
+     * @param b the second number
+     * @return the lcm of two numbers
+     */
+    private int lcm(int a, int b) {
+        return (a*b)/gcd(a,b);
     }
 }
