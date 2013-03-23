@@ -18,7 +18,7 @@ public class Token {
     private Type type;
     private int octave;
     private int accidental;
-    
+    private RationalNumber duration;
     
     /**
      * Gets the octave of the Token
@@ -56,6 +56,13 @@ public class Token {
         return this.value;
     }
     
+    /**
+     * Gets the duration of Token
+     * @return the duration
+     */
+    public RationalNumber getDuration() {
+        return this.duration;
+    }
     
     /**
      * Gets the rational number from the value
@@ -80,7 +87,7 @@ public class Token {
         
         while (index < value.length() ){
             denominator *= 10;
-            denominator += value.charAt(index);
+            denominator += value.charAt(index) - '0';
             index ++;
         }
         
@@ -113,9 +120,44 @@ public class Token {
     }
     
     
-    // give type to newly created Token
+    /**
+     * Creates a new Token object with Type type
+     * @param type
+     */
     public Token(Type type){
         this.type = type;
     }
     
+    /**
+     * Sets the value of Token
+     * @param value
+     */
+    public void setValue(String value){
+        this.value = value;
+    }
+    
+    
+    /**
+     * Sets the octave of Token
+     * @param octave
+     */
+    public void setOctave(int octave){
+        this.octave = octave;
+    }
+    
+    /**
+     * Sets the accidental of Token
+     * @param accidental
+     */
+    public void setAccidental(int accidental){
+        this.accidental = accidental;
+    }
+    
+    /**
+     * Sets the duration of Token
+     * @param duration
+     */
+    public void setDuration(RationalNumber duration){
+        this.duration = duration;
+    }
 }
