@@ -1,0 +1,88 @@
+COMPOSER ::= (?<=C:)[A-Z a-z.]+(?<!\n)
+KEY ::= (?<=K:)[A-Za-z]+(?<!\n)
+LENGTH ::= (?<=L:)[0-9]*/[0-9]*(?<!\n)
+METER ::= (?<=M:)[0-9]+/[0-9]+(?<!\n)
+TEMPO ::= (?<=Q:)[0-9]+(?<!\n)
+TITLE ::= (?<=T:)[A-Z a-z]+(?<!\n)
+INDEX ::= (?<=X:)[0-9]+(?<!\n)
+
+KEYNOTE ::= [A-Ga-g](?!:)
+TIME ::= ([1-9]*/[1-9]*)|([1-9]+)
+REST ::= "z"
+CHORD_START ::= "["
+CHORD_END ::= "]"
+DUPLET_START ::= "(2"
+TRIPLET_START ::= "(3"
+QUAD_START ::= "(4"
+BAR ::= "|"
+START_REPEAT ::= "|:"
+END_REPEAT ::= ":|"
+REPEAT_NUMBER ::= "["[1-2]
+END_LINE ::= \n
+VOICE ::= "V"
+
+abc-tune ::= abc-header abc-music
+
+abc-header ::= field-number comment* field-title other-fields* field-key
+        
+NUMBER ::= "X:" DIGIT+ end-of-line
+TITLE ::= "T:" text end-of-line
+other-fields ::= field-composer | field-default-length | field-meter 
+	| field-tempo | field-voice | comment
+COMPOSER ::= "C:" text end-of-line
+LENGTH ::= "L:" note-length-strict end-of-line
+METER ::= "M:" meter end-of-line
+TEMPO ::= "Q:" tempo end-of-line
+VOICE ::= "V:" text end-of-line
+KEY ::= "K:" key end-of-line
+
+key ::= keynote [mode-minor]
+keynote ::= basenote [key-accidental]
+key-accidental ::= "#" | "b"
+mode-minor ::= "m"
+
+meter ::= "C" | "C|" | meter-fraction
+meter-fraction ::= DIGIT+ "/" DIGIT+ 
+
+tempo ::= DIGIT+ 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+abc-music ::= abc-line+
+abc-line ::= (element+ linefeed) | mid-tune-field | comment
+element ::= note-element | tuplet-element | barline | nth-repeat | space 
+
+note-element ::= (note | multi-note)
+
+// note is either a pitch or a rest
+note ::= note-or-rest [note-length]
+note-or-rest ::= pitch | rest
+pitch ::= [accidental] basenote [octave]
+octave ::= ("'"+) | (","+)
+note-length ::= [DIGIT+] ["/" [DIGIT+]]
+note-length-strict ::= DIGIT+ "/" DIGIT+
+
+; "^" is sharp, "_" is flat, and "=" is neutral
+accidental ::= "^" | "^^" | "_" | "__" | "="
+
+KEYNOTE ::= "C" | "D" | "E" | "F" | "G" | "A" | "B"
+        | "c" | "d" | "e" | "f" | "g" | "a" | "b"
+
+REST ::= "z"
+
+// tuplets
+tuplet-element ::= tuplet-spec note-element+
+tuplet-spec ::= "(" DIGIT 
+
+// chords
+multi-note ::= "[" note+ "]"
+
+BAR ::= "|" | "||" | "[|" | "|]" | ":|" | "|:"
+nth-repeat ::= "[1" | "[2"
+
+; A voice field might reappear in the middle of a piece
+; to indicate the change of a voice
+mid-tune-field- ::= field-voice
+
+comment ::= "%" text linefeed
+end-of-line ::= comment | linefeed
