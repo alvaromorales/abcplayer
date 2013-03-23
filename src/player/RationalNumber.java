@@ -112,7 +112,7 @@ public class RationalNumber {
      * @param b the second number
      * @return the gcd of two numbers
      */
-    private int gcd(int a, int b) {
+    public static int gcd(int a, int b) {
         if (a<b) {
             int temp = a;
             a = b;
@@ -132,7 +132,7 @@ public class RationalNumber {
      * @param b the second number
      * @return the lcm of two numbers
      */
-    private int lcm(int a, int b) {
+    public static int lcm(int a, int b) {
         return (a*b)/gcd(a,b);
     }
 }
