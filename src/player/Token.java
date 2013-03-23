@@ -71,40 +71,14 @@ public class Token {
         
     public RationalNumber getRationalValue(){
         int nominator = 0, denominator = 0;
-        int index = 0;
-        boolean isSlash = false;
+        int index = -1;
         
-        while (index < value.length() && value.charAt(index) != '/'){
-            nominator *= 10;
-            nominator += value.charAt(index) - '0';
-            index ++;
-        }
+        index = value.indexOf('/');
         
-        if (index < value.length() && value.charAt(index) == '/'){
-            isSlash = true;
-            index ++;
-        }
-        
-        while (index < value.length() ){
-            denominator *= 10;
-            denominator += value.charAt(index) - '0';
-            index ++;
-        }
-        
-        if (nominator == 0)
-            nominator = 1;
-        if (denominator == 0)
-            denominator = 2;
-        
-        RationalNumber number;
-        
-        if (isSlash){
-            number = new RationalNumber(nominator, denominator);
-        }
-        else{
-            number = new RationalNumber(nominator, 1);
-        }
+        nominator = Integer.parseInt(value.substring(0,index));
+        denominator = Integer.parseInt(value.substring(index+1));
 
+        RationalNumber number = new RationalNumber(nominator, denominator);
 
         return number;
     }
