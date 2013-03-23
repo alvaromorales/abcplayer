@@ -65,6 +65,7 @@ public class Token {
     public RationalNumber getRationalValue(){
         int nominator = 0, denominator = 0;
         int index = 0;
+        boolean isSlash = false;
         
         while (index < value.length() && value.charAt(index) != '/'){
             nominator *= 10;
@@ -72,7 +73,10 @@ public class Token {
             index ++;
         }
         
-        index ++;
+        if (index < value.length() && value.charAt(index) == '/'){
+            isSlash = true;
+            index ++;
+        }
         
         while (index < value.length() ){
             denominator *= 10;
@@ -80,10 +84,34 @@ public class Token {
             index ++;
         }
         
-        RationalNumber number = new RationalNumber(nominator, denominator);
+        if (nominator == 0)
+            nominator = 1;
+        if (denominator == 0)
+            denominator = 2;
+        
+        RationalNumber number;
+        
+        if (isSlash){
+            number = new RationalNumber(nominator, denominator);
+        }
+        else{
+            number = new RationalNumber(nominator, 1);
+        }
+
 
         return number;
     }
+    
+    
+    /**
+     * Gets integer number from value
+     * @return integer value
+     */
+    
+    public int getIntValue(){
+        return Integer.parseInt(value);
+    }
+    
     
     // give type to newly created Token
     public Token(Type type){
