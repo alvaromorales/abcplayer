@@ -13,3 +13,10 @@ tramp
 # Org-mode
 .org-id-locations
 *_archive
+
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
