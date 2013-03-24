@@ -1,6 +1,7 @@
 package player;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class representing the AST for the abcplayer
@@ -10,7 +11,7 @@ public class AST {
     /**
      * Class representing a SingleNote
      */
-    public class SingleNote implements NoteElement {
+    public static class SingleNote implements NoteElement {
         private char pitch;
         private RationalNumber duration;
         private int octave;
@@ -60,6 +61,14 @@ public class AST {
          */
         public int getAccidental() {
             return accidental;
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
         }        
         
     }
@@ -67,7 +76,7 @@ public class AST {
     /**
      * Class representing a Rest
      */
-    public class Rest implements NoteElement {
+    public static class Rest implements NoteElement {
         private RationalNumber duration;
         
         /**
@@ -85,13 +94,21 @@ public class AST {
         public RationalNumber getDuration() {
             return duration;
         }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
         
     }
     
     /**
      * Class representing a Chord
      */
-    public class Chord implements NoteElement {
+    public static class Chord implements NoteElement {
         private RationalNumber duration;
         private ArrayList<NoteElement> notes;
         
@@ -120,13 +137,21 @@ public class AST {
         public ArrayList<NoteElement> getNotes() {
             return notes;
         }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
         
     }
     
     /**
      * Class representing a Duplet
      */
-    public class Duplet implements NoteElement, Tuple {
+    public static class Duplet implements NoteElement, Tuple {
         private NoteElement first;
         private NoteElement second;
         private RationalNumber noteDuration;
@@ -149,7 +174,7 @@ public class AST {
          * @return the duration of the duplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(3, 2));
+            return noteDuration.mul(new RationalNumber(3, 2)).mulC(2);
         }
         
         /**
@@ -176,12 +201,20 @@ public class AST {
         public RationalNumber getNoteDuration() {
             return noteDuration;
         }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
     }
     
     /**
      * Class representing a Triplet
      */
-    public class Triplet implements NoteElement, Tuple {
+    public static class Triplet implements NoteElement, Tuple {
         private NoteElement first;
         private NoteElement second;
         private NoteElement third;
@@ -240,7 +273,15 @@ public class AST {
          * @return the duration of the triplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(2, 3));
+            return noteDuration.mul(new RationalNumber(2, 3)).mulC(3);
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
         }
         
     }
@@ -248,7 +289,7 @@ public class AST {
     /**
      * Class representing a quadruplet
      */
-    public class Quadruplet implements NoteElement, Tuple {
+    public static class Quadruplet implements NoteElement, Tuple {
         private NoteElement first;
         private NoteElement second;
         private NoteElement third;
@@ -317,7 +358,15 @@ public class AST {
          * @return the duration of the quadruplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(3, 4));
+            return noteDuration.mul(new RationalNumber(3, 4)).mulC(4);
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
         }
         
     }
@@ -325,8 +374,8 @@ public class AST {
     /**
      * Class representing a voice
      */
-    public class Voice implements NoteElement {
-        private ArrayList<NoteElement> notes;
+    public static class Voice implements NoteElement {
+        private List<NoteElement> notes = new ArrayList<NoteElement>();
         
         /**
          * Creates a Voice object
@@ -342,13 +391,29 @@ public class AST {
         public void addNote(NoteElement e) {
             notes.add(e);
         }
+        
+        /**
+         * Gets the notes in the voice
+         * @return the notes in the voice
+         */
+        public List<NoteElement> getNotes() {
+            return notes;
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
     }
     
     /**
      * Class representing a song
      */
-    public class Song implements NoteElement {
-        private ArrayList<Voice> voices;
+    public static class Song implements NoteElement {
+        private List<Voice> voices = new ArrayList<Voice>();
         
         /**
          * Creates a Song object
@@ -363,6 +428,22 @@ public class AST {
          */
         public void addVoice(Voice v) {
             voices.add(v);
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
+        
+        /**
+         * Gets the voices in the song
+         * @return the voices in the song
+         */
+        public List<Voice> getVoices() {
+            return voices;
         }
     }
 
