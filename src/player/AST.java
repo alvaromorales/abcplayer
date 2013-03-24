@@ -174,7 +174,7 @@ public class AST {
          * @return the duration of the duplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(3, 2)).mulC(2);
+            return noteDuration.mul(new RationalNumber(3, 1));
         }
         
         /**
@@ -225,7 +225,7 @@ public class AST {
          * @param first the first NoteElement
          * @param second the second NoteElement
          * @param third the third NoteElement
-         * @param noteDuration the duration of a note, which is equal across all the notes in a tuple
+         * @param noteDuration the original duration of a single note, which is equal across all the notes in a tuple
          */
         public Triplet(NoteElement first, NoteElement second, NoteElement third, RationalNumber noteDuration) {
             this.first = first;
@@ -273,7 +273,7 @@ public class AST {
          * @return the duration of the triplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(2, 3)).mulC(3);
+            return noteDuration.mul(new RationalNumber(2, 1));
         }
 
         /**
@@ -358,7 +358,7 @@ public class AST {
          * @return the duration of the quadruplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(3, 4)).mulC(4);
+            return noteDuration.mul(new RationalNumber(3, 1));
         }
 
         /**
@@ -407,6 +407,19 @@ public class AST {
         public <E> E accept(Visitor<E> v) {
             return v.visit(this);
         }
+
+        /**
+         * Gets the RationalNumber duration of all the NoteElements in the Voice
+         * @return the RationalNumber duration of all the NoteElements in the Voice
+         */
+        @Override
+        public RationalNumber getDuration() {
+            RationalNumber result = new RationalNumber(0, 1);
+            for (NoteElement n: notes) {
+                result = result.add(n.getDuration());
+            }
+            return result;
+        }
     }
     
     /**
@@ -444,6 +457,19 @@ public class AST {
          */
         public List<Voice> getVoices() {
             return voices;
+        }
+
+        /**
+         * Gets the RationalNumber duration of all the Voices in the Song
+         * @return the RationalNumber duration of all the Voices in the Song
+         */
+        @Override
+        public RationalNumber getDuration() {
+            RationalNumber result = new RationalNumber(0, 1);
+            for (Voice v: voices) {
+                result = result.add(v.getDuration());
+            }
+            return result;
         }
     }
 
