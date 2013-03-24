@@ -1,9 +1,9 @@
 package player;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import player.AST.*;
 import player.NoteElement.Visitor;
 
@@ -56,7 +56,7 @@ public class DurationVisitor implements Visitor<Void> {
      */
     @Override
     public Void visit(Triplet t) {
-        denominators.add(t.getDuration().getDenominator());
+        denominators.add(t.getNoteDuration().getDenominator());
         return null;
     }
 
