@@ -35,30 +35,30 @@ public class PlayerVisitorTest {
         v.addNote(new SingleNote('G',new RationalNumber(2, 1),0,0));
 
         v.addNote(new Triplet(
-                new SingleNote('C',new RationalNumber(2, 3),1,0),
-                new SingleNote('C',new RationalNumber(2, 3),1,0),
-                new SingleNote('C',new RationalNumber(2, 3),1,0)
+                new SingleNote('C',new RationalNumber(2, 6),1,0),
+                new SingleNote('C',new RationalNumber(2, 6),1,0),
+                new SingleNote('C',new RationalNumber(2, 6),1,0)
                 ));
         v.addNote(new Triplet(
-                new SingleNote('G',new RationalNumber(2, 3),0,0),
-                new SingleNote('G',new RationalNumber(2, 3),0,0),
-                new SingleNote('G',new RationalNumber(2, 3),0,0)
+                new SingleNote('G',new RationalNumber(2, 6),0,0),
+                new SingleNote('G',new RationalNumber(2, 6),0,0),
+                new SingleNote('G',new RationalNumber(2, 6),0,0)
                 ));
         v.addNote(new Triplet(
-                new SingleNote('E',new RationalNumber(2, 3),0,0),
-                new SingleNote('E',new RationalNumber(2, 3),0,0),
-                new SingleNote('E',new RationalNumber(2, 3),0,0)
+                new SingleNote('E',new RationalNumber(2, 6),0,0),
+                new SingleNote('E',new RationalNumber(2, 6),0,0),
+                new SingleNote('E',new RationalNumber(2, 6),0,0)
                 ));
         v.addNote(new Triplet(
-                new SingleNote('C',new RationalNumber(2, 3),0,0),
-                new SingleNote('C',new RationalNumber(2, 3),0,0),
-                new SingleNote('C',new RationalNumber(2, 3),0,0)
+                new SingleNote('C',new RationalNumber(2, 6),0,0),
+                new SingleNote('C',new RationalNumber(2, 6),0,0),
+                new SingleNote('C',new RationalNumber(2, 6),0,0)
                 ));
         
         v.addNote(new SingleNote('G',new RationalNumber(3, 4),0,0));
-        v.addNote(new SingleNote('F',new RationalNumber(1, 8),0,0));
+        v.addNote(new SingleNote('F',new RationalNumber(1, 4),0,0));
         v.addNote(new SingleNote('E',new RationalNumber(3, 4),0,0));
-        v.addNote(new SingleNote('D',new RationalNumber(1, 8),0,0));
+        v.addNote(new SingleNote('D',new RationalNumber(1, 4),0,0));
         v.addNote(new SingleNote('C',new RationalNumber(2, 1),0,0));
 
         s.addVoice(v);
