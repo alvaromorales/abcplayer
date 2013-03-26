@@ -394,7 +394,14 @@ public class AST {
      */
     public static class Song implements NoteElement {
         private List<Voice> voices = new ArrayList<Voice>();
-        
+        private String composer;
+        private String keySignature;
+        private RationalNumber defaultDuration;
+        private RationalNumber meter;
+        private int tempo;
+        private String title;
+        private String index;
+
         /**
          * Creates a Song object
          */
@@ -438,6 +445,133 @@ public class AST {
             }
             return result;
         }
+        
+        /**
+         * Gets the name of the composer of the song.
+         * The composer header field is labeled "C:".
+         * @return the name of the composer of the song.
+         */
+        public String getComposer() {
+            return composer;
+        }
+
+        /**
+         * Sets the name of the composer of the song.
+         * The composer header field is labeled "C:".
+         * @param composer the name of the composer of the song.
+         */
+        public void setComposer(String composer) {
+            this.composer = composer;
+        }
+
+        /**
+         * Gets the key signature of the song.
+         * The key signature header field is labeled "K:".
+         * @return the key signature of the song.
+         */
+        public String getKeySignature() {
+            return keySignature;
+        }
+
+        /**
+         * Sets the key signature of the song.
+         * The key signature header field is labeled "K:".
+         * @param keySignature the key signature of the song.
+         */
+        public void setKeySignature(String keySignature) {
+            this.keySignature = keySignature;
+        }
+
+        /**
+         * Gets the default duration of the song.
+         * The default duration header field is labeled "L:".
+         * @return the default duration of the song.
+         */
+        public RationalNumber getDefaultDuration() {
+            return defaultDuration;
+        }
+
+        /**
+         * Sets the default duration of the song.
+         * The default duration header field is labeled "L:".
+         * @param defaultDuration the default duration of the song.
+         */
+        public void setDefaultDuration(RationalNumber defaultDuration) {
+            this.defaultDuration = defaultDuration;
+        }
+
+        /**
+         * Gets the meter of the song.
+         * The meter header field is labeled "M:".
+         * @return the meter of the song.
+         */
+        public RationalNumber getMeter() {
+            return meter;
+        }
+
+        /**
+         * Sets the meter of the song
+         * The meter header field is labeled "M:".
+         * @param meter the meter of the song
+         */
+        public void setMeter(RationalNumber meter) {
+            this.meter = meter;
+        }
+
+        /**
+         * Gets the tempo of the song
+         * The tempo header field is labeled "Q:".
+         * @return the tempo of the song
+         */
+        public int getTempo() {
+            return tempo;
+        }
+
+        /**
+         * Sets the tempo of the song
+         * The tempo header field is labeled "Q:".
+         * @param tempo the tempo of the song.
+         */
+        public void setTempo(int tempo) {
+            this.tempo = tempo;
+        }
+
+        /**
+         * Gets the title of the song
+         * The title header field is labeled "T:".
+         * @return the title of the song
+         */
+        public String getTitle() {
+            return title;
+        }
+
+        /**
+         * Sets the title of the song
+         * The title header field is labeled "T:".
+         * @param title the title of the song
+         */
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        /**
+         * Gets the index of the song.
+         * The index header field is labeled "X:".
+         * @return the index of the song.
+         */
+        public String getIndex() {
+            return index;
+        }
+
+        /**
+         * Sets the index of the song.
+         * The index header field is labeled "X:".
+         * @param index the index of the song.
+         */
+        public void setIndex(String index) {
+            this.index = index;
+        }
+
     }
 
 }
