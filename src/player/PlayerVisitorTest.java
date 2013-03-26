@@ -34,26 +34,22 @@ public class PlayerVisitorTest {
         v.addNote(new Triplet(
                 new SingleNote('C',new RationalNumber(2, 3),1,0),
                 new SingleNote('C',new RationalNumber(2, 3),1,0),
-                new SingleNote('C',new RationalNumber(2, 3),1,0),
-                new RationalNumber(2, 3)
+                new SingleNote('C',new RationalNumber(2, 3),1,0)
                 ));
         v.addNote(new Triplet(
                 new SingleNote('G',new RationalNumber(2, 3),0,0),
                 new SingleNote('G',new RationalNumber(2, 3),0,0),
-                new SingleNote('G',new RationalNumber(2, 3),0,0),
-                new RationalNumber(2, 3)
+                new SingleNote('G',new RationalNumber(2, 3),0,0)
                 ));
         v.addNote(new Triplet(
                 new SingleNote('E',new RationalNumber(2, 3),0,0),
                 new SingleNote('E',new RationalNumber(2, 3),0,0),
-                new SingleNote('E',new RationalNumber(2, 3),0,0),
-                new RationalNumber(2, 3)
+                new SingleNote('E',new RationalNumber(2, 3),0,0)
                 ));
         v.addNote(new Triplet(
                 new SingleNote('C',new RationalNumber(2, 3),0,0),
                 new SingleNote('C',new RationalNumber(2, 3),0,0),
-                new SingleNote('C',new RationalNumber(2, 3),0,0),
-                new RationalNumber(2, 3)
+                new SingleNote('C',new RationalNumber(2, 3),0,0)
                 ));
         
         v.addNote(new SingleNote('G',new RationalNumber(3, 4),0,0));
@@ -67,7 +63,7 @@ public class PlayerVisitorTest {
         DurationVisitor durationV = new DurationVisitor();
         durationV.visit(s);
         
-        PlayerVisitor visitor = new PlayerVisitor(140, durationV.findTicksPerQuarter());
+        PlayerVisitor visitor = new PlayerVisitor(140, durationV.getTicksPerQuarter());
         visitor.visit(s);
         SequencePlayer player = visitor.getPlayer();
         try {

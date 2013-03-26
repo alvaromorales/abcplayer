@@ -154,18 +154,15 @@ public class AST {
     public static class Duplet implements NoteElement, Tuple {
         private NoteElement first;
         private NoteElement second;
-        private RationalNumber noteDuration;
         
         /**
          * Creates a Duplet object
          * @param first the first NoteElement
          * @param second the second NoteElement
-         * @param noteDuration the duration of a note, which is equal across all the notes in a tuple
          */
-        public Duplet(NoteElement first, NoteElement second, RationalNumber noteDuration) {
+        public Duplet(NoteElement first, NoteElement second) {
             this.first = first;
             this.second = second;
-            this.noteDuration = noteDuration;
         }
 
         /**
@@ -174,7 +171,7 @@ public class AST {
          * @return the duration of the duplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(3, 1));
+            return first.getDuration().add(second.getDuration());
         }
         
         /**
@@ -194,15 +191,6 @@ public class AST {
         }
 
         /**
-         * Gets the duration of a single note in the duplet
-         * The duration is the same across all notes in the duplet
-         * @return the duration of a single note in the duplet
-         */
-        public RationalNumber getNoteDuration() {
-            return noteDuration;
-        }
-
-        /**
          * Accepts a visitor
          */
         @Override
@@ -218,20 +206,17 @@ public class AST {
         private NoteElement first;
         private NoteElement second;
         private NoteElement third;
-        private RationalNumber noteDuration;
         
         /**
          * Creates a Triplet object
          * @param first the first NoteElement
          * @param second the second NoteElement
          * @param third the third NoteElement
-         * @param noteDuration the original duration of a single note, which is equal across all the notes in a tuple
          */
-        public Triplet(NoteElement first, NoteElement second, NoteElement third, RationalNumber noteDuration) {
+        public Triplet(NoteElement first, NoteElement second, NoteElement third) {
             this.first = first;
             this.second = second;
             this.third = third;
-            this.noteDuration = noteDuration;
         }
 
         /**
@@ -258,14 +243,6 @@ public class AST {
             return third;
         }
 
-        /**
-         * Gets the duration of a single note in the triplet
-         * The duration is the same across all notes in the triplet
-         * @return the duration of a single note in the triplet
-         */
-        public RationalNumber getNoteDuration() {
-            return noteDuration;
-        }
         
         /**
          * Gets the duration of the triplet
@@ -273,7 +250,7 @@ public class AST {
          * @return the duration of the triplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(2, 1));
+            return first.getDuration().add(second.getDuration().add(third.getDuration()));
         }
 
         /**
@@ -294,7 +271,6 @@ public class AST {
         private NoteElement second;
         private NoteElement third;
         private NoteElement fourth;
-        private RationalNumber noteDuration;
         
         /**
          * Creates a Quadruplet object
@@ -302,9 +278,8 @@ public class AST {
          * @param second the second NoteElement
          * @param third the third NoteElement
          * @param fourth the fourth NoteElement
-         * @param noteDuration the duration of a note, which is equal across all the notes in a tuple
          */
-        public Quadruplet(NoteElement first, NoteElement second, NoteElement third, NoteElement fourth, RationalNumber noteDuration) {
+        public Quadruplet(NoteElement first, NoteElement second, NoteElement third, NoteElement fourth) {
             this.first = first;
             this.second = second;
             this.third = third;
@@ -343,14 +318,6 @@ public class AST {
             return fourth;
         }
 
-        /**
-         * Gets the duration of a single note in the quadruplet
-         * The duration is the same across all notes in the quadruplet
-         * @return the duration of a single note in the quadruplet
-         */
-        public RationalNumber getNoteDuration() {
-            return noteDuration;
-        }
         
         /**
          * Gets the duration of the quadruplet
@@ -358,7 +325,7 @@ public class AST {
          * @return the duration of the quadruplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(3, 1));
+            return first.getDuration().add(second.getDuration().add(third.getDuration().add(fourth.getDuration())));
         }
 
         /**

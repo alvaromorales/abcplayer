@@ -56,7 +56,7 @@ public class DurationVisitor implements Visitor<Void> {
      */
     @Override
     public Void visit(Triplet t) {
-        denominators.add(t.getNoteDuration().getDenominator());
+        denominators.add(t.getDuration().getDenominator());
         return null;
     }
 
@@ -95,12 +95,12 @@ public class DurationVisitor implements Visitor<Void> {
     }
    
     /**
-     * Find the ticksPerQuarter for a NoteElement
-     * Iteratively compute the LCM of the denominators
+     * Calculates the ticksPerQuarter for a NoteElement.
+     * Iteratively compute the LCM of the denominators.
      * Code adapted from http://stackoverflow.com/questions/4201860/how-to-find-gcf-lcm-on-a-set-of-numbers
      * @return the ticksPerQuarter of a NoteElement
      */
-    public int findTicksPerQuarter() {
+    public int getTicksPerQuarter() {
         List<Integer> denominators = new ArrayList<Integer>(this.denominators);
         if (denominators.size() > 0) {
             int result = denominators.get(0);
