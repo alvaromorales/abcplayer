@@ -18,4 +18,6 @@ public interface NoteElement {
     }
     
     public <E> E accept(Visitor<E> v);
+    
+    public RationalNumber getDuration();
 }

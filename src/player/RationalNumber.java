@@ -1,19 +1,31 @@
 package player;
 
 /**
- * ADT used to represent the rational number durations of notes
+ * ADT used to represent the positive rational number durations of notes
  */
 public class RationalNumber {
     private int numerator;
     private int denominator;
        
     /**
-     * Creates a new RationalNumber object
-     * Reduces the number to its lowest terms
-     * @param numerator the numerator
-     * @param denominator the denominator
+     * Creates a new RationalNumber object.
+     * Represents a positive rational number.
+     * @param numerator the numerator. Must be >= 0
+     * @param denominator the denominator. Must be > 0
+     * @throws RuntimeException if denominator is 0 or the inputs represent a negative number
      */
     public RationalNumber(int numerator, int denominator) {        
+        if (denominator == 0){
+            throw new RuntimeException("Error creating a rational number with denominator of 0");
+        } 
+        
+        if (numerator < 0 && denominator < 0) {
+            numerator *= -1;
+            denominator *= -1;
+        } else if (numerator < 0 || denominator < 0){
+            throw new RuntimeException("A RationalNumber duration cannot be negative");
+        }
+        
         this.numerator = numerator;
         this.denominator = denominator;
     }
@@ -107,9 +119,9 @@ public class RationalNumber {
     }
     
     /**
-     * Computes the gcd (greatest common divisor) of two numbers
-     * @param a the first number
-     * @param b the second number
+     * Computes the gcd (greatest common divisor) of two numbers.
+     * @param a the first number. Must be >= 0
+     * @param b the second number. Must be >= 0
      * @return the gcd of two numbers
      */
     public static int gcd(int a, int b) {
@@ -128,8 +140,8 @@ public class RationalNumber {
     
     /**
      * Computes the lcm (lowest common multiple) of two numbers
-     * @param a the first number
-     * @param b the second number
+     * @param a the first number. Must be > 0
+     * @param b the second number. Must be > 0
      * @return the lcm of two numbers
      */
     public static int lcm(int a, int b) {

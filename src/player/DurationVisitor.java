@@ -1,9 +1,9 @@
 package player;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import player.AST.*;
 import player.NoteElement.Visitor;
 
@@ -95,12 +95,12 @@ public class DurationVisitor implements Visitor<Void> {
     }
    
     /**
-     * Find the ticksPerQuarter for a NoteElement
-     * Iteratively compute the LCM of the denominators
+     * Calculates the ticksPerQuarter for a NoteElement.
+     * Iteratively compute the LCM of the denominators.
      * Code adapted from http://stackoverflow.com/questions/4201860/how-to-find-gcf-lcm-on-a-set-of-numbers
      * @return the ticksPerQuarter of a NoteElement
      */
-    public int findTicksPerQuarter() {
+    public int getTicksPerQuarter() {
         List<Integer> denominators = new ArrayList<Integer>(this.denominators);
         if (denominators.size() > 0) {
             int result = denominators.get(0);
