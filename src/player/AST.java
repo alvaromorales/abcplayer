@@ -2,6 +2,8 @@ package player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Class representing the AST for the abcplayer
@@ -122,6 +124,7 @@ public class AST {
             this.notes = notes;
         }
 
+        
         /**
          * Gets the duration of the chord
          * @return the duration of the chord
@@ -343,14 +346,22 @@ public class AST {
      */
     public static class Voice implements NoteElement {
         private List<NoteElement> notes = new ArrayList<NoteElement>();
+        private String name;
         
         /**
          * Creates a Voice object
+         * @param name, the name of the voice
          */
-        public Voice() {
-            
+        public Voice(String name) {
+            this.name=name;
         }
         
+        /**
+         * Creates an anonymous Voice object
+         */
+        public Voice(){
+        	this.name=null;
+        }
         /**
          * Adds a NoteElement to the voice
          * @param e the NoteElement to add
@@ -382,9 +393,8 @@ public class AST {
         @Override
         public RationalNumber getDuration() {
             RationalNumber result = new RationalNumber(0, 1);
-            for (NoteElement n: notes) {
+            for (NoteElement n: notes)
                 result = result.add(n.getDuration());
-            }
             return result;
         }
     }
@@ -393,30 +403,64 @@ public class AST {
      * Class representing a song
      */
     public static class Song implements NoteElement {
-        private List<Voice> voices = new ArrayList<Voice>();
+        private Map<String,Voice> voices = new HashMap<String,Voice>();
+        private Voice currentVoice=null;
         private String composer;
         private String keySignature;
         private RationalNumber defaultDuration;
         private RationalNumber meter;
         private int tempo;
+
         private String title;
-        private String index;
+        private int index;
 
         /**
          * Creates a Song object
          */
         public Song() {
-            
+
+        }
+        
+        /*
+         * Returns list of voices in song
+         * @return list of voices in song
+         */
+        public List<Voice> getVoices(){
+        	return (List<Voice>) voices.values();
+        }
+        /*
+         * Adds a new note to the song.
+         * The new note is added to the current Voice.
+         * If no voice exists, create one with voice.name=null
+         * @param e, the NoteElement to add
+         */
+        public void add(NoteElement e){
+        	if(currentVoice == null){
+        		this.getVoice(null);
+        		this.currentVoice=voices.get(null);
+        	}
+        	currentVoice.addNote(e);
         }
         
         /**
-         * Adds a Voice to the song
+         * Private, adds a Voice to the song
          * @param v the Voice to add
          */
         public void addVoice(Voice v) {
-            voices.add(v);
+            voices.put(v.name,v); //adds a voice object to the HashMap
         }
 
+        /**
+         * Adds a new Voice to the song. If voice exists, changes to that voice.
+         * @param name, the name of the Voice to create or fetch
+         */
+        public void getVoice(String name) {     	//handles Voice tokens both in header and body
+        	if(voices.containsKey(name))        	//if voice exists
+        		this.currentVoice=voices.get(name); //fetch that voice
+        	else									//if doesn't exist create it
+        		this.addVoice(new Voice(name)); 	//create voice if it doesn't exist
+        }
+        
         /**
          * Accepts a visitor
          */
@@ -425,21 +469,7 @@ public class AST {
             return v.visit(this);
         }
         
-        /**
-         * Gets the voices in the song
-         * @return the voices in the song
-         */
-        public List<Voice> getVoices() {
-            return voices;
-        }
 
-        /**
-         * Gets the last voice added to the song.
-         * @return the last voice added
-         */
-        public Voice getLastVoice() {
-        	return voices.get(voices.size()-1);
-        }
         /**
          * Gets the RationalNumber duration of all the Voices in the Song
          * @return the RationalNumber duration of all the Voices in the Song
@@ -447,7 +477,7 @@ public class AST {
         @Override
         public RationalNumber getDuration() {
             RationalNumber result = new RationalNumber(0, 1);
-            for (Voice v: voices) {
+            for (Voice v: this.voices.values()) {
                 result = result.add(v.getDuration());
             }
             return result;
@@ -566,7 +596,7 @@ public class AST {
          * The index header field is labeled "X:".
          * @return the index of the song.
          */
-        public String getIndex() {
+        public int getIndex() {
             return index;
         }
 
@@ -575,7 +605,7 @@ public class AST {
          * The index header field is labeled "X:".
          * @param index the index of the song.
          */
-        public void setIndex(String index) {
+        public void setIndex(int index) {
             this.index = index;
         }
 
