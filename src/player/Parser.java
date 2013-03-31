@@ -150,18 +150,33 @@ public class Parser {
 			if(it.inHeader()){ //We are parsing the header
 				switch(it.getType()){
 				case COMPOSER:
+					if(song.getHeaderCount()<0)
+						throw new ParserException("Header field found after KEY");
 					song.setComposer(it.getValue());
 				case KEY:
+					if(song.getHeaderCount()<0)
+						throw new ParserException("Duplicate KEY found in header");
+					song.minimizeHeaderCount();
 					song.setKeySignature(it.getValue());
 				case LENGTH:
+					if(song.getHeaderCount()<0)
+						throw new ParserException("LENGTH Header field found after KEY");
 					song.setDefaultDuration(it.getRationalValue());
 				case METER:
+					if(song.getHeaderCount()<0)
+						throw new ParserException("METER Header field found after KEY");
 					song.setMeter(it.getRationalValue());
 				case TEMPO:
+					if(song.getHeaderCount()<0)
+						throw new ParserException("TEMPO Header field found after KEY");
 					song.setTempo(it.getIntValue());
 				case TITLE:
+					if(song.getHeaderCount()!=1)
+						throw new ParserException("Second header field is not the title");
 					song.setTitle(it.getValue());
 				case INDEX:
+					if(song.getHeaderCount()!=0)
+						throw new ParserException("First header field is not the index");
 					song.setIndex(it.getIntValue());
 				case VOICE:
 					song.getVoice(it.getValue());
@@ -169,10 +184,10 @@ public class Parser {
 					throw new ParserException("Invalid type found in header");		
 				}
 			}
-			else{ //We are parsing the body
+			else{ 										//We are parsing the body
 				switch(it.getType()){
 				case BAR:
-					break;
+					song.accidentalAssociator.revert(); // restore default accidentals for the piece
 				case CHORD_END:
 					throw new ParserException("Unexpected Chord End");
 				case CHORD_START:
@@ -186,8 +201,6 @@ public class Parser {
 				case DUPLET_START:
 					song.add(this.parseDuplet(inp.subList(i+1, i+3)));
 					i+=2; //skip to the next usuable token
-				case END_LINE:
-					break;
 				case KEYNOTE:
 					song.add(new SingleNote(it.getValue().charAt(0), it.getDuration(), it.getOctave(), it.getAccidential()));	
 				case QUAD_START:
