@@ -31,19 +31,19 @@ public class Lexer{
         map.put("TEMPO", 5);
         map.put("TITLE", 6);
         map.put("INDEX", 7);
-        map.put("KEYNOTE", 8);
-        map.put("REST", 9);
-        map.put("CHORD_START", 10);
-        map.put("CHORD_END", 11);
-        map.put("DUPLET_START", 12);
-        map.put("TRIPLET_START", 13);
-        map.put("QUAD_START", 14);
-        map.put("BAR", 15);
-        map.put("DOUBLE_BAR", 16);
-        map.put("REPEAT_START", 17);
-        map.put("REPEAT_END", 18);
-        map.put("REPEAT_NUMBER", 19);
-        map.put("VOICE", 20);
+        map.put("VOICE", 8);
+        map.put("KEYNOTE", 9);
+        map.put("REST", 10);
+        map.put("CHORD_START", 11);
+        map.put("CHORD_END", 12);
+        map.put("DUPLET_START", 13);
+        map.put("TRIPLET_START", 14);
+        map.put("QUAD_START", 15);
+        map.put("BAR", 16);
+        map.put("DOUBLE_BAR", 17);
+        map.put("REPEAT_START", 18);
+        map.put("REPEAT_END", 19);
+        map.put("REPEAT_NUMBER", 20);
     }
 
     
@@ -54,71 +54,72 @@ public class Lexer{
     private StringBuffer patternMaker(){
         StringBuffer tokensBuf = new StringBuffer();
         //1- add COMPOSER
-        tokensBuf.append("((?<=C:)[A-Z a-z\\.-]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=C:)[A-Z a-z\\.-]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //2- add KEY
-        tokensBuf.append("((?<=K:)[A-Za-z]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=K:)[A-Ga-g][#b]?m?(?=(?:\n|%)))");
         tokensBuf.append("|");
         //3- add LENGTH
-        tokensBuf.append("((?<=L:)[0-9]+/[0-9]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=L:)[0-9]+/[0-9]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //4- add METER
-        tokensBuf.append("((?<=M:)[0-9]+/[0-9]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=M:)(?:C\\|?|(?:[0-9]+/[0-9]+))(?=(?:\n|%)))");
         tokensBuf.append("|");
         //5- add TEMPO
-        tokensBuf.append("((?<=Q:)[0-9]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=Q:)[0-9]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //6- add TITLE
-        tokensBuf.append("((?<=T:)[A-Z a-z]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=T:)[A-Z a-z]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //7- add INDEX
-        tokensBuf.append("((?<=X:)[0-9]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=X:)[0-9]+(?=(?:\n|%)))");
+        tokensBuf.append("|");
+        //8- add VOICE
+        tokensBuf.append("((?<=V:)[\\-A-Z a-z\\.0-9]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         
-        //8- add KEYNOTE
-        tokensBuf.append("(((^)|(^^)|(_)|(__)|(=))?[A-Ga-g]((,*)|('*)) ([0-9]*/?[0-9]*))");
-        tokensBuf.append("|");
-        //9- add REST
+        //9- add KEYNOTE
+//        tokensBuf.append("((?:(?:^)|(?:^^)|(?:_)|(?:__)|(?:=))?[A-Ga-g](?:(?:,*)|(?:'*)) ([0-9]*/?[0-9]*))");
+//        tokensBuf.append("|");
+        //10- add REST
         tokensBuf.append("(z)");
         tokensBuf.append("|");
-        //10- add CHORD_START
-        tokensBuf.append("(\\[)");
-        tokensBuf.append("|");
-        //11- add CHORD_END
-        tokensBuf.append("(\\])");
-        tokensBuf.append("|");
-        //12- add DUPLET_START 
-        tokensBuf.append("(\\(2)");
-        tokensBuf.append("|");
-        //13- add TRIPLET_START
-        tokensBuf.append("(\\(3)");
-        tokensBuf.append("|");
-        //14- add QUAD_START
-        tokensBuf.append("(\\(4)");
-        tokensBuf.append("|");
-        //15- add BAR
-        tokensBuf.append("(\\|)");
-        tokensBuf.append("|");
-        //16- add DOUBLE_BAR
-        tokensBuf.append("(\\|\\|)");
-        tokensBuf.append("|");
-        //17- add REPEAT_START
-        tokensBuf.append("(\\|:)");
-        tokensBuf.append("|");
-        //18- add REPEAT_END
-        tokensBuf.append("(:\\|)");
-        tokensBuf.append("|");
-        //19- add REPEAT_NUMBER
-        tokensBuf.append("(\\[[1-2])");
-        tokensBuf.append("|");
-        //20- add VOICE
-        tokensBuf.append("((?<=V:)[A-Z a-z\\.-]+(?=(\n)|(%)))");
-        tokensBuf.append("|");
-        //21- add regex for comment, we won't consider it later
-        tokensBuf.append("((?<=%)[a-zA-Z_0-9]*(?=\n))");
-        tokensBuf.append("|");
-        //22- add an extra character, we will use this to detect if there's syntax error or not
-        tokensBuf.append("(.?)");
+//        //11- add CHORD_START
+//        tokensBuf.append("(\\[)");
+//        tokensBuf.append("|");
+//        //12- add CHORD_END
+//        tokensBuf.append("(\\])");
+//        tokensBuf.append("|");
+//        //13- add DUPLET_START 
+//        tokensBuf.append("(\\(2)");
+//        tokensBuf.append("|");
+//        //14- add TRIPLET_START
+//        tokensBuf.append("(\\(3)");
+//        tokensBuf.append("|");
+//        //15- add QUAD_START
+//        tokensBuf.append("(\\(4)");
+//        tokensBuf.append("|");
+//        //16- add BAR
+//        tokensBuf.append("(\\|)");
+//        tokensBuf.append("|");
+//        //17- add DOUBLE_BAR
+//        tokensBuf.append("(\\|\\|)");
+//        tokensBuf.append("|");
+//        //18- add REPEAT_START
+//        tokensBuf.append("(\\|:)");
+//        tokensBuf.append("|");
+//        //19- add REPEAT_END
+//        tokensBuf.append("(:\\|)");
+//        tokensBuf.append("|");
+//        //20- add REPEAT_NUMBER
+//        tokensBuf.append("(\\[[1-2])");
+//        tokensBuf.append("|");
+//        //21- add regex for comment, we won't consider it later
+//        tokensBuf.append("((?<=%)[a-zA-Z_0-9]*(?=\n))");
+//        tokensBuf.append("|");
+//        //22- add an extra character, we will use this to detect if there's syntax error or not
+//        //tokensBuf.append("(.?)");
+//        
         return tokensBuf;
         
     }
@@ -144,7 +145,7 @@ public class Lexer{
         
         
         while (matcher.find()) {
-            
+            System.out.println(matcher.group(0));
             if (matcher.group(map.get("COMPOSER")) != null) {
                 Token newToken = new Token(Token.Type.COMPOSER);
                 newToken.setValue(matcher.group(map.get("COMPOSER")));
@@ -194,28 +195,16 @@ public class Lexer{
                 continue;
             }
             
-            
-            
-            
-            else if (matcher.group(map.get("KEYNOTE")) != null) {
-                Token newToken = new Token(Token.Type.KEYNOTE);
-                newToken.setValue(matcher.group(map.get("KEYNOTE")));
-                newToken.parseValue();
-                
+            else if (matcher.group(map.get("VOICE")) != null) {
+                Token newToken = new Token(Token.Type.VOICE);
+                newToken.setValue(matcher.group(map.get("VOICE")));
                 tokens.add(newToken);
                 continue;
             }
-            
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
-                tokens.add(newToken);
-                continue;
-            }
-            
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+     // should add key here       
+            else if (matcher.group(map.get("REST")) != null) {
+                Token newToken = new Token(Token.Type.REST);
+                newToken.setValue(matcher.group(map.get("REST")));
                 tokens.add(newToken);
                 continue;
             }

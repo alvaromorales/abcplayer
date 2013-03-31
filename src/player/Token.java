@@ -143,8 +143,34 @@ public class Token {
      * parses the octave, accidental, key , and duration from value
      */
     public void parseValue(){
+        int octave = 0;
+        RationalNumber duration;
+        int accidental = 0;
+        char keynote,c;
+        
+        for (int i=0; i<this.value.length(); i++){
+            c = this.value.charAt(i);
+            if (c == ',')
+                octave --;
+            if (c == '\'')
+                octave ++;
+            if (c == '^')
+                accidental ++;
+            if (c == '_')
+                accidental --;
+            if (c >='a' && c <= 'g'){
+                keynote = Character.toUpperCase(c);
+                octave ++;
+            }
+            if (c >= 'A' && c<= 'G'){
+                keynote = c;
+            }
+        }
+            
         
     }
+    
+    
 
     /**
      * Sets the value of Token
@@ -208,5 +234,13 @@ public class Token {
         } else {
             return this.type.equals(otherType) && this.value.equals(otherValue) && this.header == otherHeader;
         }
+    }
+    
+    /**
+     * Gets the string representation of a Token
+     */
+    @Override
+    public String toString() {
+        return "Token: " + type + " : " + value;
     }
 }

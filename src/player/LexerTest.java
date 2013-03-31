@@ -106,7 +106,7 @@ public class LexerTest {
     /**
      * Tests that a KEYNOTE token is correctly lexed, with all fields
      */
-    @Test
+    
     public void keynoteFullTest() {
         Lexer lexer = new Lexer("_E,7");
         Token expected = new Token(Token.Type.KEYNOTE);
@@ -120,7 +120,7 @@ public class LexerTest {
     /**
      * Tests that a KEYNOTE token is correctly lexed, if KEYNOTE is only a basenote
      */
-    @Test
+    
     public void keynoteTest() {
         Lexer lexer = new Lexer("E");
         Token expected = new Token(Token.Type.KEYNOTE);
@@ -134,10 +134,12 @@ public class LexerTest {
     /**
      * Tests that a REST token is correctly lexed
      */
+    
     @Test
     public void restTest() {
         Lexer lexer = new Lexer("z");
         Token expected = new Token(Token.Type.REST);
+        expected.setDuration(new RationalNumber(1,2));
         expected.setValue("z");
         assertEquals(expected, lexer.lex().get(0));
     }
@@ -145,7 +147,7 @@ public class LexerTest {
     /**
      * Tests that a CHORD_START token is correctly lexed
      */
-    @Test
+    
     public void chordStartTest() {
         Lexer lexer = new Lexer("[");
         Token expected = new Token(Token.Type.CHORD_START);
@@ -156,7 +158,7 @@ public class LexerTest {
     /**
      * Tests that a CHORD_END token is correctly lexed
      */
-    @Test
+    
     public void chordEndTest() {
         Lexer lexer = new Lexer("]");
         Token expected = new Token(Token.Type.CHORD_END);
@@ -167,7 +169,7 @@ public class LexerTest {
     /**
      * Tests that a DUPLET_START token is correctly lexed
      */
-    @Test
+    
     public void dupletStartTest() {
         Lexer lexer = new Lexer("(2");
         Token expected = new Token(Token.Type.DUPLET_START);
@@ -178,7 +180,7 @@ public class LexerTest {
     /**
      * Tests that a TRIPLET_START token is correctly lexed
      */
-    @Test
+    
     public void tripletStartTest() {
         Lexer lexer = new Lexer("(3");
         Token expected = new Token(Token.Type.TRIPLET_START);
@@ -189,7 +191,7 @@ public class LexerTest {
     /**
      * Tests that a QUAD_START token is correctly lexed
      */
-    @Test
+    
     public void quadStartTest() {
         Lexer lexer = new Lexer("(4");
         Token expected = new Token(Token.Type.QUAD_START);
@@ -200,7 +202,7 @@ public class LexerTest {
     /**
      * Tests that a BAR token is correctly lexed
      */
-    @Test
+    
     public void barTest() {
         Lexer lexer = new Lexer("|");
         Token expected = new Token(Token.Type.BAR);
@@ -211,7 +213,7 @@ public class LexerTest {
     /**
      * Tests that a DOUBLE_BAR token is correctly lexed
      */
-    @Test
+    
     public void doubleBarTest() {
         Lexer lexer = new Lexer("||");
         Token expected = new Token(Token.Type.DOUBLE_BAR);
@@ -222,7 +224,7 @@ public class LexerTest {
     /**
      * Tests that a REPEAT_START token is correctly lexed
      */
-    @Test
+    
     public void repeatStartTest() {
         Lexer lexer = new Lexer("|:");
         Token expected = new Token(Token.Type.REPEAT_START);
@@ -233,7 +235,7 @@ public class LexerTest {
     /**
      * Tests that a REPEAT_END token is correctly lexed
      */
-    @Test
+    
     public void repeatEndTest() {
         Lexer lexer = new Lexer(":|");
         Token expected = new Token(Token.Type.REPEAT_END);
@@ -244,7 +246,7 @@ public class LexerTest {
     /**
      * Tests that a REPEAT_NUMBER token is correctly lexed, for repeat #1
      */
-    @Test
+    
     public void repeatNumber1Test() {
         Lexer lexer = new Lexer("[1");
         Token expected = new Token(Token.Type.REPEAT_NUMBER);
@@ -255,7 +257,7 @@ public class LexerTest {
     /**
      * Tests that a REPEAT_NUMBER token is correctly lexed, for repeat #2
      */
-    @Test
+    
     public void repeatNumber2Test() {
         Lexer lexer = new Lexer("[2");
         Token expected = new Token(Token.Type.REPEAT_NUMBER);
@@ -266,7 +268,7 @@ public class LexerTest {
     /**
      * Tests that a comment is ignored
      */
-    @Test
+    
     public void ignoreCommentTest() {
         Lexer lexer = new Lexer("G,,8\n%comment\nV:1\n");
         ArrayList<Token> expected = new ArrayList<Token>();
@@ -288,7 +290,7 @@ public class LexerTest {
      * Tests that whitespace is ignored
      * Whitespace should not be ignored in header fields
      */
-    @Test
+    
     public void ignoreWhitespaceTest() {
         Lexer lexer = new Lexer("T:Paddy O'Rafferty\ndf c e ");
         ArrayList<Token> expected = new ArrayList<Token>();
