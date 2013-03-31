@@ -36,7 +36,33 @@ public class Token {
     private Type type;
     private int octave;
     private int accidental;
+    private boolean header=false;
     private RationalNumber duration;
+    
+    /**
+     * Creates a new Token object with Type type
+     * @param type
+     */
+    public Token(Type type){
+        this.type = type;
+        if(type == Type.COMPOSER || 
+           type == Type.KEY || 
+           type == Type.LENGTH || 
+           type == Type.METER || 
+           type == Type.TEMPO ||
+           type == Type.TITLE ){
+        	this.header=true;
+        }
+        	
+    }
+    
+    /**
+     * Gets whether this is a header token or not.
+     * @return A boolean, true if this is a header token or false otherwise.
+     */
+    public boolean inHeader(){
+    	return this.header;
+    }
     
     /**
      * Gets the octave of the Token
@@ -112,14 +138,7 @@ public class Token {
     }
     
     
-    /**
-     * Creates a new Token object with Type type
-     * @param type
-     */
-    public Token(Type type){
-        this.type = type;
-    }
-    
+
     /**
      * Sets the value of Token
      * @param value

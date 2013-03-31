@@ -8,7 +8,6 @@ import org.junit.Test;
 /**
  * Tests SequencePlayer by playing the warmup exercises
  * @category no_didit
- *
  */
 
 public class SequencePlayerTest {

@@ -1,6 +1,7 @@
 package player;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class representing the AST for the abcplayer
@@ -10,7 +11,7 @@ public class AST {
     /**
      * Class representing a SingleNote
      */
-    public class SingleNote implements NoteElement {
+    public static class SingleNote implements NoteElement {
         private char pitch;
         private RationalNumber duration;
         private int octave;
@@ -60,6 +61,14 @@ public class AST {
          */
         public int getAccidental() {
             return accidental;
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
         }        
         
     }
@@ -67,7 +76,7 @@ public class AST {
     /**
      * Class representing a Rest
      */
-    public class Rest implements NoteElement {
+    public static class Rest implements NoteElement {
         private RationalNumber duration;
         
         /**
@@ -85,13 +94,21 @@ public class AST {
         public RationalNumber getDuration() {
             return duration;
         }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
         
     }
     
     /**
      * Class representing a Chord
      */
-    public class Chord implements NoteElement {
+    public static class Chord implements NoteElement {
         private RationalNumber duration;
         private ArrayList<NoteElement> notes;
         
@@ -120,27 +137,32 @@ public class AST {
         public ArrayList<NoteElement> getNotes() {
             return notes;
         }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
         
     }
     
     /**
      * Class representing a Duplet
      */
-    public class Duplet implements NoteElement, Tuple {
+    public static class Duplet implements NoteElement, Tuple {
         private NoteElement first;
         private NoteElement second;
-        private RationalNumber noteDuration;
         
         /**
          * Creates a Duplet object
          * @param first the first NoteElement
          * @param second the second NoteElement
-         * @param noteDuration the duration of a note, which is equal across all the notes in a tuple
          */
-        public Duplet(NoteElement first, NoteElement second, RationalNumber noteDuration) {
+        public Duplet(NoteElement first, NoteElement second) {
             this.first = first;
             this.second = second;
-            this.noteDuration = noteDuration;
         }
 
         /**
@@ -149,7 +171,7 @@ public class AST {
          * @return the duration of the duplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(3, 2));
+            return first.getDuration().add(second.getDuration());
         }
         
         /**
@@ -169,36 +191,32 @@ public class AST {
         }
 
         /**
-         * Gets the duration of a single note in the duplet
-         * The duration is the same across all notes in the duplet
-         * @return the duration of a single note in the duplet
+         * Accepts a visitor
          */
-        public RationalNumber getNoteDuration() {
-            return noteDuration;
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
         }
     }
     
     /**
      * Class representing a Triplet
      */
-    public class Triplet implements NoteElement, Tuple {
+    public static class Triplet implements NoteElement, Tuple {
         private NoteElement first;
         private NoteElement second;
         private NoteElement third;
-        private RationalNumber noteDuration;
         
         /**
          * Creates a Triplet object
          * @param first the first NoteElement
          * @param second the second NoteElement
          * @param third the third NoteElement
-         * @param noteDuration the duration of a note, which is equal across all the notes in a tuple
          */
-        public Triplet(NoteElement first, NoteElement second, NoteElement third, RationalNumber noteDuration) {
+        public Triplet(NoteElement first, NoteElement second, NoteElement third) {
             this.first = first;
             this.second = second;
             this.third = third;
-            this.noteDuration = noteDuration;
         }
 
         /**
@@ -225,14 +243,6 @@ public class AST {
             return third;
         }
 
-        /**
-         * Gets the duration of a single note in the triplet
-         * The duration is the same across all notes in the triplet
-         * @return the duration of a single note in the triplet
-         */
-        public RationalNumber getNoteDuration() {
-            return noteDuration;
-        }
         
         /**
          * Gets the duration of the triplet
@@ -240,7 +250,15 @@ public class AST {
          * @return the duration of the triplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(2, 3));
+            return first.getDuration().add(second.getDuration().add(third.getDuration()));
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
         }
         
     }
@@ -248,12 +266,11 @@ public class AST {
     /**
      * Class representing a quadruplet
      */
-    public class Quadruplet implements NoteElement, Tuple {
+    public static class Quadruplet implements NoteElement, Tuple {
         private NoteElement first;
         private NoteElement second;
         private NoteElement third;
         private NoteElement fourth;
-        private RationalNumber noteDuration;
         
         /**
          * Creates a Quadruplet object
@@ -261,9 +278,8 @@ public class AST {
          * @param second the second NoteElement
          * @param third the third NoteElement
          * @param fourth the fourth NoteElement
-         * @param noteDuration the duration of a note, which is equal across all the notes in a tuple
          */
-        public Quadruplet(NoteElement first, NoteElement second, NoteElement third, NoteElement fourth, RationalNumber noteDuration) {
+        public Quadruplet(NoteElement first, NoteElement second, NoteElement third, NoteElement fourth) {
             this.first = first;
             this.second = second;
             this.third = third;
@@ -302,14 +318,6 @@ public class AST {
             return fourth;
         }
 
-        /**
-         * Gets the duration of a single note in the quadruplet
-         * The duration is the same across all notes in the quadruplet
-         * @return the duration of a single note in the quadruplet
-         */
-        public RationalNumber getNoteDuration() {
-            return noteDuration;
-        }
         
         /**
          * Gets the duration of the quadruplet
@@ -317,7 +325,15 @@ public class AST {
          * @return the duration of the quadruplet
          */
         public RationalNumber getDuration() {
-            return noteDuration.mul(new RationalNumber(3, 4));
+            return first.getDuration().add(second.getDuration().add(third.getDuration().add(fourth.getDuration())));
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
         }
         
     }
@@ -325,8 +341,8 @@ public class AST {
     /**
      * Class representing a voice
      */
-    public class Voice implements NoteElement {
-        private ArrayList<NoteElement> notes;
+    public static class Voice implements NoteElement {
+        private List<NoteElement> notes = new ArrayList<NoteElement>();
         
         /**
          * Creates a Voice object
@@ -342,14 +358,50 @@ public class AST {
         public void addNote(NoteElement e) {
             notes.add(e);
         }
+        
+        /**
+         * Gets the notes in the voice
+         * @return the notes in the voice
+         */
+        public List<NoteElement> getNotes() {
+            return notes;
+        }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
+
+        /**
+         * Gets the RationalNumber duration of all the NoteElements in the Voice
+         * @return the RationalNumber duration of all the NoteElements in the Voice
+         */
+        @Override
+        public RationalNumber getDuration() {
+            RationalNumber result = new RationalNumber(0, 1);
+            for (NoteElement n: notes) {
+                result = result.add(n.getDuration());
+            }
+            return result;
+        }
     }
     
     /**
      * Class representing a song
      */
-    public class Song implements NoteElement {
-        private ArrayList<Voice> voices;
-        
+    public static class Song implements NoteElement {
+        private List<Voice> voices = new ArrayList<Voice>();
+        private String composer;
+        private String keySignature;
+        private RationalNumber defaultDuration;
+        private RationalNumber meter;
+        private int tempo;
+        private String title;
+        private String index;
+
         /**
          * Creates a Song object
          */
@@ -364,6 +416,169 @@ public class AST {
         public void addVoice(Voice v) {
             voices.add(v);
         }
+
+        /**
+         * Accepts a visitor
+         */
+        @Override
+        public <E> E accept(Visitor<E> v) {
+            return v.visit(this);
+        }
+        
+        /**
+         * Gets the voices in the song
+         * @return the voices in the song
+         */
+        public List<Voice> getVoices() {
+            return voices;
+        }
+
+        /**
+         * Gets the last voice added to the song.
+         * @return the last voice added
+         */
+        public Voice getLastVoice() {
+        	return voices.get(voices.size()-1);
+        }
+        /**
+         * Gets the RationalNumber duration of all the Voices in the Song
+         * @return the RationalNumber duration of all the Voices in the Song
+         */
+        @Override
+        public RationalNumber getDuration() {
+            RationalNumber result = new RationalNumber(0, 1);
+            for (Voice v: voices) {
+                result = result.add(v.getDuration());
+            }
+            return result;
+        }
+        
+        /**
+         * Gets the name of the composer of the song.
+         * The composer header field is labeled "C:".
+         * @return the name of the composer of the song.
+         */
+        public String getComposer() {
+            return composer;
+        }
+
+        /**
+         * Sets the name of the composer of the song.
+         * The composer header field is labeled "C:".
+         * @param composer the name of the composer of the song.
+         */
+        public void setComposer(String composer) {
+            this.composer = composer;
+        }
+
+        /**
+         * Gets the key signature of the song.
+         * The key signature header field is labeled "K:".
+         * @return the key signature of the song.
+         */
+        public String getKeySignature() {
+            return keySignature;
+        }
+
+        /**
+         * Sets the key signature of the song.
+         * The key signature header field is labeled "K:".
+         * @param keySignature the key signature of the song.
+         */
+        public void setKeySignature(String keySignature) {
+            this.keySignature = keySignature;
+        }
+
+        /**
+         * Gets the default duration of the song.
+         * The default duration header field is labeled "L:".
+         * @return the default duration of the song.
+         */
+        public RationalNumber getDefaultDuration() {
+            return defaultDuration;
+        }
+
+        /**
+         * Sets the default duration of the song.
+         * The default duration header field is labeled "L:".
+         * @param defaultDuration the default duration of the song.
+         */
+        public void setDefaultDuration(RationalNumber defaultDuration) {
+            this.defaultDuration = defaultDuration;
+        }
+
+        /**
+         * Gets the meter of the song.
+         * The meter header field is labeled "M:".
+         * @return the meter of the song.
+         */
+        public RationalNumber getMeter() {
+            return meter;
+        }
+
+        /**
+         * Sets the meter of the song
+         * The meter header field is labeled "M:".
+         * @param meter the meter of the song
+         */
+        public void setMeter(RationalNumber meter) {
+            this.meter = meter;
+        }
+
+        /**
+         * Gets the tempo of the song
+         * The tempo header field is labeled "Q:".
+         * @return the tempo of the song
+         */
+        public int getTempo() {
+            return tempo;
+        }
+
+        /**
+         * Sets the tempo of the song
+         * The tempo header field is labeled "Q:".
+         * @param tempo the tempo of the song.
+         */
+        public void setTempo(int tempo) {
+            this.tempo = tempo;
+        }
+
+        /**
+         * Gets the title of the song
+         * The title header field is labeled "T:".
+         * @return the title of the song
+         */
+        public String getTitle() {
+            return title;
+        }
+
+        /**
+         * Sets the title of the song
+         * The title header field is labeled "T:".
+         * @param title the title of the song
+         */
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        /**
+         * Gets the index of the song.
+         * The index header field is labeled "X:".
+         * @return the index of the song.
+         */
+        public String getIndex() {
+            return index;
+        }
+
+        /**
+         * Sets the index of the song.
+         * The index header field is labeled "X:".
+         * @param index the index of the song.
+         */
+        public void setIndex(String index) {
+            this.index = index;
+        }
+
     }
 
 }
