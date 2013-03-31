@@ -54,7 +54,7 @@ public class Lexer{
     private StringBuffer patternMaker(){
         StringBuffer tokensBuf = new StringBuffer();
         //1- add COMPOSER
-        tokensBuf.append("((?<=C:)[A-Z a-z.-]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=C:)[A-Z a-z\\.-]+(?=(\n)|(%)))");
         tokensBuf.append("|");
         //2- add KEY
         tokensBuf.append("((?<=K:)[A-Za-z]+(?=(\n)|(%)))");
@@ -82,43 +82,43 @@ public class Lexer{
         tokensBuf.append("(z)");
         tokensBuf.append("|");
         //10- add CHORD_START
-        tokensBuf.append("([(?![1-2]))");
+        tokensBuf.append("(\\[)");
         tokensBuf.append("|");
         //11- add CHORD_END
-        tokensBuf.append("(])");
+        tokensBuf.append("(\\])");
         tokensBuf.append("|");
         //12- add DUPLET_START 
-        tokensBuf.append("((2)");
+        tokensBuf.append("(\\(2)");
         tokensBuf.append("|");
         //13- add TRIPLET_START
-        tokensBuf.append("((3)");
+        tokensBuf.append("(\\(3)");
         tokensBuf.append("|");
         //14- add QUAD_START
-        tokensBuf.append("((4)");
+        tokensBuf.append("(\\(4)");
         tokensBuf.append("|");
         //15- add BAR
-        tokensBuf.append("(|)");
+        tokensBuf.append("(\\|)");
         tokensBuf.append("|");
         //16- add DOUBLE_BAR
-        tokensBuf.append("(||)");
+        tokensBuf.append("(\\|\\|)");
         tokensBuf.append("|");
         //17- add REPEAT_START
-        tokensBuf.append("(|:)");
+        tokensBuf.append("(\\|:)");
         tokensBuf.append("|");
         //18- add REPEAT_END
-        tokensBuf.append("(:|)");
+        tokensBuf.append("(:\\|)");
         tokensBuf.append("|");
         //19- add REPEAT_NUMBER
-        tokensBuf.append("([[1-2])");
+        tokensBuf.append("(\\[[1-2])");
         tokensBuf.append("|");
         //20- add VOICE
-        tokensBuf.append("((?<=V:)[A-Z a-z.-]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=V:)[A-Z a-z\\.-]+(?=(\n)|(%)))");
         tokensBuf.append("|");
         //21- add regex for comment, we won't consider it later
         tokensBuf.append("((?<=%)[a-zA-Z_0-9]*(?=\n))");
         tokensBuf.append("|");
         //22- add an extra character, we will use this to detect if there's syntax error or not
-        tokensBuf.append(".?");
+        tokensBuf.append("(.?)");
         return tokensBuf;
         
     }
