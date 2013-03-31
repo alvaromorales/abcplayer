@@ -27,7 +27,6 @@ public class Token {
             REPEAT_START,
             REPEAT_END,
             REPEAT_NUMBER,
-            END_LINE,
             VOICE;
     
     };
