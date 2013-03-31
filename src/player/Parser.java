@@ -2,17 +2,15 @@ package player;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import player.AST.Chord;
 import player.Lexer;
-import player.AST;
+import player.AST.*;
 import player.Token.Type;
 
 public class Parser {
 
 	private Lexer lexer;
 
-	/*
+	/**
 	 * Constructor, attaches lexer to parser, assuming lexer is initialized
 	 * @param lexer, an initialized lexer instance
 	 */
@@ -20,7 +18,7 @@ public class Parser {
 		this.lexer=lexer;
 	}
 
-	/*
+	/**
 	 * Returns the index of the next token with a specific type
 	 * @param inp, the input list to search
 	 * @param type, the type we are looking for
@@ -30,44 +28,43 @@ public class Parser {
 		for(int i=0;i<inp.size();++i)
 			if(inp.get(i).getType() == type){
 				return i;
-				break;
 			}
 		return -1;
 	}
 	
-	/*
+	/**
 	 * Parses a list of keyNotes into a Chord
 	 * @param inp, list of tokens to parse into a Chord
 	 */
-	public AST.Chord parseChord(RationalNumber duration, List<Token> chordTokens){
+	public Chord parseChord(RationalNumber duration, List<Token> chordTokens){
 		ArrayList<NoteElement> buffer = new ArrayList<NoteElement>(0);
 		for(Token j: chordTokens){
 			if(j.getType() != Token.Type.KEYNOTE)
 				throw new ParserException("Found non-single note inside a chord");
 			
-			buffer.add(new AST.SingleNote(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidential()));
+			buffer.add(new SingleNote(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidential()));
 		}
-		return new AST.Chord(duration,buffer);
+		return new Chord(duration,buffer);
 	}
 	
-	/*
+	/**
 	 * Create a duplet from a list of Tokens
 	 * @param inp, a list of tokens, inp.size()==2
 	 * @return duplet, a new duplet 
 	 */
-	public AST.Duplet parseDuplet(List<Token> inp){
+	public Duplet parseDuplet(List<Token> inp){
 		try{
-			AST.SingleNote note1=new AST.SingleNote(inp.get(0).getValue().charAt(0), 
-													inp.get(0).getDuration(), 
+			SingleNote note1=new SingleNote(inp.get(0).getValue().charAt(0), 
+													inp.get(0).getDuration().mul(new RationalNumber(3, 2)), 
 													inp.get(0).getOctave(), 
 													inp.get(0).getAccidential());
 		
-			AST.SingleNote note2=new AST.SingleNote(inp.get(1).getValue().charAt(0), 
-													inp.get(1).getDuration(), 
+			SingleNote note2=new SingleNote(inp.get(1).getValue().charAt(0), 
+													inp.get(1).getDuration().mul(new RationalNumber(3, 2)), 
 													inp.get(1).getOctave(), 
 													inp.get(1).getAccidential());
 		
-			return new AST.Duplet(note1 , note2);
+			return new Duplet(note1 , note2);
 			
 		}
 		catch(ArrayIndexOutOfBoundsException e){ // in case i+1 or i+2 fails
@@ -75,29 +72,29 @@ public class Parser {
 		}
 	}
 	
-	/*
+	/**
 	 * Create a triplet from a list of Tokens
 	 * @param inp, a list of tokens, inp.size()==3
 	 * @return triplet, a new triplet 
 	 */
-	public AST.Triplet parseTriplet(List<Token> inp){
+	public Triplet parseTriplet(List<Token> inp){
 		try{
-			AST.SingleNote note1=new AST.SingleNote(inp.get(0).getValue().charAt(0), 
-													inp.get(0).getDuration(), 
+			SingleNote note1=new SingleNote(inp.get(0).getValue().charAt(0), 
+													inp.get(0).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(0).getOctave(), 
 													inp.get(0).getAccidential());
 		
-			AST.SingleNote note2=new AST.SingleNote(inp.get(1).getValue().charAt(0), 
-													inp.get(1).getDuration(), 
+			SingleNote note2=new SingleNote(inp.get(1).getValue().charAt(0), 
+													inp.get(1).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(1).getOctave(), 
 													inp.get(1).getAccidential());
 			
-			AST.SingleNote note3=new AST.SingleNote(inp.get(1).getValue().charAt(0), 
-													inp.get(2).getDuration(), 
+			SingleNote note3=new SingleNote(inp.get(1).getValue().charAt(0), 
+													inp.get(2).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(2).getOctave(), 
 													inp.get(2).getAccidential());
 		
-			return new AST.Triplet(note1 , note2, note3);
+			return new Triplet(note1 , note2, note3);
 			
 		}
 		catch(ArrayIndexOutOfBoundsException e){ // in case 0, 1 or 2 fails
@@ -105,47 +102,47 @@ public class Parser {
 		}
 	}
 	
-	/*
+	/**
 	 * Create a quad from a list of Tokens
 	 * @param inp, a list of tokens, inp.size()==4
 	 * @return quad, a new quad 
 	 */
-	public AST.Quadruplet parseQuad(List<Token> inp){
+	public Quadruplet parseQuad(List<Token> inp){
 		try{
-			AST.SingleNote note1=new AST.SingleNote(inp.get(0).getValue().charAt(0), 
-													inp.get(0).getDuration(), 
+			SingleNote note1=new SingleNote(inp.get(0).getValue().charAt(0), 
+													inp.get(0).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(0).getOctave(), 
 													inp.get(0).getAccidential());
 		
-			AST.SingleNote note2=new AST.SingleNote(inp.get(1).getValue().charAt(0), 
-													inp.get(1).getDuration(), 
+			SingleNote note2=new SingleNote(inp.get(1).getValue().charAt(0), 
+													inp.get(1).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(1).getOctave(), 
 													inp.get(1).getAccidential());
 			
-			AST.SingleNote note3=new AST.SingleNote(inp.get(2).getValue().charAt(0), 
-													inp.get(2).getDuration(), 
+			SingleNote note3=new SingleNote(inp.get(2).getValue().charAt(0), 
+													inp.get(2).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(2).getOctave(), 
 													inp.get(2).getAccidential());
 			
-			AST.SingleNote note4=new AST.SingleNote(inp.get(3).getValue().charAt(0), 
-													inp.get(3).getDuration(), 
+			SingleNote note4=new SingleNote(inp.get(3).getValue().charAt(0), 
+													inp.get(3).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(3).getOctave(), 
 													inp.get(3).getAccidential());
 		
-			return new AST.Quadruplet(note1 , note2, note3, note4);
+			return new Quadruplet(note1 , note2, note3, note4);
 			
 		}
 		catch(ArrayIndexOutOfBoundsException e){ // in case 0, 1 or 2 fails
 			throw new ParserException(e.getMessage()); //throw ParserException
 		}
 	}
-	/*
+	/**
 	 * Parses the list of tokens produced by the lexer to fill the AST for the song.
 	 * @param inp, the list of tokens produced by the lexer
 	 */
-	public AST.Song parse(List<Token> inp){
+	public Song parse(List<Token> inp){
 
-		AST.Song song=new AST.Song();
+		Song song=new Song();
 		int i=0;
 		while(i<inp.size()){
 			Token it=inp.get(i); //iterator object from index 
@@ -192,7 +189,7 @@ public class Parser {
 				case END_LINE:
 					break;
 				case KEYNOTE:
-					song.add(new AST.SingleNote(it.getValue().charAt(0), it.getDuration(), it.getOctave(), it.getAccidential()));	
+					song.add(new SingleNote(it.getValue().charAt(0), it.getDuration(), it.getOctave(), it.getAccidential()));	
 				case QUAD_START:
 					song.add(this.parseQuad(inp.subList(i+1, i+5)));
 					i+=4; //skip to the next usuable token
@@ -203,7 +200,7 @@ public class Parser {
 				case REPEAT_START:
 					break;
 				case REST:
-					song.add(new AST.Rest(it.getDuration()));
+					song.add(new Rest(it.getDuration()));
 				case TIME:
 					break;
 				case TRIPLET_START:
