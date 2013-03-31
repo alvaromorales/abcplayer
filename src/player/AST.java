@@ -434,6 +434,13 @@ public class AST {
         }
 
         /**
+         * Gets the last voice added to the song.
+         * @return the last voice added
+         */
+        public Voice getLastVoice() {
+        	return voices.get(voices.size()-1);
+        }
+        /**
          * Gets the RationalNumber duration of all the Voices in the Song
          * @return the RationalNumber duration of all the Voices in the Song
          */
