@@ -1,5 +1,7 @@
 package player;
 
+import java.util.ArrayList;
+
 /**
  * Main entry point of your application.
  */
@@ -18,8 +20,16 @@ public class Main {
         // YOUR CODE HERE
     }
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
         // CALL play() HERE
+//    }
+    
+    public static void main(String[] args){
+        String input = "| V B C D V: D D D B ||";
+
+        ArrayList <Token> tokens = Lexer.Lexer(input);
+        for (Token token : tokens)
+            System.out.println(token.getValue());
     }
 
 }

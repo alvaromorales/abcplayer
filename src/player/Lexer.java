@@ -1,6 +1,7 @@
 package player;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -11,6 +12,33 @@ public class Lexer{
     public Lexer(String s) {
         this.s = s;
     }
+    
+    // Create a map, mapping token types to their numbers in order
+    private Map<String,Integer> map = new HashMap<String,Integer>();
+    
+    private void createTypeMap() {
+        map.put("COMPOSER", 1);
+        map.put("KEY", 2);
+        map.put("LENGTH", 3);
+        map.put("METER", 4);
+        map.put("TEMPO", 5);
+        map.put("TITLE", 6);
+        map.put("INDEX", 7);
+        map.put("KEYNOTE", 8);
+        map.put("REST", 9);
+        map.put("CHORD_START", 10);
+        map.put("CHORD_END", 11);
+        map.put("DUPLET_START", 12);
+        map.put("TRIPLET_START", 13);
+        map.put("QUAD_START", 14);
+        map.put("BAR", 15);
+        map.put("REPEAT_START", 16);
+        map.put("REPEAT_END", 17);
+        map.put("REPEAT_NUMBER", 18);
+        map.put("END_LINE", 19);
+        map.put("VOICE", 20);
+    }
+
     
     private StringBuffer patternMaker(){
         StringBuffer tokensBuf = new StringBuffer();
@@ -81,28 +109,8 @@ public class Lexer{
     
     public ArrayList<Token> lex(String input){
         
-        // Create a map, mapping token types to their numbers in order
-        HashMap map = new HashMap();
-        map.put("COMPOSER", 1);
-        map.put("KEY", 2);
-        map.put("LENGTH", 3);
-        map.put("METER", 4);
-        map.put("TEMPO", 5);
-        map.put("TITLE", 6);
-        map.put("INDEX", 7);
-        map.put("KEYNOTE", 8);
-        map.put("REST", 9);
-        map.put("CHORD_START", 10);
-        map.put("CHORD_END", 11);
-        map.put("DUPLET_START", 12);
-        map.put("TRIPLET_START", 13);
-        map.put("QUAD_START", 14);
-        map.put("BAR", 15);
-        map.put("REPEAT_START", 16);
-        map.put("REPEAT_END", 17);
-        map.put("REPEAT_NUMBER", 18);
-        map.put("END_LINE", 19);
-        map.put("VOICE", 20);
+        // create a map
+        createTypeMap();
         
         
         // Create a pattern
