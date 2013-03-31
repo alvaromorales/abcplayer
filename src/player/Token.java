@@ -8,10 +8,28 @@ public class Token {
     /**
      * All the types of tokens that can be made.
      */
-    public static enum Type {COMPOSER, KEY, LENGTH, METER, TEMPO, TITLE, INDEX, KEYNOTE,  
-                            TIME, REST, CHORD_START, CHORD_END, DUPLET_START, TRIPLET_START,
-                            QUAD_START, BAR, REPEAT_START, REPEAT_END, REPEAT_NUMBER, 
-                            END_LINE, VOICE};
+    public static enum Type {COMPOSER, 
+            KEY,
+            LENGTH,
+            METER,
+            TEMPO,
+            TITLE,
+            INDEX,
+            KEYNOTE,
+            REST,
+            CHORD_START,
+            CHORD_END,
+            DUPLET_START,
+            TRIPLET_START,
+            QUAD_START,
+            BAR,
+            REPEAT_START,
+            REPEAT_END,
+            REPEAT_NUMBER,
+            END_LINE,
+            VOICE;
+    
+    };
                             
     
     private String value;
