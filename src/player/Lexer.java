@@ -1,5 +1,6 @@
 package player;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -75,17 +76,43 @@ public class Lexer{
     }
     
     public static  ArrayList<Token> Lexer(String input){
-        ArrayList <Token> tokens = new ArrayList<Token>();
+        // Create a map, mapping token types to their numbers in order
+        HashMap map = new HashMap();
+        map.put("COMPOSER", 1);
+        map.put("KEY", 2);
+        map.put("LENGTH", 3);
+        map.put("METER", 4);
+        map.put("TEMPO", 5);
+        map.put("TITLE", 6);
+        map.put("INDEX", 7);
+        map.put("KEYNOTE", 8);
+        map.put("REST", 9);
+        map.put("CHORD_START", 10);
+        map.put("CHORD_END", 11);
+        map.put("DUPLET_START", 12);
+        map.put("TRIPLET_START", 13);
+        map.put("QUAD_START", 14);
+        map.put("BAR", 15);
+        map.put("REPEAT_START", 16);
+        map.put("REPEAT_END", 17);
+        map.put("REPEAT_NUMBER", 18);
+        map.put("END_LINE", 19);
+        map.put("VOICE", 20);
         
+        
+        // Create a pattern
+        ArrayList <Token> tokens = new ArrayList<Token>();
         
         Pattern tokenPatterns = Pattern.compile(new String(patternMaker()));
         
+        // Create matcher and start matching to groups 
         Matcher matcher = tokenPatterns.matcher(input);
+        
         
         while (matcher.find()) {
             
             System.out.println(matcher.group(3));
-            if (matcher.group(map["VOICE"]) != null) {
+            if (matcher.group() != null) {
                 Token newToken = new Token(Token.Type.VOICE);
                 tokens.add(newToken);
             }
