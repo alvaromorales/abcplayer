@@ -1,6 +1,5 @@
 package player;
 
-
 /**
  * A token is a lexical item that the parser uses.
  */
@@ -8,7 +7,8 @@ public class Token {
     /**
      * All the types of tokens that can be made.
      */
-    public static enum Type {COMPOSER, 
+    public static enum Type {
+            COMPOSER, 
             KEY,
             LENGTH,
             METER,
@@ -28,15 +28,13 @@ public class Token {
             REPEAT_NUMBER,
             END_LINE,
             VOICE;
-    
     };
-                            
-    
+
     private String value;
     private Type type;
     private int octave;
     private int accidental;
-    private boolean header=false;
+    private boolean header = false;
     private RationalNumber duration;
     
     /**
@@ -171,5 +169,36 @@ public class Token {
      */
     public void setDuration(RationalNumber duration){
         this.duration = duration;
+    }
+    
+    /**
+     * Checks if a Token is equal to another Token
+     * @param obj the Object to compare to
+     * @return true if equal, else false
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { // quick check
+            return true;
+        }
+
+        if (o == null || !(o instanceof Token)) {
+            return false;
+        }
+
+        Type otherType = ((Token) o).type;      
+        String otherValue = ((Token) o).value;
+        int otherOctave = ((Token) o).octave;
+        int otherAccidental = ((Token) o).accidental;
+        boolean otherHeader = ((Token) o).header;
+        RationalNumber otherDuration = ((Token) o).duration;
+        
+        //all tokens have a type, value and header
+        //KEYNOTE tokens have octave, accidental and duration
+        if (otherType.equals(Token.Type.KEYNOTE) && otherDuration != null) {
+            return this.octave == otherOctave && this.accidental == otherAccidental && this.duration.equals(otherDuration);
+        } else {
+            return this.type.equals(otherType) && this.value.equals(otherValue) && this.header == otherHeader;
+        }
     }
 }

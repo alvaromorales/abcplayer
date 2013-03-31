@@ -1,16 +1,332 @@
 package player;
 
 import static org.junit.Assert.*;
-
-
+import java.util.ArrayList;
 import org.junit.Test;
 
+/**
+ * Tests the Lexer class
+ * Testing Strategy:
+ *  - Each individual token type is correctly lexed
+ *  - Whitespace is ignored
+ *  - Linefeeds are ignored and lexing continues after a newline character
+ *  - Comments are ignored
+ *  - Characters outside the grammar throw exceptions
+ */
 public class LexerTest {
 
+    /**
+     * Tests that a COMPOSER token is correctly lexed
+     */
     @Test
-    public void test1() {
-        Lexer.Lexer("ABC1/4,,DDG");
-        assertEquals(1,1);
+    public void composerTest() {
+        Lexer lexer = new Lexer("C:Wolfgang Amadeus-Mozart\n");
+        Token expected = new Token(Token.Type.COMPOSER);
+        expected.setValue("Wolfgang Amadeus-Mozart");
+        assertEquals(expected, lexer.lex().get(0));
     }
-
+    
+    /**
+     * Tests that a KEY token is correctly lexed
+     */
+    @Test
+    public void keyTest() {
+        Lexer lexer = new Lexer("K:A#m\n");
+        Token expected = new Token(Token.Type.KEY);
+        expected.setValue("A#m");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a LENGTH token is correctly lexed
+     */
+    @Test
+    public void lengthTest() {
+        Lexer lexer = new Lexer("L:1/8\n");
+        Token expected = new Token(Token.Type.LENGTH);
+        expected.setValue("1/8");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a METER token is correctly lexed
+     */
+    @Test
+    public void meterTest() {
+        Lexer lexer = new Lexer("M:C|%Comment\n");
+        Token expected = new Token(Token.Type.METER);
+        expected.setValue("C|");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a TEMPO token is correctly lexed
+     */
+    @Test
+    public void tempoTest() {
+        Lexer lexer = new Lexer("Q:240%Comment\n");
+        Token expected = new Token(Token.Type.TEMPO);
+        expected.setValue("240");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a TITLE token is correctly lexed
+     */
+    @Test
+    public void titleTest() {
+        Lexer lexer = new Lexer("T:Title of song%Comment\n");
+        Token expected = new Token(Token.Type.TITLE);
+        expected.setValue("Title of song");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a INDEX token is correctly lexed
+     */
+    @Test
+    public void indexTest() {
+        Lexer lexer = new Lexer("X:57%Comment\n");
+        Token expected = new Token(Token.Type.INDEX);
+        expected.setValue("57");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a VOICE token is correctly lexed
+     */
+    @Test
+    public void voiceTest() {
+        Lexer lexer = new Lexer("V:Voice Number 1\n");
+        Token expected = new Token(Token.Type.VOICE);
+        expected.setValue("Voice Number 1");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a KEYNOTE token is correctly lexed, with all fields
+     */
+    @Test
+    public void keynoteFullTest() {
+        Lexer lexer = new Lexer("_E,7");
+        Token expected = new Token(Token.Type.KEYNOTE);
+        expected.setValue("E");
+        expected.setAccidental(-1);
+        expected.setOctave(-1);
+        expected.setDuration(new RationalNumber(7, 1));
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a KEYNOTE token is correctly lexed, if KEYNOTE is only a basenote
+     */
+    @Test
+    public void keynoteTest() {
+        Lexer lexer = new Lexer("E");
+        Token expected = new Token(Token.Type.KEYNOTE);
+        expected.setValue("E");
+        expected.setAccidental(0);
+        expected.setOctave(0);
+        expected.setDuration(new RationalNumber(1, 1));
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a REST token is correctly lexed
+     */
+    @Test
+    public void restTest() {
+        Lexer lexer = new Lexer("z");
+        Token expected = new Token(Token.Type.REST);
+        expected.setValue("z");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a CHORD_START token is correctly lexed
+     */
+    @Test
+    public void chordStartTest() {
+        Lexer lexer = new Lexer("[");
+        Token expected = new Token(Token.Type.CHORD_START);
+        expected.setValue("[");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a CHORD_END token is correctly lexed
+     */
+    @Test
+    public void chordEndTest() {
+        Lexer lexer = new Lexer("]");
+        Token expected = new Token(Token.Type.CHORD_END);
+        expected.setValue("]");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a DUPLET_START token is correctly lexed
+     */
+    @Test
+    public void dupletStartTest() {
+        Lexer lexer = new Lexer("(2");
+        Token expected = new Token(Token.Type.DUPLET_START);
+        expected.setValue("(2");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a TRIPLET_START token is correctly lexed
+     */
+    @Test
+    public void tripletStartTest() {
+        Lexer lexer = new Lexer("(3");
+        Token expected = new Token(Token.Type.TRIPLET_START);
+        expected.setValue("(3");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a QUAD_START token is correctly lexed
+     */
+    @Test
+    public void quadStartTest() {
+        Lexer lexer = new Lexer("(4");
+        Token expected = new Token(Token.Type.QUAD_START);
+        expected.setValue("(4");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a BAR token is correctly lexed
+     */
+    @Test
+    public void barTest() {
+        Lexer lexer = new Lexer("|");
+        Token expected = new Token(Token.Type.BAR);
+        expected.setValue("|");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a DOUBLE_BAR token is correctly lexed
+     */
+    @Test
+    public void doubleBarTest() {
+        Lexer lexer = new Lexer("||");
+        Token expected = new Token(Token.Type.DOUBLE_BAR);
+        expected.setValue("||");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a REPEAT_START token is correctly lexed
+     */
+    @Test
+    public void repeatStartTest() {
+        Lexer lexer = new Lexer("|:");
+        Token expected = new Token(Token.Type.REPEAT_START);
+        expected.setValue("|:");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a REPEAT_END token is correctly lexed
+     */
+    @Test
+    public void repeatEndTest() {
+        Lexer lexer = new Lexer(":|");
+        Token expected = new Token(Token.Type.REPEAT_END);
+        expected.setValue(":|");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a REPEAT_NUMBER token is correctly lexed, for repeat #1
+     */
+    @Test
+    public void repeatNumber1Test() {
+        Lexer lexer = new Lexer("[1");
+        Token expected = new Token(Token.Type.REPEAT_NUMBER);
+        expected.setValue("[1");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a REPEAT_NUMBER token is correctly lexed, for repeat #2
+     */
+    @Test
+    public void repeatNumber2Test() {
+        Lexer lexer = new Lexer("[2");
+        Token expected = new Token(Token.Type.REPEAT_NUMBER);
+        expected.setValue("[2");
+        assertEquals(expected, lexer.lex().get(0));
+    }
+    
+    /**
+     * Tests that a comment is ignored
+     */
+    @Test
+    public void ignoreCommentTest() {
+        Lexer lexer = new Lexer("G,,8\n%comment\nV:1\n");
+        ArrayList<Token> expected = new ArrayList<Token>();
+        Token first = new Token(Token.Type.KEYNOTE);
+        first.setValue("G");
+        first.setOctave(-2);
+        first.setDuration(new RationalNumber(8, 1));
+        
+        Token second = new Token(Token.Type.VOICE);
+        second.setValue("1");
+        
+        expected.add(first);
+        expected.add(second);
+        
+        assertEquals(expected, lexer.lex());
+    }
+    
+    /**
+     * Tests that whitespace is ignored
+     * Whitespace should not be ignored in header fields
+     */
+    @Test
+    public void ignoreWhitespaceTest() {
+        Lexer lexer = new Lexer("T:Paddy O'Rafferty\ndf c e ");
+        ArrayList<Token> expected = new ArrayList<Token>();
+        Token first = new Token(Token.Type.TITLE);
+        first.setValue("Paddy O'Rafferty");
+        
+        RationalNumber singleDuration = new RationalNumber(1, 1);
+        
+        Token second = new Token(Token.Type.KEYNOTE);
+        second.setValue("D");
+        second.setAccidental(0);
+        second.setOctave(1);
+        second.setDuration(singleDuration);
+        
+        Token third = new Token(Token.Type.KEYNOTE);
+        third.setValue("F");
+        third.setAccidental(0);
+        third.setOctave(1);
+        third.setDuration(singleDuration);
+        
+        Token fourth = new Token(Token.Type.KEYNOTE);
+        fourth.setValue("C");
+        fourth.setAccidental(0);
+        fourth.setOctave(1);
+        fourth.setDuration(singleDuration);
+        
+        Token fifth = new Token(Token.Type.KEYNOTE);
+        fifth.setValue("E");
+        fifth.setAccidental(0);
+        fifth.setOctave(1);
+        fifth.setDuration(singleDuration);
+        
+        expected.add(first);
+        expected.add(second);
+        expected.add(third);
+        expected.add(fourth);
+        expected.add(fifth);
+        
+        assertEquals(expected, lexer.lex());
+    }
 }
