@@ -1,6 +1,5 @@
 package player;
 
-
 /**
  * A token is a lexical item that the parser uses.
  */
@@ -8,17 +7,34 @@ public class Token {
     /**
      * All the types of tokens that can be made.
      */
-    public static enum Type {COMPOSER, KEY, LENGTH, METER, TEMPO, TITLE, INDEX, KEYNOTE,  
-                            TIME, REST, CHORD_START, CHORD_END, DUPLET_START, TRIPLET_START,
-                            QUAD_START, BAR, REPEAT_START, REPEAT_END, REPEAT_NUMBER, 
-                            END_LINE, VOICE};
-                            
-    
+    public static enum Type {
+            COMPOSER, 
+            KEY,
+            LENGTH,
+            METER,
+            TEMPO,
+            TITLE,
+            INDEX,
+            KEYNOTE,
+            REST,
+            CHORD_START,
+            CHORD_END,
+            DUPLET_START,
+            TRIPLET_START,
+            QUAD_START,
+            BAR,
+            DOUBLE_BAR,
+            REPEAT_START,
+            REPEAT_END,
+            REPEAT_NUMBER,
+            VOICE;
+    };
+
     private String value;
     private Type type;
     private int octave;
     private int accidental;
-    private boolean header=false;
+    private boolean header = false;
     private RationalNumber duration;
     
     /**
@@ -39,6 +55,8 @@ public class Token {
         }
 
     }
+    
+    
     
     /**
      * Gets whether this is a header token or not.
@@ -99,40 +117,14 @@ public class Token {
         
     public RationalNumber getRationalValue(){
         int nominator = 0, denominator = 0;
-        int index = 0;
-        boolean isSlash = false;
+        int index = -1;
         
-        while (index < value.length() && value.charAt(index) != '/'){
-            nominator *= 10;
-            nominator += value.charAt(index) - '0';
-            index ++;
-        }
+        index = value.indexOf('/');
         
-        if (index < value.length() && value.charAt(index) == '/'){
-            isSlash = true;
-            index ++;
-        }
-        
-        while (index < value.length() ){
-            denominator *= 10;
-            denominator += value.charAt(index) - '0';
-            index ++;
-        }
-        
-        if (nominator == 0)
-            nominator = 1;
-        if (denominator == 0)
-            denominator = 2;
-        
-        RationalNumber number;
-        
-        if (isSlash){
-            number = new RationalNumber(nominator, denominator);
-        }
-        else{
-            number = new RationalNumber(nominator, 1);
-        }
+        nominator = Integer.parseInt(value.substring(0,index));
+        denominator = Integer.parseInt(value.substring(index+1));
 
+        RationalNumber number = new RationalNumber(nominator, denominator);
 
         return number;
     }
@@ -147,7 +139,13 @@ public class Token {
         return Integer.parseInt(value);
     }
     
-    
+
+    /**
+     * parses the octave, accidental, key , and duration from value
+     */
+    public void parseValue(){
+        
+    }
 
     /**
      * Sets the value of Token
@@ -180,5 +178,36 @@ public class Token {
      */
     public void setDuration(RationalNumber duration){
         this.duration = duration;
+    }
+    
+    /**
+     * Checks if a Token is equal to another Token
+     * @param obj the Object to compare to
+     * @return true if equal, else false
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { // quick check
+            return true;
+        }
+
+        if (o == null || !(o instanceof Token)) {
+            return false;
+        }
+
+        Type otherType = ((Token) o).type;      
+        String otherValue = ((Token) o).value;
+        int otherOctave = ((Token) o).octave;
+        int otherAccidental = ((Token) o).accidental;
+        boolean otherHeader = ((Token) o).header;
+        RationalNumber otherDuration = ((Token) o).duration;
+        
+        //all tokens have a type, value and header
+        //KEYNOTE tokens have octave, accidental and duration
+        if (otherType.equals(Token.Type.KEYNOTE) && otherDuration != null) {
+            return this.octave == otherOctave && this.accidental == otherAccidental && this.duration.equals(otherDuration);
+        } else {
+            return this.type.equals(otherType) && this.value.equals(otherValue) && this.header == otherHeader;
+        }
     }
 }
