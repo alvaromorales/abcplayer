@@ -6,9 +6,13 @@ import java.util.regex.Matcher;
 
 
 public class Lexer{
+    private String s;
     
+    public Lexer(String s) {
+        this.s = s;
+    }
     
-    private static StringBuffer patternMaker(){
+    private StringBuffer patternMaker(){
         StringBuffer tokensBuf = new StringBuffer();
         //1- add COMPOSER
         tokensBuf.append("((?<=C:)[A-Z a-z.-]+(?=\n))");
@@ -75,7 +79,8 @@ public class Lexer{
         
     }
     
-    public static  ArrayList<Token> Lexer(String input){
+    public ArrayList<Token> lex(String input){
+        
         // Create a map, mapping token types to their numbers in order
         HashMap map = new HashMap();
         map.put("COMPOSER", 1);
