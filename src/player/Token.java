@@ -32,7 +32,8 @@ public class Token {
            type == Type.LENGTH || 
            type == Type.METER || 
            type == Type.TEMPO ||
-           type == Type.TITLE ){
+           type == Type.TITLE ||
+           type == Type.INDEX){
         	this.header=true;
         }
         	
