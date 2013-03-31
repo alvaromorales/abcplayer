@@ -184,7 +184,7 @@ public class Parser {
 					throw new ParserException("Invalid type found in header");		
 				}
 			}
-			else{ 										//We are parsing the body
+			else { 										//We are parsing the body
 				switch(it.getType()){
 				case BAR:
 					song.accidentalAssociator.revert(); // restore default accidentals for the piece
@@ -214,8 +214,6 @@ public class Parser {
 					break;
 				case REST:
 					song.add(new Rest(it.getDuration()));
-				case TIME:
-					break;
 				case TRIPLET_START:
 					song.add(this.parseTriplet(inp.subList(i+1, i+4)));
 					i+=3; //skip to the next usuable token
@@ -227,6 +225,7 @@ public class Parser {
 			++i;
 		}
 
+		return song;
 	}
 	
 }
