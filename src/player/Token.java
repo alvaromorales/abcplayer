@@ -23,6 +23,7 @@ public class Token {
             TRIPLET_START,
             QUAD_START,
             BAR,
+            DOUBLE_BAR,
             REPEAT_START,
             REPEAT_END,
             REPEAT_NUMBER,
@@ -52,10 +53,12 @@ public class Token {
            type == Type.TEMPO ||
            type == Type.TITLE ||
            type == Type.INDEX){
-        	this.header=true;
+            this.header=true;
         }
         	
     }
+    
+    
     
     /**
      * Gets whether this is a header token or not.
@@ -138,7 +141,13 @@ public class Token {
         return Integer.parseInt(value);
     }
     
-    
+
+    /**
+     * parses the octave, accidental, key , and duration from value
+     */
+    public void parseValue(){
+        
+    }
 
     /**
      * Sets the value of Token
