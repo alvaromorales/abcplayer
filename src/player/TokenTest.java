@@ -18,7 +18,7 @@ public class TokenTest {
      * Tests the initialization method
      */
     @Test
-    public void testInitialization() {
+    public void initTest() {
         Token test = new Token(Token.Type.BAR);
         assertEquals(test.getType(), Token.Type.BAR);
     }
@@ -28,7 +28,7 @@ public class TokenTest {
      * Tests getIntValue
      */
     @Test
-    public void testGetIntValue(){
+    public void getIntValueTest(){
         Token test = new Token(Token.Type.TEMPO);
         test.setValue("300");
         assertEquals(test.getIntValue(), 300);
@@ -38,7 +38,7 @@ public class TokenTest {
      * Tests getRationalNumber
      */
     @Test
-    public void testGetRationalNumber(){
+    public void getRationalNumberTest(){
         Token test = new Token(Token.Type.LENGTH);
         test.setValue("1/4");
         RationalNumber expected  = new RationalNumber(1,4);

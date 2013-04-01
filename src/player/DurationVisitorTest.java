@@ -31,7 +31,7 @@ public class DurationVisitorTest {
      * Tests the duration visitor on a basic song
      */
     @Test
-    public void basicSongtest() {
+    public void basicSongTest() {
         Voice v1 = new Voice();
         v1.addNote(new SingleNote('C',new RationalNumber(1, 8),0,0));
         v1.addNote(new SingleNote('C',new RationalNumber(3, 4),0,0));
