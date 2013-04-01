@@ -40,20 +40,20 @@ public class Parser {
 	 * @return New Note, the new note with the correct accidentals applied
 	 */
 	
-	public SingleNote applyAccidental(Token tok){
+	public SingleNote applyAccidental(final Token tok){
 		
-		if(tok.getAccidential() == 0) 									//if accidental is neutral disregard table info
+		if(tok.getAccidental() == 0) 									//if accidental is neutral disregard table info
 			return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), 0);  				//If neutral, disregard table information
 		
-		else if(tok.getAccidential()<-2 || tok.getAccidential()>2)
+		else if(tok.getAccidental()<-2 || tok.getAccidental()>2)
 			return new AST.SingleNote(tok.getValue().charAt(0), 
 					tok.getDuration(), 
 					tok.getOctave(), 
 					this.song.accidentalAssociator.getAccidental(tok.getValue().charAt(0))); //if no accidental set fetch default from table
 		
 		
-		this.song.accidentalAssociator.setAccidental(tok.getValue().charAt(0), tok.getAccidential());
-		return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), tok.getAccidential());
+		this.song.accidentalAssociator.setAccidental(tok.getValue().charAt(0), tok.getAccidental());
+		return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), tok.getAccidental());
 		
 	}
 	
@@ -93,7 +93,7 @@ public class Parser {
 			if(j.getType() != Token.Type.KEYNOTE)
 				throw new ParserException("Found non-single note inside a chord");
 			
-			buffer.add(this.applyAccidental(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidential()));
+			buffer.add(this.applyAccidental(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidental()));
 		}
 		return new Chord(duration,buffer);
 	}
@@ -108,12 +108,12 @@ public class Parser {
 			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(3, 2)), 
 													inp.get(0).getOctave(), 
-													inp.get(0).getAccidential());
+													inp.get(0).getAccidental());
 		
 			SingleNote note2=new SingleNote(inp.get(1).getValue().charAt(0), 
 													inp.get(1).getDuration().mul(new RationalNumber(3, 2)), 
 													inp.get(1).getOctave(), 
-													inp.get(1).getAccidential());
+													inp.get(1).getAccidental());
 		
 			return new Duplet(note1 , note2);
 			
@@ -133,17 +133,17 @@ public class Parser {
 			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(0).getOctave(), 
-													inp.get(0).getAccidential());
+													inp.get(0).getAccidental());
 		
 			SingleNote note2=this.applyAccidental(inp.get(1).getValue().charAt(0), 
 													inp.get(1).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(1).getOctave(), 
-													inp.get(1).getAccidential());
+													inp.get(1).getAccidental());
 			
 			SingleNote note3=this.applyAccidental(inp.get(1).getValue().charAt(0), 
 													inp.get(2).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(2).getOctave(), 
-													inp.get(2).getAccidential());
+													inp.get(2).getAccidental());
 		
 			return new Triplet(note1 , note2, note3);
 			
@@ -163,22 +163,22 @@ public class Parser {
 			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(0).getOctave(), 
-													inp.get(0).getAccidential());
+													inp.get(0).getAccidental());
 		
 			SingleNote note2=this.applyAccidental(inp.get(1).getValue().charAt(0), 
 													inp.get(1).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(1).getOctave(), 
-													inp.get(1).getAccidential());
+													inp.get(1).getAccidental());
 			
 			SingleNote note3=this.applyAccidental(inp.get(2).getValue().charAt(0), 
 													inp.get(2).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(2).getOctave(), 
-													inp.get(2).getAccidential());
+													inp.get(2).getAccidental());
 			
 			SingleNote note4=this.applyAccidental(inp.get(3).getValue().charAt(0), 
 													inp.get(3).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(3).getOctave(), 
-													inp.get(3).getAccidential());
+													inp.get(3).getAccidental());
 		
 			return new Quadruplet(note1 , note2, note3, note4);
 			
@@ -235,10 +235,10 @@ public class Parser {
 					throw new ParserException("Invalid type found in header");		
 				}
 			}
-			else { 										//We are parsing the body
+			else { 																					//We are parsing the body
 				switch(it.getType()){
 				case BAR:
-					song.accidentalAssociator.revert(); // restore default accidentals for the piece
+					song.accidentalAssociator.revert(); 											// restore default accidentals for the piece
 					
 				case CHORD_END:
 					throw new ParserException("Unexpected Chord End");
@@ -252,14 +252,14 @@ public class Parser {
 					
 				case DUPLET_START:
 					song.add(this.parseDuplet(inp.subList(i+1, i+3)));
-					i+=2; //skip to the next usable token
+					i+=2; 																			//skip to the next usable token
 					
 				case KEYNOTE:
 					song.add(this.applyAccidental(it));	
 					
 				case QUAD_START:
 					song.add(this.parseQuad(inp.subList(i+1, i+5)));
-					i+=4; //skip to the next usable token
+					i+=4; 																			//skip to the next usable token
 					
 				case REPEAT_END:
 					break;
@@ -271,7 +271,7 @@ public class Parser {
 					song.add(new Rest(it.getDuration()));
 				case TRIPLET_START:
 					song.add(this.parseTriplet(inp.subList(i+1, i+4)));
-					i+=3; //skip to the next usable token
+					i+=3; 																			//skip to the next usable token
 				default:
 					throw new ParserException("Invalid type found in body");
 
