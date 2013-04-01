@@ -128,7 +128,6 @@ public class Token {
         return number;
     }
     
-    
     /**
      * Gets integer number from value
      * @return integer value

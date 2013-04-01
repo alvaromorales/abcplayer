@@ -270,10 +270,11 @@ public class LexerTest {
     @Test
     public void ignoreCommentTest() {
         Lexer lexer = new Lexer("G,,8\n%comment\nV:1\n");
-        ArrayList<Token> expected = new ArrayList<Token>();
+        ArrayList<Token> expected = new ArrayList<Token>(0);
         Token first = new Token(Token.Type.KEYNOTE);
         first.setValue("G");
         first.setOctave(-2);
+        first.setAccidental(Integer.MAX_VALUE);
         first.setDuration(new RationalNumber(8, 1));
         
         Token second = new Token(Token.Type.VOICE);
@@ -282,14 +283,21 @@ public class LexerTest {
         expected.add(first);
         expected.add(second);
         
-        assertEquals(expected, lexer.lex());
+        
+        ArrayList<Token> lexx=lexer.lex();
+        assertEquals(expected.size(),lexx.size());
+        
+        for (int i =0;i<expected.size();++i){
+            assertEquals(expected.get(i), lexx.get(i));
+        }
+
     }
     
     /**
      * Tests that whitespace is ignored
      * Whitespace should not be ignored in header fields
      */
-    
+    @Test
     public void ignoreWhitespaceTest() {
         Lexer lexer = new Lexer("T:Paddy O'Rafferty\ndf c e ");
         ArrayList<Token> expected = new ArrayList<Token>();
@@ -300,25 +308,25 @@ public class LexerTest {
         
         Token second = new Token(Token.Type.KEYNOTE);
         second.setValue("D");
-        second.setAccidental(0);
+        second.setAccidental(Integer.MAX_VALUE);
         second.setOctave(1);
         second.setDuration(singleDuration);
         
         Token third = new Token(Token.Type.KEYNOTE);
         third.setValue("F");
-        third.setAccidental(0);
+        third.setAccidental(Integer.MAX_VALUE);
         third.setOctave(1);
         third.setDuration(singleDuration);
         
         Token fourth = new Token(Token.Type.KEYNOTE);
         fourth.setValue("C");
-        fourth.setAccidental(0);
+        fourth.setAccidental(Integer.MAX_VALUE);
         fourth.setOctave(1);
         fourth.setDuration(singleDuration);
         
         Token fifth = new Token(Token.Type.KEYNOTE);
         fifth.setValue("E");
-        fifth.setAccidental(0);
+        fifth.setAccidental(Integer.MAX_VALUE);
         fifth.setOctave(1);
         fifth.setDuration(singleDuration);
         
@@ -330,4 +338,9 @@ public class LexerTest {
         
         assertEquals(expected, lexer.lex());
     }
+    
+
+            
+            
+    
 }

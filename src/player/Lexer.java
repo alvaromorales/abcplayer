@@ -20,6 +20,8 @@ public class Lexer{
     // Create a map, mapping token types to their numbers in order
     private Map<String,Integer> map = new HashMap<String,Integer>();
     
+    
+    
     /**
      * Creates a Map, mapping token types to numbers
      */
@@ -45,6 +47,7 @@ public class Lexer{
         map.put("REPEAT_END", 19);
         map.put("REPEAT_NUMBER", 20);
         map.put("COMMENT", 21);
+        map.put("WHITESPACE", 22);
     }
 
     
@@ -55,7 +58,7 @@ public class Lexer{
     private StringBuffer patternMaker(){
         StringBuffer tokensBuf = new StringBuffer();
         //1- add COMPOSER
-        tokensBuf.append("((?<=C:)[A-Z a-z\\.-]+(?=(?:\n|%)))");
+        tokensBuf.append("((?<=C:)[A-Z a-z\\.\\-\\']+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //2- add KEY
         tokensBuf.append("((?<=K:)[A-Ga-g][#b]?m?(?=(?:\n|%)))");
@@ -70,7 +73,7 @@ public class Lexer{
         tokensBuf.append("((?<=Q:)[0-9]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //6- add TITLE
-        tokensBuf.append("((?<=T:)[A-Z a-z]+(?=(?:\n|%)))");
+        tokensBuf.append("((?<=T:)[A-Z a-z\\.\\-\\']+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //7- add INDEX
         tokensBuf.append("((?<=X:)[0-9]+(?=(?:\n|%)))");
@@ -117,11 +120,11 @@ public class Lexer{
         tokensBuf.append("(\\[[1-2])");
         tokensBuf.append("|");
         //21- add regex for comment, we won't consider it later
-        tokensBuf.append("((?<=%)[a-zA-Z_0-9 ]*(?=\n))");
+        tokensBuf.append("(%[\\w\\s]*(?=\n))");
         tokensBuf.append("|");
-//        //22- add an extra character, we will use this to detect if there's syntax error or not
-//        //tokensBuf.append("(.?)");
-//        
+        //22- add regec xo whitespace
+        tokensBuf.append("( +)");
+        
         return tokensBuf;
         
     }
@@ -147,9 +150,15 @@ public class Lexer{
         
         
         while (matcher.find()) {
+            
             if (matcher.group(map.get("COMMENT")) != null){
                 continue;
             }
+            
+            else if (matcher.group(map.get("WHITESPACE")) != null) {
+                continue;
+            }
+            
             else if (matcher.group(map.get("COMPOSER")) != null) {
                 Token newToken = new Token(Token.Type.COMPOSER);
                 newToken.setValue(matcher.group(map.get("COMPOSER")));
@@ -202,6 +211,7 @@ public class Lexer{
             else if (matcher.group(map.get("VOICE")) != null) {
                 Token newToken = new Token(Token.Type.VOICE);
                 newToken.setValue(matcher.group(map.get("VOICE")));
+                System.out.printf("%s +=",newToken.getValue());
                 tokens.add(newToken);
                 continue;
             }
@@ -209,10 +219,11 @@ public class Lexer{
             else if (matcher.group(map.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
                 newToken.setValue(matcher.group(map.get("KEYNOTE")));
-                System.out.println(newToken.getValue());
+                
                 newToken.parseValue();
-                System.out.println(newToken.getValue());
+                System.out.println(newToken.getOctave());
                 System.out.println(newToken.getDuration());
+                System.out.println(newToken.getValue());
                 tokens.add(newToken);
                 continue;
             }

@@ -25,31 +25,6 @@ VOICE ::= (?<=V:)[A-Z a-z.-]+(?=(\n)|(%))
 
 
 
-COMPOSER("(?<=(C:))[A-Z a-z.-]+(?=\n)"), 
-            KEY("(?<=(K:))[A-Za-z]+(?=\n)"),
-            LENGTH("(?<=(L:))[0-9]+/[0-9]+(?=\n)"),
-            METER("(?<=M:)[0-9]+/[0-9]+(?=\n)"),
-            TEMPO("(?<=Q:)[0-9]+(?=\n)"),
-            TITLE("(?<=T:)[A-Z a-z]+(?=\n)"),
-            INDEX("(?<=X:)[0-9]+(?=\n)"),
-            KEYNOTE("[A-Ga-g](?!:)[,_0-9/ ^]*"),
-            REST("z"),
-            CHORD_START("[(?![1-2])"),
-            CHORD_END("]"),
-            DUPLET_START("(2"),
-            TRIPLET_START("(3"),
-            QUAD_START("(4"),
-            BAR ("(?<!:)|(?!:)"),
-            REPEAT_START("|:"),
-            REPEAT_END (":|"),
-            REPEAT_NUMBER("[[1-2]"),
-            END_LINE("\n"),
-            VOICE("V");
-    
-    
-    
-    
-
 abc-tune ::= abc-header abc-music
 
 abc-header ::= field-number comment* field-title other-fields* field-key
