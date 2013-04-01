@@ -1,17 +1,12 @@
 package player;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-
 import javax.sound.midi.MidiUnavailableException;
-
 import sound.SequencePlayer;
 
 /**

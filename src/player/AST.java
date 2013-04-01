@@ -475,8 +475,7 @@ public class AST {
          * Creates an anonymous Voice object
          */
         public Voice(){
-        	this.name=null;
-
+        	this.name = null;
         }
         /**
          * Adds a NoteElement to the voice
@@ -566,7 +565,7 @@ public class AST {
          * @return list of voices in song
          */
         public List<Voice> getVoices(){
-        	return new ArrayList<Voice>(voices.values());
+            return new ArrayList<Voice>(voices.values());
         }
         
         /**
@@ -612,9 +611,9 @@ public class AST {
          */
         public void getVoice(String name) {     	//handles Voice tokens both in header and body
         	if(voices.containsKey(name))        	//if voice exists
-        		this.currentVoice=voices.get(name); //fetch that voice
+        		currentVoice=voices.get(name); //fetch that voice
         	else									//if doesn't exist create it
-        		this.addVoice(new Voice(name)); 	//create voice if it doesn't exist
+        		addVoice(new Voice(name)); 	//create voice if it doesn't exist
         }
         
         /**
