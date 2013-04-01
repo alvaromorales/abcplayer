@@ -73,6 +73,25 @@ public class AST {
             return v.visit(this);
         }        
         
+        /**
+         * Checks if an SingleNote is equal to another SingleNote
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof SingleNote)) {
+                return false;
+            }
+
+            SingleNote other = (SingleNote)o;
+            return this.pitch == other.pitch && this.accidental == other.accidental && this.octave == other.octave && this.duration.equals(other.duration);
+        }
+        
     }
     
     /**
@@ -103,6 +122,25 @@ public class AST {
         @Override
         public <E> E accept(Visitor<E> v) {
             return v.visit(this);
+        }
+        
+        /**
+         * Checks if an Rest is equal to another Rest
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Rest)) {
+                return false;
+            }
+
+            Rest other = (Rest)o;
+            return this.duration.equals(other.duration);
         }
         
     }
@@ -147,6 +185,25 @@ public class AST {
         @Override
         public <E> E accept(Visitor<E> v) {
             return v.visit(this);
+        }
+        
+        /**
+         * Checks if an Chord is equal to another Chord
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Chord)) {
+                return false;
+            }
+
+            Chord other = (Chord)o;
+            return this.duration.equals(other.duration) && this.notes.equals(other.notes);
         }
         
     }
@@ -200,6 +257,26 @@ public class AST {
         public <E> E accept(Visitor<E> v) {
             return v.visit(this);
         }
+        
+        /**
+         * Checks if an Duplet is equal to another Duplet
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Duplet)) {
+                return false;
+            }
+
+            Duplet other = (Duplet)o;
+            return this.first.equals(other.first) && this.second.equals(other.second);
+        }
+        
     }
     
     /**
@@ -262,6 +339,25 @@ public class AST {
         @Override
         public <E> E accept(Visitor<E> v) {
             return v.visit(this);
+        }
+        
+        /**
+         * Checks if an Triplet is equal to another Triplet
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Triplet)) {
+                return false;
+            }
+
+            Triplet other = (Triplet)o;
+            return this.first.equals(other.first) && this.second.equals(other.second) && this.third.equals(other.third);
         }
         
     }
@@ -339,6 +435,25 @@ public class AST {
             return v.visit(this);
         }
         
+        /**
+         * Checks if an Quadruplet is equal to another Quadruplet
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Quadruplet)) {
+                return false;
+            }
+
+            Quadruplet other = (Quadruplet)o;
+            return this.first.equals(other.first) && this.second.equals(other.second) && this.third.equals(other.third) && this.fourth.equals(other.fourth);
+        }
+        
     }
     
     /**
@@ -347,8 +462,6 @@ public class AST {
     public static class Voice implements NoteElement {
         private List<NoteElement> notes = new ArrayList<NoteElement>();
         private String name;
-        
-
 
         /**
          * Creates a Voice object
@@ -400,6 +513,25 @@ public class AST {
                 result = result.add(n.getDuration());
             return result;
         }
+        
+        /**
+         * Checks if an Voice is equal to another Voice
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Voice)) {
+                return false;
+            }
+
+            Voice other = (Voice)o;
+            return this.name.equals(other.name) && this.notes.equals(other.notes);
+        }
     }
     
     /**
@@ -410,7 +542,7 @@ public class AST {
         private Voice currentVoice=null;
         private String composer;
         private String keySignature;
-        private RationalNumber defaultDuration;
+        private RationalNumber defaultNoteLength;
         private RationalNumber meter;
         private int tempo;
         private int headerCount=0;
@@ -427,7 +559,7 @@ public class AST {
 
         }
         
-        /*
+        /**
          * Returns list of voices in song
          * @return list of voices in song
          */
@@ -465,7 +597,7 @@ public class AST {
         	this.headerCount=Integer.MIN_VALUE;
         }
         /**
-         * Private, adds a Voice to the song
+         * Adds a Voice to the song
          * @param v the Voice to add
          */
         public void addVoice(Voice v) {
@@ -550,7 +682,7 @@ public class AST {
          * @return the default duration of the song.
          */
         public RationalNumber getDefaultDuration() {
-            return defaultDuration;
+            return defaultNoteLength;
         }
 
         /**
@@ -560,7 +692,7 @@ public class AST {
          */
         public void setDefaultDuration(RationalNumber defaultDuration) {
         	this.headerCount++;
-            this.defaultDuration = defaultDuration;
+            this.defaultNoteLength = defaultDuration;
         }
 
         /**
@@ -639,6 +771,59 @@ public class AST {
             this.index = index;
         }
 
+
+        /**
+         * Checks if a Song is equal to another Song
+         * Auto-generated by eclipse
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Song other = (Song) obj;
+            if (composer == null) {
+                if (other.composer != null)
+                    return false;
+            } else if (!composer.equals(other.composer))
+                return false;
+            if (defaultNoteLength == null) {
+                if (other.defaultNoteLength != null)
+                    return false;
+            } else if (!defaultNoteLength.equals(other.defaultNoteLength))
+                return false;
+            if (index != other.index)
+                return false;
+            if (keySignature == null) {
+                if (other.keySignature != null)
+                    return false;
+            } else if (!keySignature.equals(other.keySignature))
+                return false;
+            if (meter == null) {
+                if (other.meter != null)
+                    return false;
+            } else if (!meter.equals(other.meter))
+                return false;
+            if (tempo != other.tempo)
+                return false;
+            if (title == null) {
+                if (other.title != null)
+                    return false;
+            } else if (!title.equals(other.title))
+                return false;
+            if (voices == null) {
+                if (other.voices != null)
+                    return false;
+            } else if (!voices.equals(other.voices))
+                return false;
+            return true;
+        }
+        
     }
 
 }
