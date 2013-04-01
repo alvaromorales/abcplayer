@@ -35,7 +35,7 @@ public class AccidentalAssociationMaker {
     }
     
     /**
-     * Initializes the hashmap
+     * Initializes the hashmap with no sharps or flats for all notes.
      */
     public void init(){
     	for(char Note='A';Note<='G';Note++)
@@ -50,7 +50,7 @@ public class AccidentalAssociationMaker {
      */
     
 	public AccidentalAssociationMaker(String Key){
-		this.init();
+		this.init(); //make a zero map before adding the actual values
 		
     	switch(Key){ //assigns keys to notes according to the key signature
     	case "Cm":

@@ -33,6 +33,23 @@ public class Parser {
 	}
 	
 	/**
+	 * Apply accidental association table
+	 * @param tok, the token to parse into a KeyNote
+	 * @param Associator, the accidentalAssociator that associates notes with the corrects accidentals
+	 * @return New Note, the new note with the correct accidentals applied
+	 */
+	
+	public SingleNote applyAccidental(Token tok, AccidentalAssociationMaker Associator){
+		
+		if(tok.getAccidential() == 0) 				//if accidental is neutral disregard table info
+			return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), 0);  				//If neutral, disregard table information
+		
+		if(tok.getAccidential()<-2 || tok.getAccidential()>2)
+			return new SingleNote(tok.getValue().charAt(0))
+		
+		return newnote;
+	}
+	/**
 	 * Parses a list of keyNotes into a Chord
 	 * @param inp, list of tokens to parse into a Chord
 	 */
@@ -194,7 +211,6 @@ public class Parser {
 					int offset=this.findNextType(inp.subList(i,inp.size()-1), Token.Type.CHORD_END); //find CHORD_END
 					if(offset<0)
 						throw new ParserException("End of Chord not found");
-			
 					song.add(this.parseChord(it.getDuration(), inp.subList(i+1, i+offset-1))); //add chord to current song
 					
 					i+=offset; //skip until the end of the chord
@@ -216,7 +232,7 @@ public class Parser {
 					song.add(new Rest(it.getDuration()));
 				case TRIPLET_START:
 					song.add(this.parseTriplet(inp.subList(i+1, i+4)));
-					i+=3; //skip to the next usuable token
+					i+=3; //skip to the next usable token
 				default:
 					throw new ParserException("Invalid type found in body");
 
