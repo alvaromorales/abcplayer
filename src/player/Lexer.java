@@ -58,28 +58,28 @@ public class Lexer{
     private StringBuffer patternMaker(){
         StringBuffer tokensBuf = new StringBuffer();
         //1- add COMPOSER
-        tokensBuf.append("((?<=C:)[A-Z a-z\\.\\-\\']+(?=(?:\n|%)))");
+        tokensBuf.append("((?<=C:)[A-Z a-z\\.\\-\\']+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //2- add KEY
-        tokensBuf.append("((?<=K:)[A-Ga-g][#b]?m?(?=(?:\n|%)))");
+        tokensBuf.append("((?<=K:)[A-Ga-g][#b]?m?(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //3- add LENGTH
-        tokensBuf.append("((?<=L:)[0-9]+/[0-9]+(?=(?:\n|%)))");
+        tokensBuf.append("((?<=L:)[0-9]+/[0-9]+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //4- add METER
-        tokensBuf.append("((?<=M:)(?:C\\|?|(?:[0-9]+/[0-9]+))(?=(?:\n|%)))");
+        tokensBuf.append("((?<=M:)(?:C\\|?|(?:[0-9]+/[0-9]+))(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //5- add TEMPO
-        tokensBuf.append("((?<=Q:)[0-9]+(?=(?:\n|%)))");
+        tokensBuf.append("((?<=Q:)[0-9]+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //6- add TITLE
-        tokensBuf.append("((?<=T:)[A-Z a-z\\.\\-\\']+(?=(?:\n|%)))");
+        tokensBuf.append("((?<=T:)[A-Z a-z\\.\\-\\']+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //7- add INDEX
-        tokensBuf.append("((?<=X:)[0-9]+(?=(?:\n|%)))");
+        tokensBuf.append("((?<=X:)[0-9]+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //8- add VOICE
-        tokensBuf.append("((?<=V:)[\\-A-Z a-z\\.0-9]+(?=(?:\n|%)))");
+        tokensBuf.append("((?<=V:)[\\-A-Z a-z\\.0-9]+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         
         //9- add KEYNOTE
@@ -105,10 +105,10 @@ public class Lexer{
         tokensBuf.append("(\\(4)");
         tokensBuf.append("|");
         //16- add BAR
-        tokensBuf.append("(\\|(?!\\|)(?!:))");
+        tokensBuf.append("(\\|)(?!:)(?!\\|)");
         tokensBuf.append("|");
         //17- add DOUBLE_BAR
-        tokensBuf.append("(\\|\\|)");
+        tokensBuf.append("((?:\\|\\|)|(?:\\[\\|)|(?:\\|\\]))");
         tokensBuf.append("|");
         //18- add REPEAT_START
         tokensBuf.append("(\\|:)");
@@ -120,7 +120,7 @@ public class Lexer{
         tokensBuf.append("(\\[[1-2])");
         tokensBuf.append("|");
         //21- add regex for comment, we won't consider it later
-        tokensBuf.append("(%[\\w\\s]*(?=\n))");
+        tokensBuf.append("(%[\\w\\s]*(?=\\n))");
         tokensBuf.append("|");
         //22- add regex xo whitespace
         tokensBuf.append("( +)");
@@ -271,12 +271,6 @@ public class Lexer{
                 continue;
             }
             
-            else if (matcher.group(map.get("BAR")) != null) {
-                Token newToken = new Token(Token.Type.BAR);
-                newToken.setValue(matcher.group(map.get("BAR")));
-                tokens.add(newToken);
-                continue;
-            }
             
             else if (matcher.group(map.get("DOUBLE_BAR")) != null) {
                 Token newToken = new Token(Token.Type.DOUBLE_BAR);
@@ -304,7 +298,14 @@ public class Lexer{
                 newToken.setValue(matcher.group(map.get("REPEAT_NUMBER")));
                 tokens.add(newToken);
                 continue;
-            }            
+            }
+            
+            else if (matcher.group(map.get("BAR")) != null) {
+                Token newToken = new Token(Token.Type.BAR);
+                newToken.setValue(matcher.group(map.get("BAR")));
+                tokens.add(newToken);
+                continue;
+            }
         }
 
         
