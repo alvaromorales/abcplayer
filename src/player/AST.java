@@ -545,7 +545,7 @@ public class AST {
         private RationalNumber defaultNoteLength;
         private RationalNumber meter;
         private int tempo;
-        private int headerCount=0;
+        private int headerCount = 0;
 
         private String title;
         private int index;
@@ -556,9 +556,9 @@ public class AST {
          * Creates a Song object
          */
         public Song() {
-        	this.meter=new RationalNumber(4,4);
-        	this.defaultNoteLength=new RationalNumber(1,8);
-        	this.tempo=100;
+        	this.meter = new RationalNumber(4,4);
+        	this.defaultNoteLength = new RationalNumber(1,8);
+        	this.tempo = 100;
         }
         
         /**

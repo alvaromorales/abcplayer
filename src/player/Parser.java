@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import player.Lexer;
 import player.AST.*;
-import player.Token.Type;
 
 public class Parser {
 
@@ -16,20 +15,18 @@ public class Parser {
 	 * @param lexer, an initialized lexer instance
 	 */
 	public Parser(Lexer lexer){
-		this.lexer=lexer;
-
+		this.lexer = lexer;
 	}
 
 	/**
-	 * Returns the song attached to this parser. 
-	 * Be sure to run Parser.Parser(lexer) and Parser.parse(inp) 
-	 * before trying to access the song, otherwise it won't be of
-	 * any use.
-	 * @return
+	 * Gets the parsed Song
+	 * Call parse() before trying to access the song, otherwise it won't be of any use.
+	 * @return the parsed Song
 	 */
 	public Song getSong(){
-		return this.song;
+		return song;
 	}
+	
 	/**
 	 * Returns the index of the next token with a specific type
 	 * @param inp, the input list to search
@@ -46,26 +43,26 @@ public class Parser {
 	
 	/**
 	 * Apply accidental association table to a token to get a SingleNote
-	 * @param tok, the token to parse into a KeyNote
-	 * @param Associator, the accidentalAssociator that associates notes with the corrects accidentals
-	 * @return New Note, the new note with the correct accidentals applied
+	 * @param tok, the token to parse into a KeyNote. 
+	 * Token.Type must be KEYNOTE. Not modified by this method.
+	 * @return the new SingleNote with the correct accidentals applied
 	 */
-	
-	public SingleNote applyAccidental(final Token tok){
-		
-		if(tok.getAccidental() == 0) 									//if accidental is neutral disregard table info
+	public SingleNote applyAccidental(Token tok){
+		if(tok.getAccidental() == 0) {									//if accidental is neutral disregard table info
 			return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), 0);  				//If neutral, disregard table information
-		
-		else if(tok.getAccidental()<-2 || tok.getAccidental()>2)
-			return new AST.SingleNote(tok.getValue().charAt(0), 
+		}
+			
+		else if(tok.getAccidental() < -2 || tok.getAccidental() > 2) {
+			return new AST.SingleNote(
+			        tok.getValue().charAt(0), 
 					tok.getDuration(), 
 					tok.getOctave(), 
-					this.song.accidentalAssociator.getAccidental(tok.getValue().charAt(0))); //if no accidental set fetch default from table
+					song.accidentalAssociator.getAccidental(tok.getValue().charAt(0))); //if no accidental set fetch default from table
+		}
 		
+		song.accidentalAssociator.setAccidental(tok.getValue().charAt(0), tok.getAccidental());
 		
-		this.song.accidentalAssociator.setAccidental(tok.getValue().charAt(0), tok.getAccidental());
 		return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), tok.getAccidental());
-		
 	}
 	
 	/**
@@ -74,24 +71,24 @@ public class Parser {
 	 * @param duration, the duration of the to-be-created SingleNote
 	 * @param octave, the octave of the to-be-created SingleNote
 	 * @param accidental, the accidental of the to-be-created SingleNote, after cross-checking with the associator
-	 * @return New Note, the new note with the correct accidentals applied
+     * @return the new SingleNote with the correct accidentals applied
 	 */
-	
-	public SingleNote applyAccidental(final char pitch, final RationalNumber duration, final int octave, final int accidental){
+	public SingleNote applyAccidental(char pitch, RationalNumber duration, int octave, int accidental){
 		
-		if(accidental == 0) 												//if accidental is neutral disregard table info
+		if(accidental == 0) { 				 								//if accidental is neutral disregard table info
 			return new SingleNote(pitch, duration, octave, 0);  			//If neutral, disregard table information
-		
-		else if(accidental<-2 || accidental>2)
+		}
+			
+		else if(accidental<-2 || accidental>2) {
 			return new AST.SingleNote(pitch, 
 					duration, 
 					octave, 
-					this.song.accidentalAssociator.getAccidental(pitch)); //if no accidental set fetch default from table
+					song.accidentalAssociator.getAccidental(pitch)); //if no accidental set fetch default from table
+		}
 		
+		song.accidentalAssociator.setAccidental(pitch, accidental);
 		
-		this.song.accidentalAssociator.setAccidental(pitch, accidental);
 		return new SingleNote(pitch, duration, octave, accidental);
-		
 	}
 	
 	/**
@@ -104,7 +101,7 @@ public class Parser {
 			if(j.getType() != Token.Type.KEYNOTE)
 				throw new ParserException("Found non-single note inside a chord");
 			
-			buffer.add(this.applyAccidental(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidental()));
+			buffer.add(applyAccidental(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidental()));
 		}
 		return new Chord(duration,buffer);
 	}
@@ -116,7 +113,7 @@ public class Parser {
 	 */
 	public Duplet parseDuplet(List<Token> inp){
 		try{
-			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
+			SingleNote note1=applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(3, 2)), 
 													inp.get(0).getOctave(), 
 													inp.get(0).getAccidental());
@@ -141,17 +138,17 @@ public class Parser {
 	 */
 	public Triplet parseTriplet(List<Token> inp){
 		try{
-			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
+			SingleNote note1=applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(0).getOctave(), 
 													inp.get(0).getAccidental());
 		
-			SingleNote note2=this.applyAccidental(inp.get(1).getValue().charAt(0), 
+			SingleNote note2=applyAccidental(inp.get(1).getValue().charAt(0), 
 													inp.get(1).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(1).getOctave(), 
 													inp.get(1).getAccidental());
 			
-			SingleNote note3=this.applyAccidental(inp.get(1).getValue().charAt(0), 
+			SingleNote note3=applyAccidental(inp.get(1).getValue().charAt(0), 
 													inp.get(2).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(2).getOctave(), 
 													inp.get(2).getAccidental());
@@ -165,52 +162,49 @@ public class Parser {
 	}
 	
 	/**
-	 * Create a quad from a list of Tokens
-	 * @param inp, a list of tokens, inp.size()==4
-	 * @return quad, a new quad 
+	 * Create a Quadruplet from a list of Tokens
+	 * @param tokens, a list of tokens, where token.size()==4
+	 * @return a new Quadruplet with the appropriate notes 
 	 */
-	public Quadruplet parseQuad(List<Token> inp){
-			System.out.println(inp.toString());
-			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
-													inp.get(0).getDuration().mul(new RationalNumber(3, 4)), 
-													inp.get(0).getOctave(), 
-													inp.get(0).getAccidental());
+	public Quadruplet parseQuad(List<Token> tokens){
+			System.out.println(tokens.toString());
+			SingleNote note1 = applyAccidental(tokens.get(0).getValue().charAt(0), 
+													tokens.get(0).getDuration().mul(new RationalNumber(3, 4)), 
+													tokens.get(0).getOctave(), 
+													tokens.get(0).getAccidental());
 		
-			SingleNote note2=this.applyAccidental(inp.get(1).getValue().charAt(0), 
-													inp.get(1).getDuration().mul(new RationalNumber(3, 4)), 
-													inp.get(1).getOctave(), 
-													inp.get(1).getAccidental());
+			SingleNote note2 = applyAccidental(tokens.get(1).getValue().charAt(0), 
+													tokens.get(1).getDuration().mul(new RationalNumber(3, 4)), 
+													tokens.get(1).getOctave(), 
+													tokens.get(1).getAccidental());
 			
-			SingleNote note3=this.applyAccidental(inp.get(2).getValue().charAt(0), 
-													inp.get(2)
-													.getDuration()
-													.mul(
-															new RationalNumber(3, 4)
-															), 
-													inp.get(2).getOctave(), 
-													inp.get(2).getAccidental());
+			SingleNote note3 = applyAccidental(tokens.get(2).getValue().charAt(0), 
+													tokens.get(2).getDuration().mul(new RationalNumber(3, 4)), 
+													tokens.get(2).getOctave(), 
+													tokens.get(2).getAccidental());
 			
-			SingleNote note4=this.applyAccidental(inp.get(3).getValue().charAt(0), 
-													inp.get(3).getDuration().mul(new RationalNumber(3, 4)), 
-													inp.get(3).getOctave(), 
-													inp.get(3).getAccidental());
-		
-			return new Quadruplet(note1 , note2, note3, note4);
-			
-	
+			SingleNote note4 = applyAccidental(tokens.get(3).getValue().charAt(0), 
+													tokens.get(3).getDuration().mul(new RationalNumber(3, 4)), 
+													tokens.get(3).getOctave(), 
+													tokens.get(3).getAccidental());
+
+			return new Quadruplet(note1,note2, note3, note4);
 	}
+	
 	/**
 	 * Parses the list of tokens produced by the lexer to fill the AST for the song.
-	 * @param inp, the list of tokens produced by the lexer
 	 */
-	public void parse(List<Token> inp){
+	public void parse(){
+		ArrayList<Token> tokens = lexer.lex();
 		
-		this.song=new Song(); 
+	    //initialize Song
+	    song=new Song(); 
 		int i=0;
-		while(i<inp.size()){
-			Token it=inp.get(i); 														//iterator object from index 
+		
+		while(i<tokens.size()) {
+			Token it=tokens.get(i);      //iterator object from index 
 			System.out.println(it.toString());
-			if(it.inHeader()){ 															//We are parsing the header
+			if(it.inHeader()) {           //We are parsing the header
 				++i;
 				switch(it.getType()){
 				case COMPOSER:
@@ -266,27 +260,27 @@ public class Parser {
 					++i;
 					break;
 				case CHORD_START:
-					int offset=this.findNextType(inp.subList(i,inp.size()-1), Token.Type.CHORD_END); //find CHORD_END
+					int offset=findNextType(tokens.subList(i,tokens.size()-1), Token.Type.CHORD_END); //find CHORD_END
 					if(offset<0)
 						throw new ParserException("End of Chord not found");
-					song.add(this.parseChord(it.getDuration(), inp.subList(i+1, i+offset-1)));  	//add chord to current song
+					song.add(parseChord(tokens.get(i+1).getDuration(), tokens.subList(i+1, i+offset-1)));  	//add chord to current song
 					i+=(offset+1); 																		//skip until the end of the chord
 					break;
 				case DUPLET_START:
-					song.add(this.parseDuplet(inp.subList(i+1, i+3)));
+					song.add(parseDuplet(tokens.subList(i+1, i+3)));
 					i+=3; 																			//skip to the next usable token
 					break;
 				case TRIPLET_START:
-					song.add(this.parseTriplet(inp.subList(i+1, i+4)));
+					song.add(parseTriplet(tokens.subList(i+1, i+4)));
 					i+=4;																	//skip to the next usable token
 					break;
 				case KEYNOTE:
-					song.add(this.applyAccidental(it));												//apply accidental to token
+					song.add(applyAccidental(it));												//apply accidental to token
 					++i;
 					break;
 				case QUAD_START:
 					System.out.println(it.toString());
-					song.add(this.parseQuad(inp.subList(i+1, i+5)));
+					song.add(parseQuad(tokens.subList(i+1, i+5)));
 					i+=5; 																			//skip to the next usable token
 					break;
 				case REPEAT_START:
@@ -294,12 +288,12 @@ public class Parser {
 					break;
 				case REPEAT_END:
 					int j=i-1;
-					while(!((inp.get(j).getType() == Token.Type.REPEAT_START && inp.get(j).getValue()!="PASS") || 
-						    inp.get(j).inHeader()==true ||
-						    inp.get(j).getType()==Token.Type.DOUBLE_BAR))							//Look for a repeat_start or a header element in order to start repeating
+					while(!((tokens.get(j).getType() == Token.Type.REPEAT_START && tokens.get(j).getValue()!="PASS") || 
+						    tokens.get(j).inHeader()==true ||
+						    tokens.get(j).getType()==Token.Type.DOUBLE_BAR))							//Look for a repeat_start or a header element in order to start repeating
 						j--;
-					if(inp.get(j).getType() == Token.Type.REPEAT_START)
-						inp.get(j).setValue("PASS");
+					if(tokens.get(j).getType() == Token.Type.REPEAT_START)
+						tokens.get(j).setValue("PASS");
 					i=j+1;
 					break;
 				case REPEAT_NUMBER:
@@ -307,12 +301,12 @@ public class Parser {
 						i=it.getOctave();															//Octave is overloaded, look below in the comments
 					else if(it.getValue().contains("1")){
 						int k=i+1;
-						while(inp.get(k).getType()!=Token.Type.BAR            && 
-							  inp.get(k).getType()!=Token.Type.DOUBLE_BAR     && 
-							  (inp.get(k).getType()!=Token.Type.REPEAT_NUMBER ||					//REPEAT_NUMBER and getValue()=="[2"
-							   !(inp.get(k).getValue().contains("2")))        &&
-							  inp.get(k).getType()!=Token.Type.REPEAT_END     &&
-							  inp.get(k).getType()!=Token.Type.REPEAT_START) 						//search for one of those Type's that stop a repeat_number
+						while(tokens.get(k).getType()!=Token.Type.BAR            && 
+							  tokens.get(k).getType()!=Token.Type.DOUBLE_BAR     && 
+							  (tokens.get(k).getType()!=Token.Type.REPEAT_NUMBER ||					//REPEAT_NUMBER and getValue()=="[2"
+							   !(tokens.get(k).getValue().contains("2")))        &&
+							  tokens.get(k).getType()!=Token.Type.REPEAT_END     &&
+							  tokens.get(k).getType()!=Token.Type.REPEAT_START) 						//search for one of those Type's that stop a repeat_number
 							k++;
 						it.setOctave(k);															//octave is overloaded to keep the redirection index
 						it.setValue("[0");															// "[0" is a "[1" that was passed already
