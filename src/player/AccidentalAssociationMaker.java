@@ -37,7 +37,7 @@ public class AccidentalAssociationMaker {
     }
 
     /**
-     * Initializes the hashmap
+     * Initializes the hashmap with no sharps or flats for all notes.
      */
     public void init(){
         for(char Note='A';Note<='G';Note++)
@@ -217,4 +217,5 @@ public class AccidentalAssociationMaker {
         AccidentalAssociationMaker other = (AccidentalAssociationMaker)o;
         return this.accidentals.equals(other.accidentals);
     }
+
 }

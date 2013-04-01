@@ -32,7 +32,7 @@ public class AST {
             this.octave = octave;
             this.accidental = accidental;
         }
-
+        
         /**
          * Gets the pitch of the note
          * @return the pitch of the note
@@ -434,6 +434,7 @@ public class AST {
         public List<Voice> getVoices(){
         	return (List<Voice>) voices.values();
         }
+        
         /**
          * Adds a new note to the song.
          * The new note is added to the current Voice.
