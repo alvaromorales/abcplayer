@@ -51,63 +51,36 @@ public class AccidentalAssociationMaker {
      * @param key
      */
     public AccidentalAssociationMaker(String key){
-        this(); //calls no-argument constructor
+        this(); 		//calls the no-argument constructor
 
-        if (key.equals("Cm") || key.equals("A") || key.equals("Gm")) {
+        if (key.equals("Gm") || key.equals("E"))
             setAccidental('F', +1);
-        } else if (key.equals("E")) {
-            setAccidental('F',+1);
-        } else if (key.equals("Dm")) {
+        else if (key.equals("Dm") || key.equals("B")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
-        } else if (key.equals("B")) {
-            setAccidental('F', +1);
-            setAccidental('C', +1);
-        } else if (key.equals("Am")) {
+        }  else if (key.equals("Am") || key.equals("F#")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
-        } else if (key.equals("F#")) {
-            setAccidental('F', +1);
-            setAccidental('C', +1);
-            setAccidental('G', +1);
-        } else if (key.equals("Em")) {
+        }  else if (key.equals("Em") || key.equals("C#")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
             setAccidental('D', +1);
-        } else if (key.equals("C#")){
-            setAccidental('F', +1);
-            setAccidental('C', +1);
-            setAccidental('G', +1);
-            setAccidental('D', +1);
-        } else if (key.equals("Bm")) {
+        }  else if (key.equals("Bm") || key.equals("G#")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
             setAccidental('D', +1);
             setAccidental('A', +1);
-        } else if (key.equals("G#")) {
-            setAccidental('F', +1);
-            setAccidental('C', +1);
-            setAccidental('G', +1);
-            setAccidental('D', +1);
-            setAccidental('A', +1);
-        } else if (key.equals("F#m")) {
+        }  else if (key.equals("F#m") || key.equals("D#")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
             setAccidental('D', +1);
             setAccidental('A', +1);
             setAccidental('E', +1);
-        } else if (key.equals("D#")) {
-            setAccidental('F', +1);
-            setAccidental('C', +1);
-            setAccidental('G', +1);
-            setAccidental('D', +1);
-            setAccidental('A', +1);
-            setAccidental('E', +1);
-        } else if (key.equals("C#m")) {
+        } else if (key.equals("C#m") || key.equals("A#")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
@@ -115,77 +88,36 @@ public class AccidentalAssociationMaker {
             setAccidental('A', +1);
             setAccidental('E', +1);
             setAccidental('B', +1);
-        } else if (key.equals("A#")) {
-            setAccidental('F', +1);
-            setAccidental('C', +1);
-            setAccidental('G', +1);
-            setAccidental('D', +1);
-            setAccidental('A', +1);
-            setAccidental('E', +1);
-            setAccidental('B', +1);
-        } else if (key.equals("Fm")) {
+        } 
+        // begin looking into minor scale keys
+        else if (key.equals("Fm") || key.equals("D"))
             setAccidental('B', -1);
-        } else if (key.equals("D")) {
-            setAccidental('B', -1);
-        } else if (key.equals("Bbm")) {
+        else if (key.equals("Bbm") || key.equals("G")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
-        } else if (key.equals("G")) {
-            setAccidental('B', -1);
-            setAccidental('E', -1);
-        } else if (key.equals("Ebm")) {
+        } else if (key.equals("Ebm") || key.equals("C")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
-        } else if (key.equals("C")) {
-            setAccidental('B', -1);
-            setAccidental('E', -1);
-            setAccidental('A', -1);
-        } else if (key.equals("Abm")) {
+        } else if (key.equals("Abm") || key.equals("F")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
             setAccidental('D', -1);
-        } else if (key.equals("F")) {
-            setAccidental('B', -1);
-            setAccidental('E', -1);
-            setAccidental('A', -1);
-            setAccidental('D', -1);
-        } else if (key.equals("Dbm")) {
+        } else if (key.equals("Dbm") || key.equals("Bb")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
             setAccidental('D', -1);
             setAccidental('G', -1);
-        } else if (key.equals("Bb")) {
-            setAccidental('B', -1);
-            setAccidental('E', -1);
-            setAccidental('A', -1);
-            setAccidental('D', -1);
-            setAccidental('G', -1);
-        } else if (key.equals("Gbm")) {
+        } else if (key.equals("Gbm") || key.equals("Eb")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
             setAccidental('D', -1);
             setAccidental('G', -1);
             setAccidental('C', -1);
-        } else if (key.equals("Eb")) {
-            setAccidental('B', -1);
-            setAccidental('E', -1);
-            setAccidental('A', -1);
-            setAccidental('D', -1);
-            setAccidental('G', -1);
-            setAccidental('C', -1);
-        } else if (key.equals("Cbm")) {
-            setAccidental('B', -1);
-            setAccidental('E', -1);
-            setAccidental('A', -1);
-            setAccidental('D', -1);
-            setAccidental('G', -1);
-            setAccidental('C', -1);
-            setAccidental('F', -1);
-        } else if (key.equals("Ab")) {
+        } else if (key.equals("Cbm") || key.equals("Ab")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);

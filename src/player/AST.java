@@ -91,6 +91,16 @@ public class AST {
             SingleNote other = (SingleNote)o;
             return this.pitch == other.pitch && this.accidental == other.accidental && this.octave == other.octave && this.duration.equals(other.duration);
         }
+
+        /**
+         * Gets the string representation of a SingleNote
+         * @return the string representation of a SingleNote
+         */
+        @Override
+        public String toString() {
+            return "SingleNote [pitch=" + pitch + ", duration=" + duration
+                    + ", octave=" + octave + ", accidental=" + accidental + "]";
+        }
         
     }
     
@@ -141,6 +151,15 @@ public class AST {
 
             Rest other = (Rest)o;
             return this.duration.equals(other.duration);
+        }
+
+        /**
+         * Gets the string representation of a Rest
+         * @return the string representation of a Rest
+         */
+        @Override
+        public String toString() {
+            return "Rest [duration=" + duration + "]";
         }
         
     }
@@ -204,6 +223,15 @@ public class AST {
 
             Chord other = (Chord)o;
             return this.duration.equals(other.duration) && this.notes.equals(other.notes);
+        }
+
+        /**
+         * Gets the string representation of a Chord
+         * @return the string representation of a Chord
+         */
+        @Override
+        public String toString() {
+            return "Chord [duration=" + duration + ", notes=" + notes + "]";
         }
         
     }
@@ -275,6 +303,15 @@ public class AST {
 
             Duplet other = (Duplet)o;
             return this.first.equals(other.first) && this.second.equals(other.second);
+        }
+
+        /**
+         * Gets the string representation of a Duplet
+         * @return the string representation of a Duplet
+         */
+        @Override
+        public String toString() {
+            return "Duplet [first=" + first + ", second=" + second + "]";
         }
         
     }
@@ -358,6 +395,16 @@ public class AST {
 
             Triplet other = (Triplet)o;
             return this.first.equals(other.first) && this.second.equals(other.second) && this.third.equals(other.third);
+        }
+
+        /**
+         * Gets the string representation of a Triplet
+         * @return the string representation of a Triplet
+         */
+        @Override
+        public String toString() {
+            return "Triplet [first=" + first + ", second=" + second
+                    + ", third=" + third + "]";
         }
         
     }
@@ -453,6 +500,16 @@ public class AST {
             Quadruplet other = (Quadruplet)o;
             return this.first.equals(other.first) && this.second.equals(other.second) && this.third.equals(other.third) && this.fourth.equals(other.fourth);
         }
+
+        /**
+         * Gets the string representation of a Quadruplet
+         * @return the string representation of a Quadruplet
+         */
+        @Override
+        public String toString() {
+            return "Quadruplet [first=" + first + ", second=" + second
+                    + ", third=" + third + ", fourth=" + fourth + "]";
+        }
         
     }
     
@@ -531,6 +588,16 @@ public class AST {
             Voice other = (Voice)o;
             return this.name.equals(other.name) && this.notes.equals(other.notes);
         }
+
+        /**
+         * Gets the string representation of a voice
+         * @return the string representation of a voice
+         */
+        @Override
+        public String toString() {
+            return "Voice [name=" + name + ",notes=" + notes + "]";
+        }
+        
     }
     
     /**
@@ -678,22 +745,22 @@ public class AST {
         }
 
         /**
-         * Gets the default duration of the song.
-         * The default duration header field is labeled "L:".
-         * @return the default duration of the song.
+         * Gets the default note length of the song.
+         * The default note length header field is labeled "L:".
+         * @return the default note length of the song.
          */
-        public RationalNumber getDefaultDuration() {
+        public RationalNumber getDefaultNoteLength() {
             return defaultNoteLength;
         }
 
         /**
-         * Sets the default duration of the song.
-         * The default duration header field is labeled "L:".
-         * @param defaultDuration the default duration of the song.
+         * Sets the default note length of the song
+         * The default note length header field is labeled "L:".
+         * @param defaultNoteLength the default note length of the song.
          */
-        public void setDefaultDuration(RationalNumber defaultDuration) {
+        public void setDefaultDuration(RationalNumber defaultNoteLength) {
         	this.headerCount++;
-            this.defaultNoteLength = defaultDuration;
+            this.defaultNoteLength = defaultNoteLength;
         }
 
         /**
@@ -824,6 +891,18 @@ public class AST {
                 return false;
             return true;
         }
+
+        /**
+         * Gets the string representation of a Song
+         * @return the string representation of a Song
+         */
+        @Override
+        public String toString() {
+            return "Song [composer=" + composer + ", keySignature=" + keySignature + ", defaultNoteLength="
+                    + defaultNoteLength + ", meter=" + meter + ", tempo="
+                    + tempo + ", title=" + title + ", index=" + index + "voices=" + voices + "]";
+        }
+        
         
     }
 
