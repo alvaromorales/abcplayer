@@ -58,28 +58,28 @@ public class Lexer{
     private StringBuffer patternMaker(){
         StringBuffer tokensBuf = new StringBuffer();
         //1- add COMPOSER
-        tokensBuf.append("((?<=C:)[A-Z a-z\\.\\-\\']+(?=(?:\\n|%)))");
+        tokensBuf.append("((?<=C:).+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //2- add KEY
-        tokensBuf.append("((?<=K:)[A-Ga-g][#b]?m?(?=(?:\\n|%)))");
+        tokensBuf.append("((?<=K:)[ \\t\\x0b\\r\\f]*[A-Ga-g][#b]?m?(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //3- add LENGTH
-        tokensBuf.append("((?<=L:)[0-9]+/[0-9]+(?=(?:\\n|%)))");
+        tokensBuf.append("((?<=L:)[ \\t\\x0b\\r\\f]*[0-9]+/[0-9]+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //4- add METER
-        tokensBuf.append("((?<=M:)(?:C\\|?|(?:[0-9]+/[0-9]+))(?=(?:\\n|%)))");
+        tokensBuf.append("((?<=M:)[ \\t\\x0b\\r\\f]*(?:C\\|?|(?:[0-9]+/[0-9]+))(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //5- add TEMPO
-        tokensBuf.append("((?<=Q:)[0-9]+(?=(?:\\n|%)))");
+        tokensBuf.append("((?<=Q:)[ \\t\\x0b\\r\\f]*[0-9]+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //6- add TITLE
-        tokensBuf.append("((?<=T:)[A-Z a-z\\.\\-\\']+(?=(?:\\n|%)))");
+        tokensBuf.append("((?<=T:)[ \\t\\x0b\\r\\f]*[A-Z a-z\\.\\-\\']+(?=%))");
         tokensBuf.append("|");
         //7- add INDEX
-        tokensBuf.append("((?<=X:)[0-9]+(?=(?:\\n|%)))");
+        tokensBuf.append("((?<=X:)[ \\t\\x0b\\r\\f]*[0-9]+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         //8- add VOICE
-        tokensBuf.append("((?<=V:)[\\-A-Z a-z\\.0-9]+(?=(?:\\n|%)))");
+        tokensBuf.append("((?<=V:)[ \\t\\x0b\\r\\f]*[\\-A-Z a-z\\.0-9]+(?=(?:\\n|%)))");
         tokensBuf.append("|");
         
         //9- add KEYNOTE
@@ -105,7 +105,7 @@ public class Lexer{
         tokensBuf.append("(\\(4)");
         tokensBuf.append("|");
         //16- add BAR
-        tokensBuf.append("(\\|)(?!:)(?!\\|)");
+        tokensBuf.append("(\\|)(?!(?:\\:|\\|))");
         tokensBuf.append("|");
         //17- add DOUBLE_BAR
         tokensBuf.append("((?:\\|\\|)|(?:\\[\\|)|(?:\\|\\]))");
@@ -120,10 +120,10 @@ public class Lexer{
         tokensBuf.append("(\\[[1-2])");
         tokensBuf.append("|");
         //21- add regex for comment, we won't consider it later
-        tokensBuf.append("(%+.*$)");
+        tokensBuf.append("(%.*)");
         tokensBuf.append("|");
-        //22- add regex xo whitespace
-        tokensBuf.append("( +)");
+        //22- add regex of whitespace
+        tokensBuf.append("(\\s+)");
         
         return tokensBuf;
 
@@ -151,7 +151,6 @@ public class Lexer{
         
         while (matcher.find()) {
             
-            System.out.println(matcher.group(0));
             if (matcher.group(map.get("COMMENT")) != null){
                 continue;
             }
