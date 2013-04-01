@@ -120,13 +120,13 @@ public class Lexer{
         tokensBuf.append("(\\[[1-2])");
         tokensBuf.append("|");
         //21- add regex for comment, we won't consider it later
-        tokensBuf.append("(%[\\w\\s]*(?=\\n))");
+        tokensBuf.append("(%+.*$)");
         tokensBuf.append("|");
         //22- add regex xo whitespace
         tokensBuf.append("( +)");
         
         return tokensBuf;
-        
+
     }
     
     
@@ -151,6 +151,7 @@ public class Lexer{
         
         while (matcher.find()) {
             
+            System.out.println(matcher.group(0));
             if (matcher.group(map.get("COMMENT")) != null){
                 continue;
             }
@@ -219,11 +220,7 @@ public class Lexer{
             else if (matcher.group(map.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
                 newToken.setValue(matcher.group(map.get("KEYNOTE")));
-
                 newToken.parseValue();
-                System.out.println(newToken.getOctave());
-                System.out.println(newToken.getDuration());
-                System.out.println(newToken.getValue());
                 tokens.add(newToken);
                 continue;
             }
