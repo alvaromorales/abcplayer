@@ -341,6 +341,60 @@ public class LexerTest {
     
 
             
-            
+    /**
+     * extra test
+     */
+    @Test
+    public void Test1() {
+        Lexer lexer = new Lexer("V: lower\nC8 C8 | C8 C8 | B,8 B,8 | C8 C8 |]");
+        ArrayList<Token> expected = new ArrayList<Token>();
+        
+        
+        Token first = new Token(Token.Type.VOICE);
+        first.setValue(" lower");
+        
+        
+        Token second = new Token(Token.Type.KEYNOTE);
+        second.setValue("C");
+        second.setAccidental(Integer.MAX_VALUE);
+        second.setOctave(0);
+        second.setDuration(new RationalNumber(8,1));
+        
+        Token bar = new Token(Token.Type.BAR);
+        bar.setValue("|");
+        
+        Token third = new Token(Token.Type.KEYNOTE);
+        third.setValue("B");
+        third.setAccidental(Integer.MAX_VALUE);
+        third.setOctave(-1);
+        third.setDuration(new RationalNumber(8,1));
+        
+
+        Token fifth = new Token(Token.Type.CHORD_END);
+        fifth.setValue("]");
+        
+        expected.add(first);
+        
+        expected.add(second);
+        expected.add(second);
+        expected.add(bar);
+        
+        expected.add(second);
+        expected.add(second);
+        expected.add(bar);
+        
+        expected.add(third);
+        expected.add(third);
+        expected.add(bar);
+        
+        expected.add(second);
+        expected.add(second);
+        expected.add(bar);
+
+        expected.add(fifth);
+        
+        
+        assertEquals(expected, lexer.lex());
+    }
     
 }

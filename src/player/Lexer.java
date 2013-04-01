@@ -122,7 +122,7 @@ public class Lexer{
         //21- add regex for comment, we won't consider it later
         tokensBuf.append("(%[\\w\\s]*(?=\n))");
         tokensBuf.append("|");
-        //22- add regec xo whitespace
+        //22- add regex xo whitespace
         tokensBuf.append("( +)");
         
         return tokensBuf;
