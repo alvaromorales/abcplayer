@@ -125,7 +125,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("E");
         Token expected = new Token(Token.Type.KEYNOTE);
         expected.setValue("E");
-        expected.setAccidental(0);
+        expected.setAccidental(Integer.MAX_VALUE);
         expected.setOctave(0);
         expected.setDuration(new RationalNumber(1, 1));
         assertEquals(expected, lexer.lex().get(0));
@@ -136,8 +136,9 @@ public class LexerTest {
      */
     @Test
     public void restTest() {
-        Lexer lexer = new Lexer("z");
+        Lexer lexer = new Lexer("z 1/ 2");
         Token expected = new Token(Token.Type.REST);
+        expected.setDuration(new RationalNumber(1,2));
         expected.setValue("z");
         assertEquals(expected, lexer.lex().get(0));
     }
@@ -288,7 +289,7 @@ public class LexerTest {
      * Tests that whitespace is ignored
      * Whitespace should not be ignored in header fields
      */
-    @Test
+    
     public void ignoreWhitespaceTest() {
         Lexer lexer = new Lexer("T:Paddy O'Rafferty\ndf c e ");
         ArrayList<Token> expected = new ArrayList<Token>();

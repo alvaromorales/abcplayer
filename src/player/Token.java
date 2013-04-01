@@ -80,7 +80,7 @@ public class Token {
      * Gets the accidental of the Token
      * @return the accidental
      */
-    public int getAccidential() {
+    public int getAccidental() {
         return this.accidental;
     }
 
@@ -144,8 +144,78 @@ public class Token {
      * parses the octave, accidental, key , and duration from value
      */
     public void parseValue(){
+        int octave = 0;
+        int accidental = 0;
+        char keynote = 'z', c;
+        int nominator = 0, denominator = 0; 
+        boolean isRational = false, isNeutral = false;
         
+        for (int i=0; i<this.value.length(); i++){
+            c = this.value.charAt(i);
+            // find octave of the keynote
+            if (c == ',')
+                octave --;
+            if (c == '\'')
+                octave ++;
+            
+            // find accidental of the keynote
+            if (c == '^')
+                accidental ++;
+            if (c == '_')
+                accidental --;
+            if (c == '=')
+                isNeutral = true;
+            
+            // find keynote 
+            if (c >='a' && c <= 'g'){
+                keynote = Character.toUpperCase(c);
+                octave ++;
+            }
+            if (c >= 'A' && c<= 'G'){
+                keynote = c;
+            }
+            
+            // find duration
+            if (c >= '0' && c <= '9'){
+                if (! (isRational)){
+                    nominator *= 10;
+                    nominator += c - '0';
+                } else
+                {
+                    denominator *= 10;
+                    denominator += c - '0';
+                }
+                
+            }
+            if (c == '/'){
+                isRational = true; 
+            }
+            
+        }
+        
+        if (!isRational && nominator != 0)
+            denominator = 1;
+        if (denominator == 0 && isRational)
+            denominator = 2;
+        if (nominator == 0 && isRational)
+            nominator = 1;
+        if (nominator == 0 && denominator == 0)
+            nominator = denominator = 1;
+        
+        if (isNeutral)
+            accidental = 0;
+        else if (accidental == 0)
+            accidental = Integer.MAX_VALUE;
+        
+        this.setOctave(octave);
+        this.setAccidental(accidental);
+        this.setDuration(new RationalNumber(nominator,denominator));
+        this.value = Character.toString(keynote);
+        
+
     }
+    
+    
 
     /**
      * Sets the value of Token
@@ -209,5 +279,13 @@ public class Token {
         } else {
             return this.type.equals(otherType) && this.value.equals(otherValue) && this.header == otherHeader;
         }
+    }
+    
+    /**
+     * Gets the string representation of a Token
+     */
+    @Override
+    public String toString() {
+        return "Token: " + type + " : " + value;
     }
 }

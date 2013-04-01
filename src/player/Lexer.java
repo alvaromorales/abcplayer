@@ -31,19 +31,20 @@ public class Lexer{
         map.put("TEMPO", 5);
         map.put("TITLE", 6);
         map.put("INDEX", 7);
-        map.put("KEYNOTE", 8);
-        map.put("REST", 9);
-        map.put("CHORD_START", 10);
-        map.put("CHORD_END", 11);
-        map.put("DUPLET_START", 12);
-        map.put("TRIPLET_START", 13);
-        map.put("QUAD_START", 14);
-        map.put("BAR", 15);
-        map.put("DOUBLE_BAR", 16);
-        map.put("REPEAT_START", 17);
-        map.put("REPEAT_END", 18);
-        map.put("REPEAT_NUMBER", 19);
-        map.put("VOICE", 20);
+        map.put("VOICE", 8);
+        map.put("KEYNOTE", 9);
+        map.put("REST", 10);
+        map.put("CHORD_START", 11);
+        map.put("CHORD_END", 12);
+        map.put("DUPLET_START", 13);
+        map.put("TRIPLET_START", 14);
+        map.put("QUAD_START", 15);
+        map.put("BAR", 16);
+        map.put("DOUBLE_BAR", 17);
+        map.put("REPEAT_START", 18);
+        map.put("REPEAT_END", 19);
+        map.put("REPEAT_NUMBER", 20);
+        map.put("COMMENT", 21);
     }
 
     
@@ -54,71 +55,73 @@ public class Lexer{
     private StringBuffer patternMaker(){
         StringBuffer tokensBuf = new StringBuffer();
         //1- add COMPOSER
-        tokensBuf.append("((?<=C:)[A-Z a-z\\.-]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=C:)[A-Z a-z\\.-]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //2- add KEY
-        tokensBuf.append("((?<=K:)[A-Za-z]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=K:)[A-Ga-g][#b]?m?(?=(?:\n|%)))");
         tokensBuf.append("|");
         //3- add LENGTH
-        tokensBuf.append("((?<=L:)[0-9]+/[0-9]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=L:)[0-9]+/[0-9]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //4- add METER
-        tokensBuf.append("((?<=M:)[0-9]+/[0-9]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=M:)(?:C\\|?|(?:[0-9]+/[0-9]+))(?=(?:\n|%)))");
         tokensBuf.append("|");
         //5- add TEMPO
-        tokensBuf.append("((?<=Q:)[0-9]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=Q:)[0-9]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //6- add TITLE
-        tokensBuf.append("((?<=T:)[A-Z a-z]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=T:)[A-Z a-z]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         //7- add INDEX
-        tokensBuf.append("((?<=X:)[0-9]+(?=(\n)|(%)))");
+        tokensBuf.append("((?<=X:)[0-9]+(?=(?:\n|%)))");
+        tokensBuf.append("|");
+        //8- add VOICE
+        tokensBuf.append("((?<=V:)[\\-A-Z a-z\\.0-9]+(?=(?:\n|%)))");
         tokensBuf.append("|");
         
-        //8- add KEYNOTE
-        tokensBuf.append("(((^)|(^^)|(_)|(__)|(=))?[A-Ga-g]((,*)|('*)) ([0-9]*/?[0-9]*))");
+        //9- add KEYNOTE
+        tokensBuf.append("((?:(?:\\^)|(?:\\^\\^)|(?:\\_)|(?:\\_\\_)|(?:\\=))?[A-Ga-g](?:(?:\\,*)|(?:\\'*))(?:[0-9]*/?[0-9]*)(?!:))");
         tokensBuf.append("|");
-        //9- add REST
-        tokensBuf.append("(z)");
+        //    
+        //10- add REST
+        tokensBuf.append("(z[0-9 ]*/?[0-9 ]*)");
         tokensBuf.append("|");
-        //10- add CHORD_START
-        tokensBuf.append("(\\[)");
+        //11- add CHORD_START
+        tokensBuf.append("(\\[(?![1-2]))");
         tokensBuf.append("|");
-        //11- add CHORD_END
+        //12- add CHORD_END
         tokensBuf.append("(\\])");
         tokensBuf.append("|");
-        //12- add DUPLET_START 
+        //13- add DUPLET_START 
         tokensBuf.append("(\\(2)");
         tokensBuf.append("|");
-        //13- add TRIPLET_START
+        //14- add TRIPLET_START
         tokensBuf.append("(\\(3)");
         tokensBuf.append("|");
-        //14- add QUAD_START
+        //15- add QUAD_START
         tokensBuf.append("(\\(4)");
         tokensBuf.append("|");
-        //15- add BAR
-        tokensBuf.append("(\\|)");
+        //16- add BAR
+        tokensBuf.append("(\\|(?!\\|)(?!:))");
         tokensBuf.append("|");
-        //16- add DOUBLE_BAR
+        //17- add DOUBLE_BAR
         tokensBuf.append("(\\|\\|)");
         tokensBuf.append("|");
-        //17- add REPEAT_START
+        //18- add REPEAT_START
         tokensBuf.append("(\\|:)");
         tokensBuf.append("|");
-        //18- add REPEAT_END
+        //19- add REPEAT_END
         tokensBuf.append("(:\\|)");
         tokensBuf.append("|");
-        //19- add REPEAT_NUMBER
+        //20- add REPEAT_NUMBER
         tokensBuf.append("(\\[[1-2])");
         tokensBuf.append("|");
-        //20- add VOICE
-        tokensBuf.append("((?<=V:)[A-Z a-z\\.-]+(?=(\n)|(%)))");
-        tokensBuf.append("|");
         //21- add regex for comment, we won't consider it later
-        tokensBuf.append("((?<=%)[a-zA-Z_0-9]*(?=\n))");
+        tokensBuf.append("((?<=%)[a-zA-Z_0-9 ]*(?=\n))");
         tokensBuf.append("|");
-        //22- add an extra character, we will use this to detect if there's syntax error or not
-        tokensBuf.append("(.?)");
+//        //22- add an extra character, we will use this to detect if there's syntax error or not
+//        //tokensBuf.append("(.?)");
+//        
         return tokensBuf;
         
     }
@@ -144,8 +147,10 @@ public class Lexer{
         
         
         while (matcher.find()) {
-            
-            if (matcher.group(map.get("COMPOSER")) != null) {
+            if (matcher.group(map.get("COMMENT")) != null){
+                continue;
+            }
+            else if (matcher.group(map.get("COMPOSER")) != null) {
                 Token newToken = new Token(Token.Type.COMPOSER);
                 newToken.setValue(matcher.group(map.get("COMPOSER")));
                 tokens.add(newToken);
@@ -194,102 +199,101 @@ public class Lexer{
                 continue;
             }
             
-            
-            
+            else if (matcher.group(map.get("VOICE")) != null) {
+                Token newToken = new Token(Token.Type.VOICE);
+                newToken.setValue(matcher.group(map.get("VOICE")));
+                tokens.add(newToken);
+                continue;
+            }
             
             else if (matcher.group(map.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
                 newToken.setValue(matcher.group(map.get("KEYNOTE")));
+                System.out.println(newToken.getValue());
                 newToken.parseValue();
-                
+                System.out.println(newToken.getValue());
+                System.out.println(newToken.getDuration());
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("REST")) != null) {
+                Token newToken = new Token(Token.Type.REST);
+                newToken.setValue(matcher.group(map.get("REST")));
+                newToken.parseValue();
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("CHORD_START")) != null) {
+                Token newToken = new Token(Token.Type.CHORD_START);
+                newToken.setValue(matcher.group(map.get("CHORD_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("CHORD_END")) != null) {
+                Token newToken = new Token(Token.Type.CHORD_END);
+                newToken.setValue(matcher.group(map.get("CHORD_END")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("DUPLET_START")) != null) {
+                Token newToken = new Token(Token.Type.DUPLET_START);
+                newToken.setValue(matcher.group(map.get("DUPLET_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("TRIPLET_START")) != null) {
+                Token newToken = new Token(Token.Type.TRIPLET_START);
+                newToken.setValue(matcher.group(map.get("TRIPLET_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("QUAD_START")) != null) {
+                Token newToken = new Token(Token.Type.QUAD_START);
+                newToken.setValue(matcher.group(map.get("QUAD_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("BAR")) != null) {
+                Token newToken = new Token(Token.Type.BAR);
+                newToken.setValue(matcher.group(map.get("BAR")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("DOUBLE_BAR")) != null) {
+                Token newToken = new Token(Token.Type.DOUBLE_BAR);
+                newToken.setValue(matcher.group(map.get("DOUBLE_BAR")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("REPEAT_START")) != null) {
+                Token newToken = new Token(Token.Type.REPEAT_START);
+                newToken.setValue(matcher.group(map.get("REPEAT_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("REPEAT_END")) != null) {
+                Token newToken = new Token(Token.Type.REPEAT_END);
+                newToken.setValue(matcher.group(map.get("REPEAT_END")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+            else if (matcher.group(map.get("REPEAT_NUMBER")) != null) {
+                Token newToken = new Token(Token.Type.REPEAT_NUMBER);
+                newToken.setValue(matcher.group(map.get("REPEAT_NUMBER")));
                 tokens.add(newToken);
                 continue;
-            }
-            
-            else if (matcher.group(map.get("INDEX")) != null) {
-                Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
-                tokens.add(newToken);
-                continue;
-            }
-            
+            }            
         }
 
         
