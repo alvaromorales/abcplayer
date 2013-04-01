@@ -49,10 +49,11 @@ public class Token {
            type == Type.METER || 
            type == Type.TEMPO ||
            type == Type.TITLE ||
-           type == Type.INDEX){
-            this.header=true;
+           type == Type.INDEX||
+           type == Type.VOICE){
+        	this.header=true;
         }
-        	
+
     }
     
     

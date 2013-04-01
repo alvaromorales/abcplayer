@@ -2,6 +2,8 @@ package player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Class representing the AST for the abcplayer
@@ -30,7 +32,7 @@ public class AST {
             this.octave = octave;
             this.accidental = accidental;
         }
-
+        
         /**
          * Gets the pitch of the note
          * @return the pitch of the note
@@ -71,6 +73,25 @@ public class AST {
             return v.visit(this);
         }        
         
+        /**
+         * Checks if an SingleNote is equal to another SingleNote
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof SingleNote)) {
+                return false;
+            }
+
+            SingleNote other = (SingleNote)o;
+            return this.pitch == other.pitch && this.accidental == other.accidental && this.octave == other.octave && this.duration.equals(other.duration);
+        }
+        
     }
     
     /**
@@ -103,6 +124,25 @@ public class AST {
             return v.visit(this);
         }
         
+        /**
+         * Checks if an Rest is equal to another Rest
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Rest)) {
+                return false;
+            }
+
+            Rest other = (Rest)o;
+            return this.duration.equals(other.duration);
+        }
+        
     }
     
     /**
@@ -122,6 +162,7 @@ public class AST {
             this.notes = notes;
         }
 
+        
         /**
          * Gets the duration of the chord
          * @return the duration of the chord
@@ -144,6 +185,25 @@ public class AST {
         @Override
         public <E> E accept(Visitor<E> v) {
             return v.visit(this);
+        }
+        
+        /**
+         * Checks if an Chord is equal to another Chord
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Chord)) {
+                return false;
+            }
+
+            Chord other = (Chord)o;
+            return this.duration.equals(other.duration) && this.notes.equals(other.notes);
         }
         
     }
@@ -197,6 +257,26 @@ public class AST {
         public <E> E accept(Visitor<E> v) {
             return v.visit(this);
         }
+        
+        /**
+         * Checks if an Duplet is equal to another Duplet
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Duplet)) {
+                return false;
+            }
+
+            Duplet other = (Duplet)o;
+            return this.first.equals(other.first) && this.second.equals(other.second);
+        }
+        
     }
     
     /**
@@ -259,6 +339,25 @@ public class AST {
         @Override
         public <E> E accept(Visitor<E> v) {
             return v.visit(this);
+        }
+        
+        /**
+         * Checks if an Triplet is equal to another Triplet
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Triplet)) {
+                return false;
+            }
+
+            Triplet other = (Triplet)o;
+            return this.first.equals(other.first) && this.second.equals(other.second) && this.third.equals(other.third);
         }
         
     }
@@ -336,6 +435,25 @@ public class AST {
             return v.visit(this);
         }
         
+        /**
+         * Checks if an Quadruplet is equal to another Quadruplet
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Quadruplet)) {
+                return false;
+            }
+
+            Quadruplet other = (Quadruplet)o;
+            return this.first.equals(other.first) && this.second.equals(other.second) && this.third.equals(other.third) && this.fourth.equals(other.fourth);
+        }
+        
     }
     
     /**
@@ -343,14 +461,23 @@ public class AST {
      */
     public static class Voice implements NoteElement {
         private List<NoteElement> notes = new ArrayList<NoteElement>();
-        
+        private String name;
+
         /**
          * Creates a Voice object
+         * @param name, the name of the voice
          */
-        public Voice() {
-            
+        public Voice(String name) {
+            this.name=name;
         }
         
+        /**
+         * Creates an anonymous Voice object
+         */
+        public Voice(){
+        	this.name=null;
+
+        }
         /**
          * Adds a NoteElement to the voice
          * @param e the NoteElement to add
@@ -382,10 +509,28 @@ public class AST {
         @Override
         public RationalNumber getDuration() {
             RationalNumber result = new RationalNumber(0, 1);
-            for (NoteElement n: notes) {
+            for (NoteElement n: notes)
                 result = result.add(n.getDuration());
-            }
             return result;
+        }
+        
+        /**
+         * Checks if an Voice is equal to another Voice
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { // quick check
+                return true;
+            }
+
+            if (o == null || !(o instanceof Voice)) {
+                return false;
+            }
+
+            Voice other = (Voice)o;
+            return this.name.equals(other.name) && this.notes.equals(other.notes);
         }
     }
     
@@ -393,30 +538,85 @@ public class AST {
      * Class representing a song
      */
     public static class Song implements NoteElement {
-        private List<Voice> voices = new ArrayList<Voice>();
+        private Map<String,Voice> voices = new HashMap<String,Voice>();
+        private Voice currentVoice=null;
         private String composer;
         private String keySignature;
-        private RationalNumber defaultDuration;
+        private RationalNumber defaultNoteLength;
         private RationalNumber meter;
         private int tempo;
-        private String title;
-        private String index;
+        private int headerCount=0;
 
+        private String title;
+        private int index;
+
+        public AccidentalAssociationMaker accidentalAssociator=new AccidentalAssociationMaker();
+        
         /**
          * Creates a Song object
          */
         public Song() {
-            
+        	this.meter=new RationalNumber(4,4);
+        	this.defaultNoteLength=new RationalNumber(1,8);
+        	this.tempo=100;
         }
         
+        /**
+         * Returns list of voices in song
+         * @return list of voices in song
+         */
+        public List<Voice> getVoices(){
+        	return new ArrayList<Voice>(voices.values());
+        }
+        
+        /**
+         * Adds a new note to the song.
+         * The new note is added to the current Voice.
+         * If no voice exists, create one with voice.name=null
+         * @param e, the NoteElement to add
+         */
+        public void add(NoteElement e){
+        	if(currentVoice == null){
+        		this.getVoice(null);
+        		this.currentVoice=voices.get(null);
+        	}
+        	currentVoice.addNote(e);
+        }
+        
+        /**
+         * Returns the header counter, which counts how many header fields have been set already.
+         * @return headerCount, the number of header fields set already
+         */
+        public int getHeaderCount(){
+        	return this.headerCount;
+        }
+        
+        /**
+         * Sets the header counter to -2^31. To be used when K: matches, 
+         * to make sure that no other header field is read after it.
+         */
+        public void minimizeHeaderCount(){
+        	this.headerCount=Integer.MIN_VALUE;
+        }
         /**
          * Adds a Voice to the song
          * @param v the Voice to add
          */
         public void addVoice(Voice v) {
-            voices.add(v);
+            voices.put(v.name,v); 					//adds a voice object to the HashMap
         }
 
+        /**
+         * Adds a new Voice to the song. If voice exists, changes to that voice.
+         * @param name, the name of the Voice to create or fetch
+         */
+        public void getVoice(String name) {     	//handles Voice tokens both in header and body
+        	if(voices.containsKey(name))        	//if voice exists
+        		this.currentVoice=voices.get(name); //fetch that voice
+        	else									//if doesn't exist create it
+        		this.addVoice(new Voice(name)); 	//create voice if it doesn't exist
+        }
+        
         /**
          * Accepts a visitor
          */
@@ -425,21 +625,7 @@ public class AST {
             return v.visit(this);
         }
         
-        /**
-         * Gets the voices in the song
-         * @return the voices in the song
-         */
-        public List<Voice> getVoices() {
-            return voices;
-        }
 
-        /**
-         * Gets the last voice added to the song.
-         * @return the last voice added
-         */
-        public Voice getLastVoice() {
-        	return voices.get(voices.size()-1);
-        }
         /**
          * Gets the RationalNumber duration of all the Voices in the Song
          * @return the RationalNumber duration of all the Voices in the Song
@@ -447,7 +633,7 @@ public class AST {
         @Override
         public RationalNumber getDuration() {
             RationalNumber result = new RationalNumber(0, 1);
-            for (Voice v: voices) {
+            for (Voice v: this.voices.values()) {
                 result = result.add(v.getDuration());
             }
             return result;
@@ -467,7 +653,8 @@ public class AST {
          * The composer header field is labeled "C:".
          * @param composer the name of the composer of the song.
          */
-        public void setComposer(String composer) {
+        public void setComposer(String composer){
+        	this.headerCount++;
             this.composer = composer;
         }
 
@@ -486,7 +673,9 @@ public class AST {
          * @param keySignature the key signature of the song.
          */
         public void setKeySignature(String keySignature) {
+        	this.headerCount++;
             this.keySignature = keySignature;
+            this.accidentalAssociator=new player.AccidentalAssociationMaker(keySignature);
         }
 
         /**
@@ -495,7 +684,7 @@ public class AST {
          * @return the default duration of the song.
          */
         public RationalNumber getDefaultDuration() {
-            return defaultDuration;
+            return defaultNoteLength;
         }
 
         /**
@@ -504,7 +693,8 @@ public class AST {
          * @param defaultDuration the default duration of the song.
          */
         public void setDefaultDuration(RationalNumber defaultDuration) {
-            this.defaultDuration = defaultDuration;
+        	this.headerCount++;
+            this.defaultNoteLength = defaultDuration;
         }
 
         /**
@@ -522,6 +712,7 @@ public class AST {
          * @param meter the meter of the song
          */
         public void setMeter(RationalNumber meter) {
+        	this.headerCount++;
             this.meter = meter;
         }
 
@@ -540,6 +731,7 @@ public class AST {
          * @param tempo the tempo of the song.
          */
         public void setTempo(int tempo) {
+        	this.headerCount++;
             this.tempo = tempo;
         }
 
@@ -558,6 +750,7 @@ public class AST {
          * @param title the title of the song
          */
         public void setTitle(String title) {
+        	this.headerCount++;
             this.title = title;
         }
 
@@ -566,7 +759,7 @@ public class AST {
          * The index header field is labeled "X:".
          * @return the index of the song.
          */
-        public String getIndex() {
+        public int getIndex() {
             return index;
         }
 
@@ -575,10 +768,64 @@ public class AST {
          * The index header field is labeled "X:".
          * @param index the index of the song.
          */
-        public void setIndex(String index) {
+        public void setIndex(int index) {
+        	this.headerCount++;
             this.index = index;
         }
 
+
+        /**
+         * Checks if a Song is equal to another Song
+         * Auto-generated by eclipse
+         * @param o the Object to compare to
+         * @return true if equal, else false
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Song other = (Song) obj;
+            if (composer == null) {
+                if (other.composer != null)
+                    return false;
+            } else if (!composer.equals(other.composer))
+                return false;
+            if (defaultNoteLength == null) {
+                if (other.defaultNoteLength != null)
+                    return false;
+            } else if (!defaultNoteLength.equals(other.defaultNoteLength))
+                return false;
+            if (index != other.index)
+                return false;
+            if (keySignature == null) {
+                if (other.keySignature != null)
+                    return false;
+            } else if (!keySignature.equals(other.keySignature))
+                return false;
+            if (meter == null) {
+                if (other.meter != null)
+                    return false;
+            } else if (!meter.equals(other.meter))
+                return false;
+            if (tempo != other.tempo)
+                return false;
+            if (title == null) {
+                if (other.title != null)
+                    return false;
+            } else if (!title.equals(other.title))
+                return false;
+            if (voices == null) {
+                if (other.voices != null)
+                    return false;
+            } else if (!voices.equals(other.voices))
+                return false;
+            return true;
+        }
+        
     }
 
 }

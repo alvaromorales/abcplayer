@@ -12,7 +12,6 @@ import org.junit.Test;
  *  - test the getIntValue method
  *  - test the getRationalValue method
  */
-
 public class TokenTest {
     
     /**

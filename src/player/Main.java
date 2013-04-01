@@ -1,12 +1,43 @@
 package player;
 
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+
+import javax.sound.midi.MidiUnavailableException;
+
+import sound.SequencePlayer;
 
 /**
  * Main entry point of your application.
  */
 public class Main {
 
+	/**
+	 * Reads file from filename to a single String
+	 * @param path, the path to file. If file not found, IOException is thrown.
+	 * @return String, the contents of the file in the default charset.
+	 */
+	
+	private static String readFile(String path) throws IOException {
+		
+		  FileInputStream stream = new FileInputStream(new File(path));
+		  try {
+		    FileChannel fc = stream.getChannel();
+		    MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+		    /* Instead of using default, pass in a decoder. */
+		    return Charset.defaultCharset().decode(bb).toString();
+		  }
+		  finally {
+		    stream.close();
+		  }
+		}
     /**
      * Plays the input file using Java MIDI API and displays
      * header information to the standard output stream.
@@ -16,20 +47,41 @@ public class Main {
      * 
      * @param file the name of input abc file
      */
-    public static void play(String file) {
-        // YOUR CODE HERE
-    }
+    public static void play(String file) throws IOException {
 
-//    public static void main(String[] args) {
-        // CALL play() HERE
-//    }
+    	String input_string=readFile(file);
+
+    	Lexer lexer = new Lexer(input_string);
+    	Parser parser = new Parser(lexer);
+    	parser.parse(lexer.lex());
+         
+    	System.out.println(parser.getSong().toString()); //debugging only
+    	
+    	DurationVisitor durationV = new DurationVisitor();
+        durationV.visit(parser.getSong());
+        
+        PlayerVisitor visitor = new PlayerVisitor(140, durationV.getTicksPerQuarter());
+        visitor.visit(parser.getSong());
+        SequencePlayer player = visitor.getPlayer();
+        try {
+            player.play();
+        } catch (MidiUnavailableException e) {
+            e.printStackTrace();
+        }
+    		
+    }
     
     public static void main(String[] args){
-        String input = "| V B C D V: D D D B ||";
-
-        ArrayList <Token> tokens = Lexer.Lexer(input);
-        for (Token token : tokens)
-            System.out.println(token.getValue());
+        String filename="sample_abc/prelude.abc";
+        try{
+        	play(filename);
+        }
+        catch(IOException e){
+        	System.err.println(e.getMessage());
+        	System.exit(-1);
+        }
+        
+        
+       
     }
-
 }
