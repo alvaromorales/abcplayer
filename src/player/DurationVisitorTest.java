@@ -1,9 +1,7 @@
 package player;
 
 import static org.junit.Assert.*;
-
 import org.junit.Test;
-
 import player.AST.*;
 
 /**
