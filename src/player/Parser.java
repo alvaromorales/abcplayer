@@ -9,6 +9,7 @@ import player.Token.Type;
 public class Parser {
 
 	private Lexer lexer;
+	private Song song;
 
 	/**
 	 * Constructor, attaches lexer to parser, assuming lexer is initialized
@@ -33,22 +34,55 @@ public class Parser {
 	}
 	
 	/**
-	 * Apply accidental association table
+	 * Apply accidental association table to a token to get a SingleNote
 	 * @param tok, the token to parse into a KeyNote
 	 * @param Associator, the accidentalAssociator that associates notes with the corrects accidentals
 	 * @return New Note, the new note with the correct accidentals applied
 	 */
 	
-	public SingleNote applyAccidental(Token tok, AccidentalAssociationMaker Associator){
+	public SingleNote applyAccidental(Token tok){
 		
-		if(tok.getAccidential() == 0) 				//if accidental is neutral disregard table info
+		if(tok.getAccidential() == 0) 									//if accidental is neutral disregard table info
 			return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), 0);  				//If neutral, disregard table information
 		
-		if(tok.getAccidential()<-2 || tok.getAccidential()>2)
-			return new SingleNote(tok.getValue().charAt(0))
+		else if(tok.getAccidential()<-2 || tok.getAccidential()>2)
+			return new AST.SingleNote(tok.getValue().charAt(0), 
+					tok.getDuration(), 
+					tok.getOctave(), 
+					this.song.accidentalAssociator.getAccidental(tok.getValue().charAt(0))); //if no accidental set fetch default from table
 		
-		return newnote;
+		
+		this.song.accidentalAssociator.setAccidental(tok.getValue().charAt(0), tok.getAccidential());
+		return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), tok.getAccidential());
+		
 	}
+	
+	/**
+	 * Apply accidental association table to a note's attributes to get new a SingleNote
+	 * @param pitch, the pitch of the to-be-created SingleNote
+	 * @param duration, the duration of the to-be-created SingleNote
+	 * @param octave, the octave of the to-be-created SingleNote
+	 * @param accidental, the accidental of the to-be-created SingleNote, after cross-checking with the associator
+	 * @return New Note, the new note with the correct accidentals applied
+	 */
+	
+	public SingleNote applyAccidental(final char pitch, final RationalNumber duration, final int octave, final int accidental){
+		
+		if(accidental == 0) 												//if accidental is neutral disregard table info
+			return new SingleNote(pitch, duration, octave, 0);  			//If neutral, disregard table information
+		
+		else if(accidental<-2 || accidental>2)
+			return new AST.SingleNote(pitch, 
+					duration, 
+					octave, 
+					this.song.accidentalAssociator.getAccidental(pitch)); //if no accidental set fetch default from table
+		
+		
+		this.song.accidentalAssociator.setAccidental(pitch, accidental);
+		return new SingleNote(pitch, duration, octave, accidental);
+		
+	}
+	
 	/**
 	 * Parses a list of keyNotes into a Chord
 	 * @param inp, list of tokens to parse into a Chord
@@ -59,7 +93,7 @@ public class Parser {
 			if(j.getType() != Token.Type.KEYNOTE)
 				throw new ParserException("Found non-single note inside a chord");
 			
-			buffer.add(new SingleNote(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidential()));
+			buffer.add(this.applyAccidental(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidential()));
 		}
 		return new Chord(duration,buffer);
 	}
@@ -71,7 +105,7 @@ public class Parser {
 	 */
 	public Duplet parseDuplet(List<Token> inp){
 		try{
-			SingleNote note1=new SingleNote(inp.get(0).getValue().charAt(0), 
+			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(3, 2)), 
 													inp.get(0).getOctave(), 
 													inp.get(0).getAccidential());
@@ -96,17 +130,17 @@ public class Parser {
 	 */
 	public Triplet parseTriplet(List<Token> inp){
 		try{
-			SingleNote note1=new SingleNote(inp.get(0).getValue().charAt(0), 
+			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(0).getOctave(), 
 													inp.get(0).getAccidential());
 		
-			SingleNote note2=new SingleNote(inp.get(1).getValue().charAt(0), 
+			SingleNote note2=this.applyAccidental(inp.get(1).getValue().charAt(0), 
 													inp.get(1).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(1).getOctave(), 
 													inp.get(1).getAccidential());
 			
-			SingleNote note3=new SingleNote(inp.get(1).getValue().charAt(0), 
+			SingleNote note3=this.applyAccidental(inp.get(1).getValue().charAt(0), 
 													inp.get(2).getDuration().mul(new RationalNumber(2, 3)), 
 													inp.get(2).getOctave(), 
 													inp.get(2).getAccidential());
@@ -126,22 +160,22 @@ public class Parser {
 	 */
 	public Quadruplet parseQuad(List<Token> inp){
 		try{
-			SingleNote note1=new SingleNote(inp.get(0).getValue().charAt(0), 
+			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(0).getOctave(), 
 													inp.get(0).getAccidential());
 		
-			SingleNote note2=new SingleNote(inp.get(1).getValue().charAt(0), 
+			SingleNote note2=this.applyAccidental(inp.get(1).getValue().charAt(0), 
 													inp.get(1).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(1).getOctave(), 
 													inp.get(1).getAccidential());
 			
-			SingleNote note3=new SingleNote(inp.get(2).getValue().charAt(0), 
+			SingleNote note3=this.applyAccidental(inp.get(2).getValue().charAt(0), 
 													inp.get(2).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(2).getOctave(), 
 													inp.get(2).getAccidential());
 			
-			SingleNote note4=new SingleNote(inp.get(3).getValue().charAt(0), 
+			SingleNote note4=this.applyAccidental(inp.get(3).getValue().charAt(0), 
 													inp.get(3).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(3).getOctave(), 
 													inp.get(3).getAccidential());
@@ -159,7 +193,7 @@ public class Parser {
 	 */
 	public Song parse(List<Token> inp){
 
-		Song song=new Song();
+		this.song=new Song();
 		int i=0;
 		while(i<inp.size()){
 			Token it=inp.get(i); //iterator object from index 
@@ -205,23 +239,28 @@ public class Parser {
 				switch(it.getType()){
 				case BAR:
 					song.accidentalAssociator.revert(); // restore default accidentals for the piece
+					
 				case CHORD_END:
 					throw new ParserException("Unexpected Chord End");
+					
 				case CHORD_START:
 					int offset=this.findNextType(inp.subList(i,inp.size()-1), Token.Type.CHORD_END); //find CHORD_END
 					if(offset<0)
 						throw new ParserException("End of Chord not found");
-					song.add(this.parseChord(it.getDuration(), inp.subList(i+1, i+offset-1))); //add chord to current song
+					song.add(this.parseChord(it.getDuration(), inp.subList(i+1, i+offset-1)));  	//add chord to current song
+					i+=offset; 																		//skip until the end of the chord
 					
-					i+=offset; //skip until the end of the chord
 				case DUPLET_START:
 					song.add(this.parseDuplet(inp.subList(i+1, i+3)));
-					i+=2; //skip to the next usuable token
+					i+=2; //skip to the next usable token
+					
 				case KEYNOTE:
-					song.add(new SingleNote(it.getValue().charAt(0), it.getDuration(), it.getOctave(), it.getAccidential()));	
+					song.add(this.applyAccidental(it));	
+					
 				case QUAD_START:
 					song.add(this.parseQuad(inp.subList(i+1, i+5)));
-					i+=4; //skip to the next usuable token
+					i+=4; //skip to the next usable token
+					
 				case REPEAT_END:
 					break;
 				case REPEAT_NUMBER:
