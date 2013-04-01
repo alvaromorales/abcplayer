@@ -17,8 +17,19 @@ public class Parser {
 	 */
 	public Parser(Lexer lexer){
 		this.lexer=lexer;
+
 	}
 
+	/**
+	 * Returns the song attached to this parser. 
+	 * Be sure to run Parser.Parser(lexer) and Parser.parse(inp) 
+	 * before trying to access the song, otherwise it won't be of
+	 * any use.
+	 * @return
+	 */
+	public Song getSong(){
+		return this.song;
+	}
 	/**
 	 * Returns the index of the next token with a specific type
 	 * @param inp, the input list to search
@@ -159,7 +170,7 @@ public class Parser {
 	 * @return quad, a new quad 
 	 */
 	public Quadruplet parseQuad(List<Token> inp){
-		try{
+			System.out.println(inp.toString());
 			SingleNote note1=this.applyAccidental(inp.get(0).getValue().charAt(0), 
 													inp.get(0).getDuration().mul(new RationalNumber(3, 4)), 
 													inp.get(0).getOctave(), 
@@ -171,7 +182,11 @@ public class Parser {
 													inp.get(1).getAccidental());
 			
 			SingleNote note3=this.applyAccidental(inp.get(2).getValue().charAt(0), 
-													inp.get(2).getDuration().mul(new RationalNumber(3, 4)), 
+													inp.get(2)
+													.getDuration()
+													.mul(
+															new RationalNumber(3, 4)
+															), 
 													inp.get(2).getOctave(), 
 													inp.get(2).getAccidental());
 			
@@ -182,105 +197,145 @@ public class Parser {
 		
 			return new Quadruplet(note1 , note2, note3, note4);
 			
-		}
-		catch(ArrayIndexOutOfBoundsException e){ // in case 0, 1 or 2 fails
-			throw new ParserException(e.getMessage()); //throw ParserException
-		}
+	
 	}
 	/**
 	 * Parses the list of tokens produced by the lexer to fill the AST for the song.
 	 * @param inp, the list of tokens produced by the lexer
 	 */
-	public Song parse(List<Token> inp){
-
-		this.song=new Song();
+	public void parse(List<Token> inp){
+		
+		this.song=new Song(); 
 		int i=0;
 		while(i<inp.size()){
-			Token it=inp.get(i); //iterator object from index 
-			
-			if(it.inHeader()){ //We are parsing the header
+			Token it=inp.get(i); 														//iterator object from index 
+			System.out.println(it.toString());
+			if(it.inHeader()){ 															//We are parsing the header
+				++i;
 				switch(it.getType()){
 				case COMPOSER:
 					if(song.getHeaderCount()<0)
 						throw new ParserException("Header field found after KEY");
 					song.setComposer(it.getValue());
+					break;
 				case KEY:
 					if(song.getHeaderCount()<0)
 						throw new ParserException("Duplicate KEY found in header");
 					song.minimizeHeaderCount();
 					song.setKeySignature(it.getValue());
+					break;
 				case LENGTH:
 					if(song.getHeaderCount()<0)
 						throw new ParserException("LENGTH Header field found after KEY");
 					song.setDefaultDuration(it.getRationalValue());
+					break;
 				case METER:
 					if(song.getHeaderCount()<0)
 						throw new ParserException("METER Header field found after KEY");
 					song.setMeter(it.getRationalValue());
+					break;
 				case TEMPO:
 					if(song.getHeaderCount()<0)
 						throw new ParserException("TEMPO Header field found after KEY");
 					song.setTempo(it.getIntValue());
+					break;
 				case TITLE:
 					if(song.getHeaderCount()!=1)
 						throw new ParserException("Second header field is not the title");
 					song.setTitle(it.getValue());
+					break;
 				case INDEX:
 					if(song.getHeaderCount()!=0)
 						throw new ParserException("First header field is not the index");
 					song.setIndex(it.getIntValue());
+					break;
 				case VOICE:
 					song.getVoice(it.getValue());
-				default:
-					throw new ParserException("Invalid type found in header");		
+					break;
+				default:  //add parserexception to default
+					throw new ParserException("Invalid type found in body");
 				}
 			}
 			else { 																					//We are parsing the body
 				switch(it.getType()){
 				case BAR:
 					song.accidentalAssociator.revert(); 											// restore default accidentals for the piece
-					
+					++i;
+					break;
 				case CHORD_END:
-					throw new ParserException("Unexpected Chord End");
-					
+					++i;
+					break;
 				case CHORD_START:
 					int offset=this.findNextType(inp.subList(i,inp.size()-1), Token.Type.CHORD_END); //find CHORD_END
 					if(offset<0)
 						throw new ParserException("End of Chord not found");
 					song.add(this.parseChord(it.getDuration(), inp.subList(i+1, i+offset-1)));  	//add chord to current song
-					i+=offset; 																		//skip until the end of the chord
-					
+					i+=(offset+1); 																		//skip until the end of the chord
+					break;
 				case DUPLET_START:
 					song.add(this.parseDuplet(inp.subList(i+1, i+3)));
-					i+=2; 																			//skip to the next usable token
-					
-				case KEYNOTE:
-					song.add(this.applyAccidental(it));	
-					
-				case QUAD_START:
-					song.add(this.parseQuad(inp.subList(i+1, i+5)));
-					i+=4; 																			//skip to the next usable token
-					
-				case REPEAT_END:
+					i+=3; 																			//skip to the next usable token
 					break;
-				case REPEAT_NUMBER:
+				case TRIPLET_START:
+					song.add(this.parseTriplet(inp.subList(i+1, i+4)));
+					i+=4;																	//skip to the next usable token
+					break;
+				case KEYNOTE:
+					song.add(this.applyAccidental(it));												//apply accidental to token
+					++i;
+					break;
+				case QUAD_START:
+					System.out.println(it.toString());
+					song.add(this.parseQuad(inp.subList(i+1, i+5)));
+					i+=5; 																			//skip to the next usable token
 					break;
 				case REPEAT_START:
+					++i;																			//do nothing, wait for a REPEAT_END to show up
+					break;
+				case REPEAT_END:
+					int j=i-1;
+					while(!((inp.get(j).getType() == Token.Type.REPEAT_START && inp.get(j).getValue()!="PASS") || 
+						    inp.get(j).inHeader()==true ||
+						    inp.get(j).getType()==Token.Type.DOUBLE_BAR))							//Look for a repeat_start or a header element in order to start repeating
+						j--;
+					if(inp.get(j).getType() == Token.Type.REPEAT_START)
+						inp.get(j).setValue("PASS");
+					i=j+1;
+					break;
+				case REPEAT_NUMBER:
+					if(it.getValue().contains("0"))
+						i=it.getOctave();															//Octave is overloaded, look below in the comments
+					else if(it.getValue().contains("1")){
+						int k=i+1;
+						while(inp.get(k).getType()!=Token.Type.BAR            && 
+							  inp.get(k).getType()!=Token.Type.DOUBLE_BAR     && 
+							  (inp.get(k).getType()!=Token.Type.REPEAT_NUMBER ||					//REPEAT_NUMBER and getValue()=="[2"
+							   !(inp.get(k).getValue().contains("2")))        &&
+							  inp.get(k).getType()!=Token.Type.REPEAT_END     &&
+							  inp.get(k).getType()!=Token.Type.REPEAT_START) 						//search for one of those Type's that stop a repeat_number
+							k++;
+						it.setOctave(k);															//octave is overloaded to keep the redirection index
+						it.setValue("[0");															// "[0" is a "[1" that was passed already
+						++i;
+					}
+					else
+						++i;																		//No need to handle "[2" as it's handled by "[1"
+					break;
+				case DOUBLE_BAR:
+					song.accidentalAssociator.revert();
+					++i;
 					break;
 				case REST:
 					song.add(new Rest(it.getDuration()));
-				case TRIPLET_START:
-					song.add(this.parseTriplet(inp.subList(i+1, i+4)));
-					i+=3; 																			//skip to the next usable token
+					++i;
+					break;
 				default:
 					throw new ParserException("Invalid type found in body");
-
 				}
 			}
-			++i;
+			
 		}
 
-		return song;
 	}
 	
 }

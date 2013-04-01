@@ -209,7 +209,6 @@ public class Lexer{
             else if (matcher.group(map.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
                 newToken.setValue(matcher.group(map.get("KEYNOTE")));
-                System.out.println(newToken.getValue());
                 newToken.parseValue();
                 System.out.println(newToken.getValue());
                 System.out.println(newToken.getDuration());

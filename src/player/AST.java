@@ -550,13 +550,15 @@ public class AST {
         private String title;
         private int index;
 
-        public AccidentalAssociationMaker accidentalAssociator;
+        public AccidentalAssociationMaker accidentalAssociator=new AccidentalAssociationMaker();
         
         /**
          * Creates a Song object
          */
         public Song() {
-
+        	this.meter=new RationalNumber(4,4);
+        	this.defaultNoteLength=new RationalNumber(1,8);
+        	this.tempo=100;
         }
         
         /**
@@ -601,7 +603,7 @@ public class AST {
          * @param v the Voice to add
          */
         public void addVoice(Voice v) {
-            voices.put(v.name,v); //adds a voice object to the HashMap
+            voices.put(v.name,v); 					//adds a voice object to the HashMap
         }
 
         /**

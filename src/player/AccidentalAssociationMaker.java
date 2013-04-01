@@ -39,7 +39,7 @@ public class AccidentalAssociationMaker {
     /**
      * Initializes the hashmap with no sharps or flats for all notes.
      */
-    public void init(){
+    public AccidentalAssociationMaker(){
         for(char Note='A';Note<='G';Note++)
             setAccidental(Note, 0);
         this.changelog.putAll(accidentals);
@@ -51,8 +51,7 @@ public class AccidentalAssociationMaker {
      * @param key
      */
     public AccidentalAssociationMaker(String key){
-        this.init();
-
+        this(); //calls no-argument constructor
 
         if (key.equals("Cm") || key.equals("A") || key.equals("Gm")) {
             setAccidental('F', +1);
