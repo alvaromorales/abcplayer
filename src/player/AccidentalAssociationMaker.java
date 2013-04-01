@@ -3,6 +3,9 @@ package player;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class 
+ */
 public class AccidentalAssociationMaker {
 
     private Map<Character, Integer> accidentals = new HashMap<Character, Integer>();
@@ -13,7 +16,6 @@ public class AccidentalAssociationMaker {
      * @param Note to assign an accidental to (i.e: "A")
      * @param 0, +1 or -1, accidental to assign to that note (i.e: +1)
      */
-
     public void setAccidental(char Note, int acc){
         accidentals.put(Note,acc);
     }
@@ -48,7 +50,6 @@ public class AccidentalAssociationMaker {
      * Makes a Note -> Note+Accidental association Map for a given key.
      * @param key
      */
-
     public AccidentalAssociationMaker(String key){
         this.init();
 
@@ -196,5 +197,24 @@ public class AccidentalAssociationMaker {
         }
 
         this.changelog.putAll(accidentals); //copy accidentals to changelog
+    }
+    
+    /**
+     * Checks if an AccidentalAssociationMaker is equal to another AccidentalAssociationMaker
+     * @param o the Object to compare to
+     * @return true if equal, else false
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { // quick check
+            return true;
+        }
+
+        if (o == null || !(o instanceof AccidentalAssociationMaker)) {
+            return false;
+        }
+
+        AccidentalAssociationMaker other = (AccidentalAssociationMaker)o;
+        return this.accidentals.equals(other.accidentals);
     }
 }
