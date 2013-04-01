@@ -564,7 +564,7 @@ public class AST {
          * @return list of voices in song
          */
         public List<Voice> getVoices(){
-        	return (List<Voice>) voices.values();
+        	return new ArrayList<Voice>(voices.values());
         }
         
         /**
