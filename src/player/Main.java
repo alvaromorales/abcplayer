@@ -1,17 +1,12 @@
 package player;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-
 import javax.sound.midi.MidiUnavailableException;
-
 import sound.SequencePlayer;
 
 /**
@@ -53,8 +48,8 @@ public class Main {
 
     	Lexer lexer = new Lexer(input_string);
     	Parser parser = new Parser(lexer);
-    	parser.parse(lexer.lex());
-         
+    	parser.parse();
+        
     	System.out.println(parser.getSong().toString()); //debugging only
     	
     	DurationVisitor durationV = new DurationVisitor();
@@ -72,7 +67,7 @@ public class Main {
     }
     
     public static void main(String[] args){
-        String filename="sample_abc/prelude.abc";
+        String filename="sample_abc/piece1.abc";
         try{
         	play(filename);
         }

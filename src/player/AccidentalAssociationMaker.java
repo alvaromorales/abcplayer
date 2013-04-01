@@ -13,20 +13,20 @@ public class AccidentalAssociationMaker {
 
     /**
      * Adds an accidental assignment in the accidentals hashmap ("A" -> +1 (flat) )
-     * @param Note to assign an accidental to (i.e: "A")
+     * @param pitch to assign an accidental to (i.e: "A")
      * @param 0, +1 or -1, accidental to assign to that note (i.e: +1)
      */
-    public void setAccidental(char Note, int acc){
-        accidentals.put(Note,acc);
+    public void setAccidental(char pitch, int acc){
+        accidentals.put(pitch,acc);
     }
 
     /**
      * Returns the accidental for that note for this specific Voice.
-     * @param Note the Note to look-up in the accidentals map
+     * @param pitch the pitch to look-up in the accidentals map
      * @return accidental, +1, 0 or -1, the change in pitch of that note
      */
-    public int getAccidental(char Note){
-        return accidentals.get(Note);
+    public int getAccidental(char pitch){
+        return accidentals.get(pitch);
     }
 
     /**
@@ -40,8 +40,8 @@ public class AccidentalAssociationMaker {
      * Initializes the hashmap with no sharps or flats for all notes.
      */
     public AccidentalAssociationMaker(){
-        for(char Note='A';Note<='G';Note++)
-            setAccidental(Note, 0);
+        for(char pitch='A';pitch<='G';pitch++)
+            setAccidental(pitch, 0);
         this.changelog.putAll(accidentals);
     }
 
