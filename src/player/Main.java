@@ -48,16 +48,17 @@ public class Main {
 
     	Lexer lexer = new Lexer(input_string);
     	Parser parser = new Parser();
-    	parser.parse(lexer.lex());
+    	parser.parse(lexer.lexHead(),lexer.lexBody());
         
     	System.out.println(parser.getSong().toString()); //debugging only
     	
     	DurationVisitor durationV = new DurationVisitor();
         durationV.visit(parser.getSong());
         
-        PlayerVisitor visitor = new PlayerVisitor(140, durationV.getTicksPerQuarter());
+        PlayerVisitor visitor = new PlayerVisitor(durationV.getTicksPerQuarter(),parser.getSong().getTempo(),parser.getSong().getDefaultNoteLength());
         visitor.visit(parser.getSong());
         SequencePlayer player = visitor.getPlayer();
+        
         try {
             player.play();
         } catch (MidiUnavailableException e) {
@@ -67,7 +68,7 @@ public class Main {
     }
     
     public static void main(String[] args){
-        String filename="sample_abc/scale.abc";
+        String filename="sample_abc/fur_elise.abc";
         try{
         	play(filename);
         }

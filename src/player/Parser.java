@@ -298,7 +298,8 @@ public class Parser {
                     tok.setValue("PASS");
                     int j=i-1;
 
-                    while(!(tokens.get(j).getType() == Token.Type.REPEAT_START || 
+                    while(!(j == 0 ||
+                            tokens.get(j).getType() == Token.Type.REPEAT_START || 
                             tokens.get(j).getType() == Token.Type.DOUBLE_BAR)) {
                         //Look for a repeat_start or a header element in order to start repeating
                         j--;

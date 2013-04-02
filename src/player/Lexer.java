@@ -51,7 +51,7 @@ public class Lexer{
      * @param s, the input string to be processed
      */
     public Lexer(String s) {
-        checkString(uncomment(s));
+        //checkString(uncomment(s));
         
         this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
         this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
