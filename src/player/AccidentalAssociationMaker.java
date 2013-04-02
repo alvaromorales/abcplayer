@@ -8,8 +8,8 @@ import java.util.Map;
  */
 public class AccidentalAssociationMaker {
 
-    private Map<Character, Integer> accidentals = new HashMap<Character, Integer>();
-    private Map<Character, Integer> changelog = new HashMap<Character, Integer>();
+    private Map<Character, Integer> accidentals = new HashMap<Character, Integer>(0);
+    private Map<Character, Integer> changelog = new HashMap<Character, Integer>(0);
 
     /**
      * Adds an accidental assignment in the accidentals hashmap ("A" -> +1 (flat) )
@@ -53,34 +53,34 @@ public class AccidentalAssociationMaker {
     public AccidentalAssociationMaker(String key){
         this(); 		//calls the no-argument constructor
 
-        if (key.equals("Gm") || key.equals("E"))
+        if (key.equals("G") || key.equals("Em"))
             setAccidental('F', +1);
-        else if (key.equals("Dm") || key.equals("B")) {
+        else if (key.equals("D") || key.equals("Bm")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
-        }  else if (key.equals("Am") || key.equals("F#")) {
+        }  else if (key.equals("A") || key.equals("F#m")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
-        }  else if (key.equals("Em") || key.equals("C#")) {
+        }  else if (key.equals("E") || key.equals("C#m")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
             setAccidental('D', +1);
-        }  else if (key.equals("Bm") || key.equals("G#")) {
+        }  else if (key.equals("B") || key.equals("G#m")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
             setAccidental('D', +1);
             setAccidental('A', +1);
-        }  else if (key.equals("F#m") || key.equals("D#")) {
+        }  else if (key.equals("F#") || key.equals("D#m")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
             setAccidental('D', +1);
             setAccidental('A', +1);
             setAccidental('E', +1);
-        } else if (key.equals("C#m") || key.equals("A#")) {
+        } else if (key.equals("C#") || key.equals("A#m")) {
             setAccidental('F', +1);
             setAccidental('C', +1);
             setAccidental('G', +1);
@@ -90,34 +90,34 @@ public class AccidentalAssociationMaker {
             setAccidental('B', +1);
         } 
         // begin looking into minor scale keys
-        else if (key.equals("Fm") || key.equals("D"))
+        else if (key.equals("F") || key.equals("Dm"))
             setAccidental('B', -1);
-        else if (key.equals("Bbm") || key.equals("G")) {
+        else if (key.equals("Bb") || key.equals("Gm")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
-        } else if (key.equals("Ebm") || key.equals("C")) {
+        } else if (key.equals("Eb") || key.equals("Cm")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
-        } else if (key.equals("Abm") || key.equals("F")) {
+        } else if (key.equals("Ab") || key.equals("Fm")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
             setAccidental('D', -1);
-        } else if (key.equals("Dbm") || key.equals("Bb")) {
+        } else if (key.equals("Db") || key.equals("Bbm")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
             setAccidental('D', -1);
             setAccidental('G', -1);
-        } else if (key.equals("Gbm") || key.equals("Eb")) {
+        } else if (key.equals("Gb") || key.equals("Ebm")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
             setAccidental('D', -1);
             setAccidental('G', -1);
             setAccidental('C', -1);
-        } else if (key.equals("Cbm") || key.equals("Ab")) {
+        } else if (key.equals("Cb") || key.equals("Abm")) {
             setAccidental('B', -1);
             setAccidental('E', -1);
             setAccidental('A', -1);
@@ -147,6 +147,15 @@ public class AccidentalAssociationMaker {
 
         AccidentalAssociationMaker other = (AccidentalAssociationMaker)o;
         return this.accidentals.equals(other.accidentals);
+    }
+
+    /**
+     * Gets the string representation of the AccidentalAssociationMaker
+     * @return the string representation of the AccidentalAssociationMaker
+     */
+    @Override
+    public String toString() {
+        return "AccidentalAssociationMaker [accidentals=" + accidentals + "]";
     }
 
 }

@@ -88,6 +88,7 @@ public class DurationVisitor implements Visitor<Void> {
      */
     @Override
     public Void visit(Song s) {
+        denominators.add(s.getDefaultNoteLength().getDenominator());
         for (Voice v : s.getVoices()) {
             v.accept(this);
         }

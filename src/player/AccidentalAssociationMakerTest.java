@@ -21,16 +21,23 @@ public class AccidentalAssociationMakerTest {
         AccidentalAssociationMaker associator = new AccidentalAssociationMaker("E");
         assertEquals(1, associator.getAccidental('F'));
     }
-    
+
     /**
-     * Tests that an AAM (initialized with key Dm) sets the correct defaults
+     * Tests that an AAM (initialized with key C) sets the correct defaults
      */
     @Test
     public void initTest() {
-        AccidentalAssociationMaker associator = new AccidentalAssociationMaker("Dm");
-        assertTrue(associator.getAccidental('F') == 1 && associator.getAccidental('C') == 1 && associator.getAccidental('A') == 0);
+        AccidentalAssociationMaker associator = new AccidentalAssociationMaker("C");
+        assertTrue(
+                associator.getAccidental('A') == 0 && 
+                associator.getAccidental('B') == 0 && 
+                associator.getAccidental('C') == 0 && 
+                associator.getAccidental('D') == 0 && 
+                associator.getAccidental('E') == 0 && 
+                associator.getAccidental('F') == 0 && 
+                associator.getAccidental('G') == 0);
     }
-    
+
     /**
      * Test setting a local accidental
      */
@@ -41,22 +48,22 @@ public class AccidentalAssociationMakerTest {
         associator.setAccidental('A', 1);
         assertEquals(1, associator.getAccidental('A'));
     }
-    
+
     /**
      * Test reverting an AAM
      */
     @Test
     public void revertTest() {
         AccidentalAssociationMaker associator = new AccidentalAssociationMaker("Ab");
-        
+
         //some local changes
         associator.setAccidental('B', 0);
         associator.setAccidental('A', 0);
         associator.setAccidental('G', 1);
-        
+
         associator.revert();
-        
+
         assertEquals(new AccidentalAssociationMaker("Ab"), associator);
     }
-    
+
 }
