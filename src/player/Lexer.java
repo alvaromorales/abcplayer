@@ -11,34 +11,35 @@ public class Lexer{
     private String head,body;
     
     private final String regexHeader = 				//One regex for the header
-  			 "((?<=C:)\\s*.+$)|" 		+  			//1- add COMPOSER
+  			 "((?<=C:)\\s*.+)|" 		+  			//1- add COMPOSER
  "((?<=K:)\\s*[A-Ga-g][#b]?m?)|" 		+			//2- add KEY
    "((?<=L:)\\s*[0-9]+/[0-9]+)|" 		+			//3- add LENGTH
  "((?<=M:)\\s*((?:\\d+\\/\\d+)|" 		+			//4- add METER
  			   	  "(?:C\\|?)))|" 		+			//4- still METER
  		  "((?<=Q:)\\s*[0-9]+)|"		+			//5- add TEMPO
- 			 "((?<=T:)\\s*.+$)|" 		+			//6- add TITLE
- 		   "((?<=X:)\\s*\\d+$)|" 		+			//7- add INDEX
- 		     "((?<=V:)\\s*.+$)|" 		;			//8- add VOICE
+ 			 "((?<=T:)\\s*.+)|" 		+			//6- add TITLE
+ 		   "((?<=X:)\\s*\\d+)|" 		+			//7- add INDEX
+ 		     "((?<=V:)\\s*.+\\n)" 		;			//8- add VOICE
 
  	private final String regexBody =	   			//One regex for the body
- 	   "((?:(?:\\^)|(?:\\^\\^)|" 		+			//1- add KEYNOTE
- 	   	   "(?:\\_)|(?:\\_\\_)|" 		+			//1- still KEYNOTE
- "(?:\\=))?[A-Ga-g](?:(?:\\,*)|" 		+			//1- KEEEEEYNOOOOOOTEEEEEEEEEEEE
-   "(?:\\'*))(?:[0-9]*/?[0-9]*)" 		+		
-					 "(?!\\:))|" 		+			
-		    "(z[0-9]*/?[0-9]*)|"		+			//2- add REST *
+ 		   "(?:(?:(?:\\^){1,2}|" 		+			//1- add KEYNOTE
+ 	   	   		 "(?:\\_){1,2}|" 		+			
+ 	   	   		 	 "(?:\\=))?"		+
+ 	   	   	 		  "[A-Ga-g]"		+
+ 	   	 "(?:(?:\\,*)|(?:\\'*))" 		+			
+ 	   	  "(?:[0-9]*/?[0-9]*))|" 		+		
+		    "(z[0-9]*/?[0-9]*)|"		+			//2- add REST
  		  	   "(\\[(?![1-2]))|"		+			//3- add CHORD_START
  		  	    "((?<!\\|)\\])|"		+			//4- add CHORD_END *
- 		  			  "(\\(2)|"			+			//5- add DUPLET_START
- 		  			  "(\\(3)|"			+			//6- add TRIPLET_START
- 		  			  "(\\(4)|"			+			//7- add QUAD_START
+ 		  			   "(\\(2)|"		+			//5- add DUPLET_START
+ 		  			   "(\\(3)|"		+			//6- add TRIPLET_START
+ 		  			   "(\\(4)|"		+			//7- add QUAD_START
  		   "((\\|)(?![\\|:\\]]))|"		+			//8- add BAR
 "((?:\\|\\|)|(?:\\[\\|)|(?:\\|\\]))|"	+			//9- add DOUBLE_BAR *
 						   "(\\|:)|"	+           //10- add REPEAT_START
 					   "(:\\|)|"		+			//11- add REPEAT_END
-				   "(\\[[1-2])"			+			//12- add REPEAT_NUMBER
- 	 		"((?<=V:)\\s*.+$)|" 		;			//13- add VOICE
+				   "(\\[[1-2])|"		+			//12- add REPEAT_NUMBER
+			   "((?<=V:)\\s*.+(?=\\n))"		;			//13- add VOICE
     
     // Create a headMap, headMapping token types to their numbers in order
     private static Map<String,Integer> headMap;
@@ -54,13 +55,12 @@ public class Lexer{
         this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
         this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
         
-        System.out.println(this.head);
+        System.out.println(this.body);
         
         headMap=new HashMap<String,Integer>();
         bodyMap=new HashMap<String,Integer>();
 
         //regex group headMappings for header
-        headMap = new HashMap<String,Integer>();
         headMap.put("COMPOSER", 1);
         headMap.put("KEY", 2);
         headMap.put("LENGTH", 3);
@@ -70,7 +70,7 @@ public class Lexer{
         headMap.put("INDEX", 7);
         headMap.put("VOICE", 8);
         
-        //regex group headMappings for header
+        //regex group bodyMappings for body
         bodyMap.put("KEYNOTE", 1);
         bodyMap.put("REST", 2);
         bodyMap.put("CHORD_START", 3);
@@ -102,8 +102,8 @@ public class Lexer{
     		while(s.charAt(splitIndex)!='\n')
     			splitIndex++;
     	}
-    	catch(Exception e){ 						//exception switching in case of EOF
-    		throw new LexerException(e.getMessage());
+    	catch(StringIndexOutOfBoundsException e){ 						//exception switching in case of EOF
+    		throw new LexerException("Reached end of file, no body after header?");
     	}
     	return s.substring(0,splitIndex);
     }
@@ -126,6 +126,7 @@ public class Lexer{
     	catch(Exception e){ 						//exception switching in case of EOF
     		throw new LexerException(e.getMessage());
     	}
+    	
     	return s.substring(splitIndex+1);
     }
     
@@ -158,7 +159,7 @@ public class Lexer{
      */
     
     public String uncomment(String s){
-    	return new String(s.replaceAll("%.*$", ""));
+    	return new String(s.replaceAll("%.*\\n", ""));
     }
     
     /**
@@ -256,18 +257,22 @@ public class Lexer{
         ArrayList <Token> tokens = new ArrayList<Token>(0);
         
         Pattern bodyPattern = Pattern.compile(this.regexBody);
- 
-        
+
         // Create Matcher and start matching to groups 
         Matcher bodyMatcher = bodyPattern.matcher(this.body);
         
         //start lexing the body
         while (bodyMatcher.find()) {
+        	System.out.printf("Matched: %s and groups=%d\n",bodyMatcher.group(), bodyMatcher.groupCount() );
+        	for(int i=1;i<=bodyMatcher.groupCount();++i)
+        		if(bodyMatcher.group(i) != null)
+        			System.out.printf("Matched: %d\n", i);
             if (bodyMatcher.group(bodyMap.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
                 newToken.setValue(bodyMatcher.group(bodyMap.get("KEYNOTE")));
                 newToken.parseValue();
                 tokens.add(newToken);
+                System.out.println(newToken.toString());
                 continue;
             }
             
@@ -348,10 +353,17 @@ public class Lexer{
                 newToken.setValue(bodyMatcher.group(bodyMap.get("BAR")));
                 tokens.add(newToken);
                 continue;
+            } 
+            else if (bodyMatcher.group(bodyMap.get("VOICE")) != null) {
+            	
+                Token newToken = new Token(Token.Type.VOICE);
+                newToken.setValue(bodyMatcher.group(bodyMap.get("VOICE")));
+                tokens.add(newToken);
+                System.out.println(newToken);
+                continue;
             }
         }
 
-        System.out.println(tokens.toString());
         return tokens;
     }
     

@@ -21,8 +21,9 @@ public class LexerTest {
      */
     @Test
     public void ignoreCommentTest() {
-        Lexer lexer = new Lexer("G,,8\n%comment\nV:1\n");
+        Lexer lexer = new Lexer("K: C\nG,,8\n%comment\nV:1\n");
         ArrayList<Token> expected = new ArrayList<Token>(0);
+       
         Token first = new Token(Token.Type.KEYNOTE);
         first.setValue("G");
         first.setOctave(-2);
@@ -31,13 +32,14 @@ public class LexerTest {
         
         Token second = new Token(Token.Type.VOICE);
         second.setValue("1");
-        
+       
         expected.add(first);
         expected.add(second);
+
         
         
-        ArrayList<Token> lexx=lexer.lex();
-        System.out.println();
+        ArrayList<Token> lexx=lexer.lexBody();
+        System.out.println("8=======================D");
         System.out.println(lexx.toString());
         System.out.println(expected.toString());
         
@@ -58,7 +60,9 @@ public class LexerTest {
         Lexer lexer = new Lexer("C:Wolfgang Amadeus-Mozart\nK: C\n");
         Token expected = new Token(Token.Type.COMPOSER);
         expected.setValue("Wolfgang Amadeus-Mozart");
-        assertEquals(expected, lexer.lex().get(0));
+        expected.setHeader(true);
+        System.out.println(lexer.lexHead().toString());
+        assertEquals(expected, lexer.lexHead().get(0));
     }
     
     /**
@@ -69,7 +73,8 @@ public class LexerTest {
         Lexer lexer = new Lexer("X: 1\nT: empty\nK:A#m\n");
         Token expected = new Token(Token.Type.KEY);
         expected.setValue("A#m");
-        assertEquals(expected, lexer.lex().get(0));
+        expected.setHeader(true);
+        assertEquals(expected, lexer.lexHead().get(0));
     }
     
     /**
@@ -77,10 +82,11 @@ public class LexerTest {
      */
     @Test
     public void lengthTest() {
-        Lexer lexer = new Lexer("L:1/8\n");
+        Lexer lexer = new Lexer("L:1/8K: C\n");
         Token expected = new Token(Token.Type.LENGTH);
         expected.setValue("1/8");
-        assertEquals(expected, lexer.lex().get(0));
+        expected.setHeader(true);
+        assertEquals(expected, lexer.lexHead().get(0));
     }
     
     /**
@@ -88,11 +94,12 @@ public class LexerTest {
      */
     @Test
     public void meterTest() {
-        Lexer lexer = new Lexer("M:C|%Comment\n");
+        Lexer lexer = new Lexer("M:C|%Comment\nK:C\n");
         Token expected = new Token(Token.Type.METER);
         expected.setValue("C|");
-        System.out.printf(" orig: %s\n expected: %s\n",lexer.lex().toString(),expected.toString());
-        assertEquals(expected, lexer.lex().get(0));
+        expected.setHeader(true);
+        System.out.printf(" orig: %s\n expected: %s\n",lexer.lexHead().toString(),expected.toString());
+        assertEquals(expected, lexer.lexHead().get(0));
     }
     
     /**
@@ -100,10 +107,11 @@ public class LexerTest {
      */
     @Test
     public void tempoTest() {
-        Lexer lexer = new Lexer("Q:240%Comment\n");
+        Lexer lexer = new Lexer("Q:240%Comment\nK:   C\n");
         Token expected = new Token(Token.Type.TEMPO);
         expected.setValue("240");
-        assertEquals(expected, lexer.lex().get(0));
+        expected.setHeader(true);
+        assertEquals(expected, lexer.lexHead().get(0));
     }
     
     /**
@@ -114,7 +122,8 @@ public class LexerTest {
         Lexer lexer = new Lexer("T:Title of song%Comment\n");
         Token expected = new Token(Token.Type.TITLE);
         expected.setValue("Title of song");
-        assertEquals(expected, lexer.lex().get(0));
+        expected.setHeader(true);
+        assertEquals(expected, lexer.lexHead().get(0));
     }
     
     /**
@@ -125,7 +134,8 @@ public class LexerTest {
         Lexer lexer = new Lexer("X:57%Comment\n");
         Token expected = new Token(Token.Type.INDEX);
         expected.setValue("57");
-        assertEquals(expected, lexer.lex().get(0));
+        expected.setHeader(true);
+        assertEquals(expected, lexer.lexHead().get(0));
     }
     
     /**
@@ -136,7 +146,8 @@ public class LexerTest {
         Lexer lexer = new Lexer("V:Voice Number 1\n");
         Token expected = new Token(Token.Type.VOICE);
         expected.setValue("Voice Number 1");
-        assertEquals(expected, lexer.lex().get(0));
+        expected.setHeader(true);
+        assertEquals(expected, lexer.lexHead().get(0));
     }
     
     /**
@@ -150,7 +161,7 @@ public class LexerTest {
         expected.setAccidental(-1);
         expected.setOctave(-1);
         expected.setDuration(new RationalNumber(7, 1));
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -164,7 +175,7 @@ public class LexerTest {
         expected.setAccidental(Integer.MAX_VALUE);
         expected.setOctave(0);
         expected.setDuration(new RationalNumber(1, 1));
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -176,7 +187,7 @@ public class LexerTest {
         Token expected = new Token(Token.Type.REST);
         expected.setDuration(new RationalNumber(1,2));
         expected.setValue("z");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -187,7 +198,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("[");
         Token expected = new Token(Token.Type.CHORD_START);
         expected.setValue("[");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -198,7 +209,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("]");
         Token expected = new Token(Token.Type.CHORD_END);
         expected.setValue("]");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -231,7 +242,7 @@ public class LexerTest {
        expected.add(third);
        expected.add(fourth);
        
-       assertEquals(expected, lexer.lex());
+       assertEquals(expected, lexer.lexBody());
     }
     
     /**
@@ -242,7 +253,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("(2");
         Token expected = new Token(Token.Type.DUPLET_START);
         expected.setValue("(2");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -253,7 +264,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("(3");
         Token expected = new Token(Token.Type.TRIPLET_START);
         expected.setValue("(3");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -264,7 +275,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("(4");
         Token expected = new Token(Token.Type.QUAD_START);
         expected.setValue("(4");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -275,7 +286,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("|");
         Token expected = new Token(Token.Type.BAR);
         expected.setValue("|");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -286,7 +297,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("||");
         Token expected = new Token(Token.Type.DOUBLE_BAR);
         expected.setValue("||");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -297,7 +308,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("|:");
         Token expected = new Token(Token.Type.REPEAT_START);
         expected.setValue("|:");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -308,7 +319,7 @@ public class LexerTest {
         Lexer lexer = new Lexer(":|");
         Token expected = new Token(Token.Type.REPEAT_END);
         expected.setValue(":|");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -319,7 +330,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("[1");
         Token expected = new Token(Token.Type.REPEAT_NUMBER);
         expected.setValue("[1");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     /**
@@ -330,7 +341,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("[2");
         Token expected = new Token(Token.Type.REPEAT_NUMBER);
         expected.setValue("[2");
-        assertEquals(expected, lexer.lex().get(0));
+        assertEquals(expected, lexer.lexBody().get(0));
     }
     
     
@@ -341,7 +352,7 @@ public class LexerTest {
      */
     @Test
     public void ignoreWhitespaceTest() {
-        Lexer lexer = new Lexer("T:Paddy O'Rafferty\ndf c e ");
+        Lexer lexer = new Lexer("T:Paddy O'Rafferty");
         ArrayList<Token> expected = new ArrayList<Token>();
         Token first = new Token(Token.Type.TITLE);
         first.setValue("Paddy O'Rafferty");
@@ -378,7 +389,7 @@ public class LexerTest {
         expected.add(fourth);
         expected.add(fifth);
         
-        assertEquals(expected, lexer.lex());
+        assertEquals(expected, lexer.lexHead());
     }
     
     /**
@@ -404,7 +415,7 @@ public class LexerTest {
         third.setValue(":|");
         expected.add(third);
         
-        assertEquals(expected, lexer.lex());
+        assertEquals(expected, lexer.lexBody());
     }
     
             
@@ -461,7 +472,7 @@ public class LexerTest {
         expected.add(fifth);
         
         
-        assertEquals(expected, lexer.lex());
+        assertEquals(expected, lexer.lexBody());
     }
     
 }
