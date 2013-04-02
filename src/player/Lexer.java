@@ -49,7 +49,8 @@ public class Lexer{
      * @param s, the input string to be processed
      */
     public Lexer(String s) {
-    	
+        checkString(uncomment(s));
+        
         this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
         this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
         
@@ -127,6 +128,28 @@ public class Lexer{
     	}
     	return s.substring(splitIndex+1);
     }
+    
+    /**
+     * Checks if the given string is valid or contains some illegal characters
+     * @param s
+     * @return
+     */
+    public void checkString(String s){
+        StringBuffer regexBuf = new StringBuffer();
+        regexBuf.append("(");
+        regexBuf.append(regexHeader);
+        regexBuf.append(regexBody);
+        regexBuf.append(")+");
+        
+        String regex = new String(regexBuf);
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(s);
+        
+        if (!matcher.matches()){
+            throw new LexerException("There is illegal character in the input file");
+        }
+    }
+    
     
     /**
      * Removes comment from a string (comments start with '%' and end with a newline)
