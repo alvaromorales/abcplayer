@@ -8,12 +8,14 @@ import java.util.regex.Matcher;
 
 public class Lexer{
 	
-    private String s;
+    private String head,body;
+    
     private final String regexHeader = 				//One regex for the header
   			 "((?<=C:)\\s*.+$)|" 		+  			//1- add COMPOSER
  "((?<=K:)\\s*[A-Ga-g][#b]?m?)|" 		+			//2- add KEY
    "((?<=L:)\\s*[0-9]+/[0-9]+)|" 		+			//3- add LENGTH
- "((?<=M:)\\s*(?:\\d+\\/\\d+))|" 		+			//4- add METER
+  "((?<=M:)\\s*(?:\\d+\\/\\d+)|" 		+			//4- add METER
+ 				   "(?:C\\|?))|" 		+			//4- still METER
  		  "((?<=Q:)\\s*[0-9]+)|"		+			//5- add TEMPO
  			 "((?<=T:)\\s*.+$)|" 		+			//6- add TITLE
  		   "((?<=X:)\\s*\\d+$)|" 		+			//7- add INDEX
@@ -25,7 +27,7 @@ public class Lexer{
  "(?:\\=))?[A-Ga-g](?:(?:\\,*)|" 		+			//1- KEEEEEYNOOOOOOTEEEEEEEEEEEE
    "(?:\\'*))(?:[0-9]*/?[0-9]*)" 		+		
 					 "(?!\\:))|" 		+			
- 		  "(z[0-9 ]*/?[0-9 ]*)|"		+			//2- add REST *
+		    "(z[0-9]*/?[0-9]*)|"		+			//2- add REST *
  		  	   "(\\[(?![1-2]))|"		+			//3- add CHORD_START
  		  	    "((?<!\\|)\\])|"		+			//4- add CHORD_END *
  		  			  "(\\(2)|"			+			//5- add DUPLET_START
@@ -38,8 +40,8 @@ public class Lexer{
 				   "(\\[[1-2])"			+			//12- add REPEAT_NUMBER
  	 		"((?<=V:)\\s*.+$)|" 		;			//13- add VOICE
     
-    // Create a map, mapping token types to their numbers in order
-    private static Map<String,Integer> headerMap;
+    // Create a headMap, headMapping token types to their numbers in order
+    private static Map<String,Integer> headMap;
     private static Map<String,Integer> bodyMap;
     
     /**
@@ -47,20 +49,22 @@ public class Lexer{
      * @param s, the input string to be processed
      */
     public Lexer(String s) {
-        this.s = uncomment(s); 						//remove comments from the abc file
+    	
+        this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
+        this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
         
-        //regex group mappings for header
-        headerMap = new HashMap<String,Integer>();
-        headerMap.put("COMPOSER", 1);
-        headerMap.put("KEY", 2);
-        headerMap.put("LENGTH", 3);
-        headerMap.put("METER", 4);
-        headerMap.put("TEMPO", 5);
-        headerMap.put("TITLE", 6);
-        headerMap.put("INDEX", 7);
-        headerMap.put("VOICE", 8);
+        //regex group headMappings for header
+        headMap = new HashMap<String,Integer>();
+        headMap.put("COMPOSER", 1);
+        headMap.put("KEY", 2);
+        headMap.put("LENGTH", 3);
+        headMap.put("METER", 4);
+        headMap.put("TEMPO", 5);
+        headMap.put("TITLE", 6);
+        headMap.put("INDEX", 7);
+        headMap.put("VOICE", 8);
         
-        //regex group mappings for header
+        //regex group headMappings for header
         bodyMap.put("KEYNOTE", 1);
         bodyMap.put("REST", 2);
         bodyMap.put("CHORD_START", 3);
@@ -73,8 +77,7 @@ public class Lexer{
         bodyMap.put("REPEAT_START", 10);
         bodyMap.put("REPEAT_END", 11);
         bodyMap.put("REPEAT_NUMBER", 12);
-        bodyMap.put("VOICE", 8);
-
+        bodyMap.put("VOICE", 13);
         
     }
     
@@ -84,7 +87,7 @@ public class Lexer{
      * @return string, the header of the piece
      */
     
-    public String getHeader(String s){
+    public String makeHeader(String s){
     	int splitIndex=s.indexOf("K:");
     	if(splitIndex<0)
     		throw new LexerException("No Key signature K: found in input");
@@ -105,7 +108,7 @@ public class Lexer{
      * @return string, the body of the piece
      */
     
-    public String getBody(String s){
+    public String makeBody(String s){
     	int splitIndex=s.indexOf("K:");
     	if(splitIndex<0)
     		throw new LexerException("No Key signature K: found in input");
@@ -119,6 +122,7 @@ public class Lexer{
     	}
     	return s.substring(splitIndex+1);
     }
+    
     /**
      * Removes comment from a string (comments start with '%' and end with a newline)
      * @param s, the string to un-comment
@@ -135,156 +139,169 @@ public class Lexer{
      */
     public ArrayList<Token> lex(){
         
-        // Create a pattern
-        ArrayList <Token> tokens = new ArrayList<Token>();
+        // Create patterns
+        ArrayList <Token> tokens = new ArrayList<Token>(0);
         
-        Pattern tokenPatterns = Pattern.compile(regexPattern);
+        Pattern bodyPattern = Pattern.compile(this.regexBody);
+        Pattern headPattern = Pattern.compile(this.regexHeader);
         
-        // Create matcher and start matching to groups 
-        Matcher matcher = tokenPatterns.matcher(s);
+        // Create headMatchers and start matching to groups 
+        Matcher headMatcher = headPattern.matcher(this.head);
+        Matcher bodyMatcher = bodyPattern.matcher(this.body);
+
         
-        while (matcher.find()) {
+        while (headMatcher.find()) {
             
-            if (matcher.group(map.get("COMPOSER")) != null) {
+            if (headMatcher.group(headMap.get("COMPOSER")) != null) {
                 Token newToken = new Token(Token.Type.COMPOSER);
-                newToken.setValue(matcher.group(map.get("COMPOSER")));
+                newToken.setValue(headMatcher.group(headMap.get("COMPOSER")));
+                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("KEY")) != null) {
+            else if (headMatcher.group(headMap.get("KEY")) != null) {
                 Token newToken = new Token(Token.Type.KEY);
-                newToken.setValue(matcher.group(map.get("KEY")));
+                newToken.setValue(headMatcher.group(headMap.get("KEY")));
+                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("LENGTH")) != null) {
+            else if (headMatcher.group(headMap.get("LENGTH")) != null) {
                 Token newToken = new Token(Token.Type.LENGTH);
-                newToken.setValue(matcher.group(map.get("LENGTH")));
+                newToken.setValue(headMatcher.group(headMap.get("LENGTH")));
+                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("METER")) != null) {
+            else if (headMatcher.group(headMap.get("METER")) != null) {
                 Token newToken = new Token(Token.Type.METER);
-                newToken.setValue(matcher.group(map.get("METER")));
+                newToken.setValue(headMatcher.group(headMap.get("METER")));
+                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("TEMPO")) != null) {
+            else if (headMatcher.group(headMap.get("TEMPO")) != null) {
                 Token newToken = new Token(Token.Type.TEMPO);
-                newToken.setValue(matcher.group(map.get("TEMPO")));
+                newToken.setValue(headMatcher.group(headMap.get("TEMPO")));
+                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("TITLE")) != null) {
+            else if (headMatcher.group(headMap.get("TITLE")) != null) {
                 Token newToken = new Token(Token.Type.TITLE);
-                newToken.setValue(matcher.group(map.get("TITLE")));
+                newToken.setValue(headMatcher.group(headMap.get("TITLE")));
+                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("INDEX")) != null) {
+            else if (headMatcher.group(headMap.get("INDEX")) != null) {
                 Token newToken = new Token(Token.Type.INDEX);
-                newToken.setValue(matcher.group(map.get("INDEX")));
+                newToken.setValue(headMatcher.group(headMap.get("INDEX")));
+                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("VOICE")) != null) {
+            else if (headMatcher.group(headMap.get("VOICE")) != null) {
                 Token newToken = new Token(Token.Type.VOICE);
-                newToken.setValue(matcher.group(map.get("VOICE")));
-                System.out.printf("%s +=",newToken.getValue());
+                newToken.setValue(headMatcher.group(headMap.get("VOICE")));
+                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
-            
-            else if (matcher.group(map.get("KEYNOTE")) != null) {
+        }
+        
+        //start lexing the body
+        while (bodyMatcher.find()) {
+            if (headMatcher.group(headMap.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
-                newToken.setValue(matcher.group(map.get("KEYNOTE")));
+                newToken.setValue(headMatcher.group(headMap.get("KEYNOTE")));
                 newToken.parseValue();
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("REST")) != null) {
+            else if (headMatcher.group(headMap.get("REST")) != null) {
                 Token newToken = new Token(Token.Type.REST);
-                newToken.setValue(matcher.group(map.get("REST")));
+                newToken.setValue(headMatcher.group(headMap.get("REST")));
                 newToken.parseValue();
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("CHORD_START")) != null) {
+            else if (headMatcher.group(headMap.get("CHORD_START")) != null) {
                 Token newToken = new Token(Token.Type.CHORD_START);
-                newToken.setValue(matcher.group(map.get("CHORD_START")));
+                newToken.setValue(headMatcher.group(headMap.get("CHORD_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("CHORD_END")) != null) {
+            else if (headMatcher.group(headMap.get("CHORD_END")) != null) {
                 Token newToken = new Token(Token.Type.CHORD_END);
-                newToken.setValue(matcher.group(map.get("CHORD_END")));
+                newToken.setValue(headMatcher.group(headMap.get("CHORD_END")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("DUPLET_START")) != null) {
+            else if (headMatcher.group(headMap.get("DUPLET_START")) != null) {
                 Token newToken = new Token(Token.Type.DUPLET_START);
-                newToken.setValue(matcher.group(map.get("DUPLET_START")));
+                newToken.setValue(headMatcher.group(headMap.get("DUPLET_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("TRIPLET_START")) != null) {
+            else if (headMatcher.group(headMap.get("TRIPLET_START")) != null) {
                 Token newToken = new Token(Token.Type.TRIPLET_START);
-                newToken.setValue(matcher.group(map.get("TRIPLET_START")));
+                newToken.setValue(headMatcher.group(headMap.get("TRIPLET_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("QUAD_START")) != null) {
+            else if (headMatcher.group(headMap.get("QUAD_START")) != null) {
                 Token newToken = new Token(Token.Type.QUAD_START);
-                newToken.setValue(matcher.group(map.get("QUAD_START")));
+                newToken.setValue(headMatcher.group(headMap.get("QUAD_START")));
                 tokens.add(newToken);
                 continue;
             }
             
             
-            else if (matcher.group(map.get("DOUBLE_BAR")) != null) {
+            else if (headMatcher.group(headMap.get("DOUBLE_BAR")) != null) {
                 Token newToken = new Token(Token.Type.DOUBLE_BAR);
-                newToken.setValue(matcher.group(map.get("DOUBLE_BAR")));
+                newToken.setValue(headMatcher.group(headMap.get("DOUBLE_BAR")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("REPEAT_START")) != null) {
+            else if (headMatcher.group(headMap.get("REPEAT_START")) != null) {
                 Token newToken = new Token(Token.Type.REPEAT_START);
-                newToken.setValue(matcher.group(map.get("REPEAT_START")));
+                newToken.setValue(headMatcher.group(headMap.get("REPEAT_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("REPEAT_END")) != null) {
+            else if (headMatcher.group(headMap.get("REPEAT_END")) != null) {
                 Token newToken = new Token(Token.Type.REPEAT_END);
-                newToken.setValue(matcher.group(map.get("REPEAT_END")));
+                newToken.setValue(headMatcher.group(headMap.get("REPEAT_END")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("REPEAT_NUMBER")) != null) {
+            else if (headMatcher.group(headMap.get("REPEAT_NUMBER")) != null) {
                 Token newToken = new Token(Token.Type.REPEAT_NUMBER);
-                newToken.setValue(matcher.group(map.get("REPEAT_NUMBER")));
+                newToken.setValue(headMatcher.group(headMap.get("REPEAT_NUMBER")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (matcher.group(map.get("BAR")) != null) {
+            else if (headMatcher.group(headMap.get("BAR")) != null) {
                 Token newToken = new Token(Token.Type.BAR);
-                newToken.setValue(matcher.group(map.get("BAR")));
+                newToken.setValue(headMatcher.group(headMap.get("BAR")));
                 tokens.add(newToken);
                 continue;
             }

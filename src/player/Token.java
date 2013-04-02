@@ -43,16 +43,6 @@ public class Token {
      */
     public Token(Type type){
         this.type = type;
-        if(type == Type.COMPOSER || 
-           type == Type.KEY || 
-           type == Type.LENGTH || 
-           type == Type.METER || 
-           type == Type.TEMPO ||
-           type == Type.TITLE ||
-           type == Type.INDEX||
-           type == Type.VOICE){
-        	this.isHeader=true;
-        }
 
     }
     
