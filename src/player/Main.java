@@ -49,9 +49,7 @@ public class Main {
     	Lexer lexer = new Lexer(input_string);
     	Parser parser = new Parser();
     	parser.parse(lexer.lexHead(),lexer.lexBody());
-        
-    	System.out.println(parser.getSong().toString()); //debugging only
-    	
+            	
     	DurationVisitor durationV = new DurationVisitor();
         durationV.visit(parser.getSong());
         
@@ -68,7 +66,7 @@ public class Main {
     }
     
     public static void main(String[] args){
-        String filename="sample_abc/fur_elise.abc";
+        String filename="sample_abc/prelude.abc";
         try{
         	play(filename);
         }

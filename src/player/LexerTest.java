@@ -39,10 +39,7 @@ public class LexerTest {
         
         
         ArrayList<Token> lexx=lexer.lexBody();
-        System.out.println("8=======================D");
-        System.out.println(lexx.toString());
-        System.out.println(expected.toString());
-        
+
         assertEquals(expected.size(),lexx.size());
         
         for (int i =0;i<expected.size();++i){
@@ -165,6 +162,20 @@ public class LexerTest {
         expected.setAccidental(Integer.MAX_VALUE);
         expected.setOctave(0);
         expected.setDuration(new RationalNumber(1, 1));
+        assertEquals(expected, lexer.lexBody().get(0));
+    }
+    
+    /**
+     * Tests that a KEYNOTE with accidentals token is correctly lexed
+     */
+    @Test
+    public void keynoteAccidentalsTest() {
+        Lexer lexer = new Lexer("K: C\nc'/");
+        Token expected = new Token(Token.Type.KEYNOTE);
+        expected.setValue("C");
+        expected.setDuration(new RationalNumber(1, 2));
+        expected.setOctave(2);
+        expected.setAccidental(Integer.MAX_VALUE);
         assertEquals(expected, lexer.lexBody().get(0));
     }
     
