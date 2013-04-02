@@ -11,7 +11,7 @@ public class Lexer{
     private String head,body;
     
     private final String regexHeader = 				//One regex for the header
-  			 "((?<=C:)\\s*.+$)|" 		+  			//1- add COMPOSER
+  			 "((?<=C:)\\s*.+)|" 		+  			//1- add COMPOSER
  "((?<=K:)\\s*[A-Ga-g][#b]?m?)|" 		+			//2- add KEY
    "((?<=L:)\\s*[0-9]+/[0-9]+)|" 		+			//3- add LENGTH
  "((?<=M:)\\s*((?:\\d+\\/\\d+)|" 		+			//4- add METER
@@ -125,6 +125,7 @@ public class Lexer{
     	catch(Exception e){ 						//exception switching in case of EOF
     		throw new LexerException(e.getMessage());
     	}
+    	
     	return s.substring(splitIndex+1);
     }
     
@@ -155,6 +156,7 @@ public class Lexer{
         while (headMatcher.find()) {
             
             if (headMatcher.group(headMap.get("COMPOSER")) != null) {
+            	System.out.println(headMatcher.group().toString());
                 Token newToken = new Token(Token.Type.COMPOSER);
                 newToken.setValue(headMatcher.group(headMap.get("COMPOSER")));
                 newToken.setHeader(true);
