@@ -10,6 +10,7 @@ import sound.SequencePlayer;
 public class PlayerVisitor implements Visitor<Void> {
     private SequencePlayer player;
     private int ticksPerQuarterNote;
+    private RationalNumber defaultNoteLength;
     private int currentTick = 0;
     
     /**
@@ -17,9 +18,12 @@ public class PlayerVisitor implements Visitor<Void> {
      * @param beatsPerMinute the beats per minute specified in the header of the abc song
      * @param ticksPerQuarterNote the number of ticks per quarter note, calculated by the DurationVisitor
      */
-    public PlayerVisitor(int beatsPerMinute, int ticksPerQuarterNote) {
+    public PlayerVisitor(int ticksPerQuarterNote, int tempo, RationalNumber defaultNoteLength) {
         try {
-            this.ticksPerQuarterNote = ticksPerQuarterNote;
+            this.ticksPerQuarterNote = 4*ticksPerQuarterNote;
+            this.defaultNoteLength = defaultNoteLength;
+            int beatsPerMinute = (int)(tempo * defaultNoteLength.getValue() * 4);
+            System.out.println("BPM: " + beatsPerMinute);
             player = new SequencePlayer(beatsPerMinute, ticksPerQuarterNote);
         } catch (MidiUnavailableException e) {
             e.printStackTrace();
@@ -35,10 +39,10 @@ public class PlayerVisitor implements Visitor<Void> {
     @Override
     public Void visit(SingleNote s) {
         //add note
-        player.addNote(new Pitch(s.getPitch()).transpose(Pitch.OCTAVE*s.getOctave()+s.getAccidental()).toMidiNote(), currentTick, (int)(ticksPerQuarterNote*s.getDuration().getValue()));
+        player.addNote(new Pitch(s.getPitch()).transpose(Pitch.OCTAVE*s.getOctave()+s.getAccidental()).toMidiNote(), currentTick, (int)(ticksPerQuarterNote*s.getDuration().mul(defaultNoteLength).getValue()));
         
         //advance song
-        currentTick += (int)(s.getDuration().getValue()*ticksPerQuarterNote);
+        currentTick += (int)(s.getDuration().mul(defaultNoteLength).getValue()*ticksPerQuarterNote);
         return null;
     }
 
@@ -49,7 +53,7 @@ public class PlayerVisitor implements Visitor<Void> {
     @Override
     public Void visit(Rest r) {
         //advance song
-        currentTick += (int)(r.getDuration().getValue()*ticksPerQuarterNote);        
+        currentTick += (int)(r.getDuration().mul(defaultNoteLength).getValue()*ticksPerQuarterNote);        
         return null;
     }
 
@@ -63,11 +67,11 @@ public class PlayerVisitor implements Visitor<Void> {
         for (NoteElement n: c.getNotes()){
             n.accept(this);
             //rewind song, all notes in the chord are played at the same time
-            currentTick -= (int)(n.getDuration().getValue()*ticksPerQuarterNote);
+            currentTick -= (int)(n.getDuration().mul(defaultNoteLength).getValue()*ticksPerQuarterNote);
         }
         
         //advance song
-        currentTick += (int)(c.getDuration().getValue()*ticksPerQuarterNote);
+        currentTick += (int)(c.getDuration().mul(defaultNoteLength).getValue()*ticksPerQuarterNote);
         return null;
     }
     

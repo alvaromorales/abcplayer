@@ -20,6 +20,7 @@ public class PlayerVisitorTest {
     @Test
     public void pieceOneTest() {
         Song s = new Song();
+        s.setTempo(140);
         Voice v = new Voice();
         
         v.addNote(new SingleNote('C',new RationalNumber(1, 1),0,0));
@@ -66,7 +67,7 @@ public class PlayerVisitorTest {
         DurationVisitor durationV = new DurationVisitor();
         durationV.visit(s);
         
-        PlayerVisitor visitor = new PlayerVisitor(140, durationV.getTicksPerQuarter());
+        PlayerVisitor visitor = new PlayerVisitor(durationV.getTicksPerQuarter(),s.getTempo(),s.getDefaultNoteLength());
         visitor.visit(s);
         SequencePlayer player = visitor.getPlayer();
         try {
@@ -82,6 +83,8 @@ public class PlayerVisitorTest {
     @Test
     public void pieceTwoTest() {
         Song s = new Song();
+        s.setTempo(200);
+        s.setDefaultDuration(new RationalNumber(1, 4));
         Voice v = new Voice();
         
         // First bar
@@ -151,7 +154,7 @@ public class PlayerVisitorTest {
         DurationVisitor durationV = new DurationVisitor();
         durationV.visit(s);
         
-        PlayerVisitor visitor = new PlayerVisitor(200, durationV.getTicksPerQuarter());
+        PlayerVisitor visitor = new PlayerVisitor(durationV.getTicksPerQuarter(),s.getTempo(),s.getDefaultNoteLength());
         visitor.visit(s);
         SequencePlayer player = visitor.getPlayer();
         try {
