@@ -51,12 +51,12 @@ public class Lexer{
      * @param s, the input string to be processed
      */
     public Lexer(String s) {
-        checkString(uncomment(s));
         
         this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
         this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
         
-        System.out.println(this.body);
+        checkHeaderString(this.head);
+        checkBodyString(this.body);
         
         headMap=new HashMap<String,Integer>();
         bodyMap=new HashMap<String,Integer>();
@@ -132,19 +132,20 @@ public class Lexer{
     }
     
     /**
-     * Checks if the given string is valid or contains some illegal characters
-     * @param s
-     * @return
-     */
-    public void checkString(String s){
+    -     * Checks if the given string is valid or contains some illegal characters
+    +     * Checks if the header of given string is valid or contains some illegal characters
+          * @param s
+    -     * @return
+          */
+    public void checkHeaderString(String s){
         StringBuffer regexBuf = new StringBuffer();
-        regexBuf.append("(");
-        regexBuf.append(regexHeader);
-        regexBuf.append(regexBody);
-        regexBuf.append(")+");
-        
+ 
+        regexBuf.append("((C:\\s*.+)|(K:\\s*[A-Ga-g][#b]?m?)|(\\s))+");
+
         String regex = new String(regexBuf);
+        System.out.println(regex);
         Pattern pattern = Pattern.compile(regex);
+        System.out.println(s);
         Matcher matcher = pattern.matcher(s);
         
         if (!matcher.matches()){
@@ -152,6 +153,31 @@ public class Lexer{
         }
     }
     
+    /**
+     * Checks if the body of given string is valid or contains some illegal characters
+     * @param s
+     */
+    public void checkBodyString(String s){
+        StringBuffer regexBuf = new StringBuffer();
+        
+        regexBuf.append("(");
+        regexBuf.append(regexHeader);
+        regexBuf.append(regexBody);
+        regexBuf.append(")+");
+        
+
+        String regex = new String(regexBuf);
+        System.out.println(regex);
+        Pattern pattern = Pattern.compile(regex);
+        System.out.println(s);
+        Matcher matcher = pattern.matcher(s);
+             
+        if (!matcher.matches()){
+             throw new LexerException("There is illegal character in the input file");
+        }
+    }
+
+
     
     /**
      * Removes comment from a string (comments start with '%' and end with a newline)
