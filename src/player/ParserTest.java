@@ -18,6 +18,7 @@ public class ParserTest {
 
     private final String correctHeader = "X:0\nT:t\nK:Cm\n"; // used for parser tests as the parser requires a correct header
     
+    
     /**
      * Returns a Song with the header information from correctHeader
      * Helper function for parser tests
@@ -34,7 +35,7 @@ public class ParserTest {
     /**
      * Tests the parsing of the header
      */
-    //@Test
+    @Test
     public void headerTest() {
         Lexer lexer = new Lexer("X:8628\nT:Title\nC:Johann Sebastian Bach\nM:4/4\nL:1/16\nQ:280\nV:1\nV:2\nV:3\nK:C\n");
         Parser parser = new Parser(lexer);
@@ -58,7 +59,7 @@ public class ParserTest {
     /**
      * Tests the parsing of a song with a complete header in an incorrect order
      */
-    //@Test(expected = ParserException.class)
+    @Test(expected = ParserException.class)
     public void incorrectHeaderTest() {
         Lexer lexer = new Lexer("K:Me\nX:500\nT:1\nGGG");
         Parser parser = new Parser(lexer);
@@ -68,7 +69,7 @@ public class ParserTest {
     /**
      * Test the parsing of a song with an incomplete header
      */
-    //@Test(expected = ParserException.class)
+    @Test(expected = ParserException.class)
     public void incompleteHeaderTest() {
         Lexer lexer = new Lexer("C:Me\nQ:500\nGGG");
         Parser parser = new Parser(lexer);
@@ -78,7 +79,7 @@ public class ParserTest {
     /**
      * Test the parsing of a SingleNote
      */
-    //@Test
+    @Test
     public void parseSingleNoteTest() {
         Lexer lexer = new Lexer(correctHeader + "^G,,8");
         Parser parser = new Parser(lexer);
@@ -92,7 +93,7 @@ public class ParserTest {
     /**
      * Test the parsing of a Rest
      */
-    //@Test
+    @Test
     public void parseRestTest() {
         Lexer lexer = new Lexer(correctHeader + "z/");
         Parser parser = new Parser(lexer);
@@ -106,7 +107,7 @@ public class ParserTest {
     /**
      * Test the parsing of a Chord
      */
-    //@Test
+    @Test
     public void parseChordTest() {
         Lexer lexer = new Lexer(correctHeader + "[E16G16]");
         Parser parser = new Parser(lexer);
@@ -124,7 +125,7 @@ public class ParserTest {
     /**
      * Test the parsing of a Duplet
      */
-    //@Test
+    @Test
     public void parseDupletTest() {
         Lexer lexer = new Lexer(correctHeader + "(2GG");
         Parser parser = new Parser(lexer);
@@ -141,7 +142,7 @@ public class ParserTest {
     /**
      * Test the parsing of a malformed Duplet
      */
-    //@Test(expected = ParserException.class)
+    @Test(expected = ParserException.class)
     public void parseIncorrectDuplet() {
         Lexer lexer = new Lexer(correctHeader + "(2G");
         Parser parser = new Parser(lexer);
@@ -151,7 +152,7 @@ public class ParserTest {
     /**
      * Tests the parsing of a Triplet
      */
-    //@Test
+    @Test
     public void parseTripletTest() {
         Lexer lexer = new Lexer(correctHeader + "(3GGG");
         Parser parser = new Parser(lexer);
@@ -168,7 +169,7 @@ public class ParserTest {
     /**
      * Test the parsing of a malformed Triplet
      */
-    //@Test(expected = ParserException.class)
+    @Test(expected = ParserException.class)
     public void parseIncorrectTriplet() {
         Lexer lexer = new Lexer(correctHeader + "(3GG");
         Parser parser = new Parser(lexer);
@@ -178,7 +179,7 @@ public class ParserTest {
     /**
      * Tests the parsing of a Quadruplet
      */
-    //@Test
+    @Test
     public void parseQuadrupletTest() {
         Lexer lexer = new Lexer(correctHeader + "(4GGGG");
         Parser parser = new Parser(lexer);
@@ -195,7 +196,7 @@ public class ParserTest {
     /**
      * Test the parsing of a malformed Quadruplet
      */
-    //@Test(expected = ParserException.class)
+    @Test(expected = ParserException.class)
     public void parseIncorrectQuadruplet() {
         Lexer lexer = new Lexer(correctHeader + "(4GGG");
         Parser parser = new Parser(lexer);
@@ -205,9 +206,10 @@ public class ParserTest {
     /**
      * Test the parsing of a song with repeats
      */
-    @Test
+    //@Test
+    //TODO should work when Lexer works
     public void parseRepeatsTest() {
-        Lexer lexer = new Lexer(correctHeader + "|:GG:|");
+        Lexer lexer = new Lexer(correctHeader + "|:G:|");
         Parser parser = new Parser(lexer);
         parser.parse();
         
@@ -217,5 +219,7 @@ public class ParserTest {
         expected.add(repeated);
         assertEquals(expected, parser.getSong());
     }
+    
+    
     
 }

@@ -34,7 +34,7 @@ public class Token {
     private Type type;
     private int octave;
     private int accidental;
-    private boolean header = false;
+    private boolean isHeader = false;
     private RationalNumber duration;
     
     /**
@@ -51,7 +51,7 @@ public class Token {
            type == Type.TITLE ||
            type == Type.INDEX||
            type == Type.VOICE){
-        	this.header=true;
+        	this.isHeader=true;
         }
 
     }
@@ -62,8 +62,16 @@ public class Token {
      * Gets whether this is a header token or not.
      * @return A boolean, true if this is a header token or false otherwise.
      */
-    public boolean inHeader(){
-    	return this.header;
+    public boolean getHeader(){
+    	return this.isHeader;
+    }
+    
+    /**
+     * Sets whether this is a header token or not.
+     * @param isHeader a boolean, true if this is a header token or false otherwise.
+     */
+    public void setHeader(boolean isHeader) {
+        this.isHeader = isHeader;
     }
     
     /**
@@ -269,7 +277,7 @@ public class Token {
         String otherValue = ((Token) o).value;
         int otherOctave = ((Token) o).octave;
         int otherAccidental = ((Token) o).accidental;
-        boolean otherHeader = ((Token) o).header;
+        boolean otherHeader = ((Token) o).isHeader;
         RationalNumber otherDuration = ((Token) o).duration;
         
         //all tokens have a type, value and header
@@ -277,7 +285,7 @@ public class Token {
         if (otherType.equals(Token.Type.KEYNOTE) && otherDuration != null) {
             return this.octave == otherOctave && this.accidental == otherAccidental && this.duration.equals(otherDuration);
         } else {
-            return this.type.equals(otherType) && this.value.equals(otherValue) && this.header == otherHeader;
+            return this.type.equals(otherType) && this.value.equals(otherValue) && this.isHeader == otherHeader;
         }
     }
     

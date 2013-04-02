@@ -196,7 +196,7 @@ public class Parser {
         while(i<tokens.size()) {
             Token it=tokens.get(i);      //iterator object from index 
             System.out.println(it.toString());
-            if(it.inHeader()) {           //We are parsing the header
+            if(it.getHeader()) {           //We are parsing the header
                 ++i;
                 switch(it.getType()){
                 case COMPOSER:
@@ -293,7 +293,7 @@ public class Parser {
                 case REPEAT_END:
                     int j=i-1;
                     while(!((tokens.get(j).getType() == Token.Type.REPEAT_START && tokens.get(j).getValue()!="PASS") || 
-                            tokens.get(j).inHeader()==true ||
+                            tokens.get(j).getHeader()==true ||
                             tokens.get(j).getType()==Token.Type.DOUBLE_BAR))							//Look for a repeat_start or a header element in order to start repeating
                         j--;
                     if(tokens.get(j).getType() == Token.Type.REPEAT_START)
