@@ -351,9 +351,6 @@ public class Lexer{
             }
         }
 
-        for (Token t: tokens) {
-            System.out.println(t);
-        }
         return tokens;
     }
     

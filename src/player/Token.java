@@ -133,7 +133,6 @@ public class Token {
      * parses the octave, accidental, key , and duration from value
      */
     public void parseValue(){
-        System.out.println(value);
         
         int octave = 0;
         int accidental = 0;
