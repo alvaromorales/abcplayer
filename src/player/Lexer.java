@@ -171,7 +171,7 @@ public class Lexer{
         
         // Create patterns
         ArrayList <Token> tokens = new ArrayList<Token>(0);
-        
+        long matchedChars=0, originalChars=this.head.replaceAll("\\s+", "").length();
         Pattern headPattern = Pattern.compile(this.regexHeader);
         
         // Create headMatchers and start matching to groups 
@@ -179,6 +179,8 @@ public class Lexer{
         
         while (headMatcher.find()) {
             
+        	matchedChars+=headMatcher.group().replaceAll("\\s+", "").length()+2; //count all matched chars minus whitespace + 2 chars (ie: C:)
+        	
             if (headMatcher.group(headMap.get("COMPOSER")) != null) {
                 Token newToken = new Token(Token.Type.COMPOSER);
                 newToken.setValue(headMatcher.group(headMap.get("COMPOSER")));
@@ -236,7 +238,8 @@ public class Lexer{
             }
         }
 
-        System.out.println(tokens.toString());
+        if(matchedChars!=originalChars)
+        	throw new LexerException("Leftover characters after lexing the header");
         return tokens;
     }
     
@@ -248,7 +251,7 @@ public class Lexer{
         
         // Create patterns
         ArrayList <Token> tokens = new ArrayList<Token>(0);
-        
+        long matchedChars=0, originalChars=this.body.replaceAll("\\s+", "").length();
         Pattern bodyPattern = Pattern.compile(this.regexBody);
 
         // Create Matcher and start matching to groups 
@@ -256,6 +259,8 @@ public class Lexer{
         
         //start lexing the body
         while (bodyMatcher.find()) {
+        	matchedChars+=bodyMatcher.group().replaceAll("\\s+", "").length(); //count all matched chars minus whitespace
+        	
         	for(int i=1;i<=bodyMatcher.groupCount();++i)
         		if(bodyMatcher.group(i) != null)
         			System.out.printf("Matched: %s, group_num=%d\n",bodyMatcher.group(i), i);
@@ -357,6 +362,9 @@ public class Lexer{
             }
         }
 
+        if(matchedChars!=originalChars){
+        	//throw new LexerException("Leftover characters after lexing the body");
+        }
         return tokens;
     }
     
