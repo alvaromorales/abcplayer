@@ -43,7 +43,6 @@ public class Main {
      * @param file the name of input abc file
      */
     public static void play(String file) throws IOException {
-
     	String input_string=readFile(file);
 
     	Lexer lexer = new Lexer(input_string);
@@ -66,16 +65,13 @@ public class Main {
     }
     
     public static void main(String[] args){
-        String filename="sample_abc/prelude.abc";
+        String filename="sample_abc/fur_elise.abc";
         try{
         	play(filename);
         }
         catch(IOException e){
-        	System.err.println(e.getMessage());
-        	System.exit(-1);
+        	throw new RuntimeException("Error reading file");
         }
-        
-        
        
     }
 }
