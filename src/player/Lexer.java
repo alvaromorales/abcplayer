@@ -26,7 +26,7 @@ public class Lexer{
  	   	   		 "(?:\\_){1,2}|" 		+			
  	   	   		 	 "(?:\\=))?"		+
  	   	   	 		  "[A-Ga-g]"		+
- 	   	 "(?:(?:\\,*)|(?:\\'*))" 		+			
+ 	   	 "(?:[,']*)" 		+			
  	   	  "(?:[0-9]*/?[0-9]*))|" 		+		
 		    "(z[0-9]*/?[0-9]*)|"		+			//2- add REST
  		  	   "(\\[(?![1-2]))|"		+			//3- add CHORD_START
@@ -55,9 +55,7 @@ public class Lexer{
         
         this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
         this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
-        
-        System.out.println(this.body);
-        
+                
         headMap=new HashMap<String,Integer>();
         bodyMap=new HashMap<String,Integer>();
 
@@ -238,8 +236,10 @@ public class Lexer{
             }
         }
 
+
         if(matchedChars!=originalChars)
         	throw new LexerException("Leftover characters after lexing the header");
+
         return tokens;
     }
     
@@ -263,14 +263,12 @@ public class Lexer{
         	
         	for(int i=1;i<=bodyMatcher.groupCount();++i)
         		if(bodyMatcher.group(i) != null)
-        			System.out.printf("Matched: %s, group_num=%d\n",bodyMatcher.group(i), i);
         	
             if (bodyMatcher.group(bodyMap.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
                 newToken.setValue(bodyMatcher.group(bodyMap.get("KEYNOTE")));
                 newToken.parseValue();
                 tokens.add(newToken);
-                System.out.println(newToken.toString());
                 continue;
             }
             
@@ -357,13 +355,12 @@ public class Lexer{
                 Token newToken = new Token(Token.Type.VOICE);
                 newToken.setValue(bodyMatcher.group(bodyMap.get("VOICE")));
                 tokens.add(newToken);
-                System.out.println(newToken);
                 continue;
             }
         }
 
         if(matchedChars!=originalChars){
-        	//throw new LexerException("Leftover characters after lexing the body");
+        	throw new LexerException("Leftover characters after lexing the body");
         }
         return tokens;
     }

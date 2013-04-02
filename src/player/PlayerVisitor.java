@@ -23,7 +23,6 @@ public class PlayerVisitor implements Visitor<Void> {
             this.ticksPerQuarterNote = 4*ticksPerQuarterNote;
             this.defaultNoteLength = defaultNoteLength;
             int beatsPerMinute = (int)(tempo * defaultNoteLength.getValue() * 4);
-            System.out.println("BPM: " + beatsPerMinute);
             player = new SequencePlayer(beatsPerMinute, ticksPerQuarterNote);
         } catch (MidiUnavailableException e) {
             e.printStackTrace();
@@ -62,7 +61,7 @@ public class PlayerVisitor implements Visitor<Void> {
      * @param c the Chord to add
      */
     @Override
-    public Void visit(Chord c) {
+    public Void visit(Chord c) {        
         //add notes
         for (NoteElement n: c.getNotes()){
             n.accept(this);

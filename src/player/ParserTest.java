@@ -589,7 +589,6 @@ public class ParserTest {
         expected.setTitle("Title");
         expected.setKeySignature("C");
         
-        System.out.println(expected.accidentalAssociator);
         expected.add(noteA);
         expected.add(noteA);
         expected.add(noteA);
