@@ -1,6 +1,7 @@
 package player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import player.AST.*;
 
@@ -203,7 +204,7 @@ public class Parser {
                 song.setTempo(tok.getIntValue());
                 break;
             case VOICE:
-                song.getVoice(tok.getValue());
+                song.addVoice(new Voice(tok.getValue()));
                 break;
             case KEY:
                 throw new ParserException("Malformed Header: K must be the last header field");
@@ -340,6 +341,42 @@ public class Parser {
         }
     }
 
+    /**
+     * Splits the body tokens into a list of tokens by voice
+     * @param tokens the list of body tokens
+     * @return the body tokens into a list of tokens by voice
+     */
+    public HashMap<String, ArrayList<Token>> splitTokensByVoice(ArrayList<Token> tokens) {
+        if (tokens.get(0).getType() != Token.Type.VOICE) {
+            throw new ParserException("Malformed body: Body starts with an undeclared voice");
+        }
+        
+        // initialize the voice map
+        HashMap<String, ArrayList<Token>> voiceMap = new HashMap<String, ArrayList<Token>>();
+        for (Voice v: song.getVoices()) {
+            voiceMap.put(v.getName(), new ArrayList<Token>(0));
+        }
+        
+        String currentVoice = tokens.get(0).getValue();
+        for (int i=1;i<tokens.size();i++) {
+            Token tok = tokens.get(i);
+            
+            //switch the currentVoice and keep going
+            if (tok.getType() == Token.Type.VOICE) {
+                currentVoice = tok.getValue();
+                continue;
+            }
+            
+            if (voiceMap.get(currentVoice) != null) {
+                voiceMap.get(currentVoice).add(tok);
+            } else {
+                throw new ParserException("Malformed body: Undeclared voice " + tok.getValue());
+            }
+        }
+        
+        return voiceMap;
+    }
+    
     /**
      * Parses the list of tokens produced by the lexer to fill the AST for the song.
      */

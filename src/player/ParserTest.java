@@ -1,6 +1,8 @@
 package player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.junit.Test;
 import player.AST.*;
 import static org.junit.Assert.*;
@@ -10,6 +12,7 @@ import static org.junit.Assert.*;
  * Testing Strategy:
  *  - test parsing of header
  *  - test parsing of individual tokens into the appropriate NoteElements
+ *  - test splitTokensByVoice
  *  - test parsing of a song with multiple voices
  *  - test repeats
  *  - test ParserExceptions
@@ -476,6 +479,76 @@ public class ParserTest {
         expected.add(parsedC);
 
         assertEquals(expected, parser.getSong());
+    }
+    
+    /**
+     * Tests splitTokensByVoice
+     */
+    public void splitVoicesTest() {
+        ArrayList<Token> tokens = new ArrayList<Token>(0);
+        
+        Token voice1 = new Token(Token.Type.VOICE);
+        voice1.setValue("1");
+        
+        Token voice2 = new Token(Token.Type.VOICE);
+        voice2.setValue("2");
+        
+        Token noteA = new Token(Token.Type.KEYNOTE);
+        noteA.setAccidental(Integer.MAX_VALUE);
+        noteA.setDuration(new RationalNumber(1, 1));
+        noteA.setOctave(0);
+        noteA.setValue("A");
+        
+        Token noteB = new Token(Token.Type.KEYNOTE);
+        noteB.setAccidental(Integer.MAX_VALUE);
+        noteB.setDuration(new RationalNumber(1, 1));
+        noteB.setOctave(0);
+        noteB.setValue("B");
+        
+        // Parse: 
+        //  V2 -> B
+        //  V1 -> A
+        //  V2 -> B
+        //  V1 -> A A
+        //  V2 -> B
+        //  V1 -> A
+        // Into:
+        // V1 -> A A A A
+        // V2 -> B B B
+        
+        tokens.add(voice2);
+        tokens.add(noteB);
+        tokens.add(voice1);
+        tokens.add(noteA);
+        tokens.add(voice2);
+        tokens.add(noteB);
+        tokens.add(voice1);
+        tokens.add(noteA);
+        tokens.add(noteA);
+        tokens.add(voice2);
+        tokens.add(noteB);
+        tokens.add(voice1);
+        tokens.add(noteA);
+        
+        HashMap<String, ArrayList<Token>> expected = new HashMap<String, ArrayList<Token>>();
+        
+        ArrayList<Token> voice1Tokens = new ArrayList<Token>(0);
+        voice1Tokens.add(noteA);
+        voice1Tokens.add(noteA);
+        voice1Tokens.add(noteA);
+        voice1Tokens.add(noteA);
+
+        ArrayList<Token> voice2Tokens = new ArrayList<Token>(0);
+        voice2Tokens.add(noteB);
+        voice2Tokens.add(noteB);
+        voice2Tokens.add(noteB);
+
+        expected.put("1", voice1Tokens);
+        expected.put("2", voice2Tokens);
+        
+        Parser parser = new Parser();
+        
+        assertEquals(expected, parser.splitTokensByVoice(tokens));
     }
     
 }

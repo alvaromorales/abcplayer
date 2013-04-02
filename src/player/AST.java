@@ -552,6 +552,14 @@ public class AST {
         }
 
         /**
+         * Gets the name of the voice
+         * @return the name of the voice
+         */
+        public String getName() {
+            return name;
+        }
+        
+        /**
          * Accepts a visitor
          */
         @Override
@@ -649,8 +657,8 @@ public class AST {
          */
         public void add(NoteElement e){
         	if(currentVoice == null){
-        		this.getVoice(null);
-        		this.currentVoice=voices.get(null);
+        		this.addVoice(new Voice(null));
+        		this.currentVoice= voices.get(null);
         	}
         	currentVoice.addNote(e);
         }
@@ -664,14 +672,13 @@ public class AST {
         }
 
         /**
-         * Adds a new Voice to the song. If voice exists, changes to that voice.
-         * @param name, the name of the Voice to create or fetch
+         * If voice exists, changes to that voice.
+         * @param name, the name of the Voice to fetch
          */
         public void getVoice(String name) {     	//handles Voice tokens both in header and body
-        	if(voices.containsKey(name))        	//if voice exists
+        	if(voices.containsKey(name)) {        	//if voice exists
         		currentVoice=voices.get(name); //fetch that voice
-        	else									//if doesn't exist create it
-        		addVoice(new Voice(name)); 	//create voice if it doesn't exist
+        	}
         }
         
         /**
