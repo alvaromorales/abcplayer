@@ -192,6 +192,8 @@ public class Token {
             
         }
         
+        
+        
         if (!isRational && nominator != 0)
             denominator = 1;
         if (denominator == 0 && isRational)
@@ -221,7 +223,7 @@ public class Token {
      * @param value
      */
     public void setValue(String value){
-        this.value = value;
+        this.value = value.trim();
     }
     
     
