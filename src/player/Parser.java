@@ -6,7 +6,7 @@ import player.AST.*;
 
 public class Parser {
 
-    private Song song;
+    private Song song = new Song();
 
     /**
      * Constructor, attaches lexer to parser, assuming lexer is initialized
@@ -164,14 +164,11 @@ public class Parser {
     /**
      * Parses the header tokens
      * @param headerTokens the header tokens the Lexer lexed
-     * @return a new Song, with the header information
      */
-    public Song parseHeader(ArrayList<Token> headerTokens) {
+    public void parseHeader(ArrayList<Token> headerTokens) {
         if (headerTokens.size() < 3) {
             throw new ParserException("Incomplete Header: The header must contain X, T, K at the very minimum");
         }
-
-        Song song = new Song();        
 
         // Parse the "X:" token
         Token index = headerTokens.get(0);
@@ -218,7 +215,7 @@ public class Parser {
                 throw new ParserException("Invalid field found in header");
             }
         }
-        
+
         //Parse the "K:" token
         Token key = headerTokens.get(headerTokens.size()-1);
         if (key.getType() != Token.Type.KEY) {
@@ -227,7 +224,120 @@ public class Parser {
             song.setKeySignature(key.getValue());
         }
 
-        return song;
+    }
+
+    /**
+     * Parses the voice tokens
+     * @param tokens the voice tokens
+     */
+    public void parseVoice(ArrayList<Token> tokens) {
+        int i=0;
+
+        while(i<tokens.size()) {
+            Token tok = tokens.get(i);
+
+            //parse body
+            switch(tok.getType()){
+            case BAR:
+                song.accidentalAssociator.revert(); // restore default accidentals for the piece
+                ++i;
+                break;
+            case CHORD_END:
+                ++i;
+                break;
+            case CHORD_START:
+                int offset=findNextType(tokens.subList(i,tokens.size()), Token.Type.CHORD_END); //find CHORD_END
+                if(offset<0)
+                    throw new ParserException("End of Chord not found");
+                song.add(parseChord(tokens.get(i+1).getDuration(), tokens.subList(i+1, i+offset)));     //add chord to current song
+                i+=(offset+1);                                                                      //skip until the end of the chord
+                break;
+            case KEYNOTE:
+                song.add(applyAccidental(
+                        tok.getValue().charAt(0),
+                        tok.getDuration(),
+                        tok.getOctave(),
+                        tok.getAccidental()
+                        ));                                              //apply accidental to token
+                ++i;
+                break;
+            case DUPLET_START:
+                try {
+                    song.add(parseDuplet(tokens.subList(i+1, i+3)));
+                    i+=3;                                                                           //skip to the next usable token
+                    break;
+                } catch (IndexOutOfBoundsException e) {
+                    throw new ParserException("Malformed Duplet");
+                }
+            case TRIPLET_START:
+                try {
+                    song.add(parseTriplet(tokens.subList(i+1, i+4)));
+                    i+=4;                                                                   //skip to the next usable token
+                    break;
+                } catch (IndexOutOfBoundsException e) {
+                    throw new ParserException("Malformed Triplet");
+                }
+            case QUAD_START:
+                try {
+                    System.out.println(tok.toString());
+                    song.add(parseQuad(tokens.subList(i+1, i+5)));
+                    i+=5;                                                                           //skip to the next usable token
+                    break;
+                } catch (IndexOutOfBoundsException e) {
+                    throw new ParserException("Malformed Quadruplet");
+                }
+            case REPEAT_START:
+                ++i;                                                                            //do nothing, wait for a REPEAT_END to show up
+                break;
+            case REPEAT_END:                    
+                if (tok.getValue().equals("PASS")) {
+                    ++i;
+                    break;
+                } else {
+                    tok.setValue("PASS");
+                    int j=i-1;
+
+                    while(!(tokens.get(j).getType() == Token.Type.REPEAT_START || 
+                            tokens.get(j).getHeader()== true ||
+                            tokens.get(j).getType() == Token.Type.DOUBLE_BAR)) {
+                        //Look for a repeat_start or a header element in order to start repeating
+                        j--;
+                    }
+
+                    i=j+1;
+                    break;
+                }
+            case REPEAT_NUMBER:
+                if(tok.getValue().contains("0"))
+                    i=tok.getOctave();                                                          //Octave is overloaded, look below in the comments
+                else if(tok.getValue().contains("1")){
+                    int k=i+1;
+                    while(tokens.get(k).getType()!=Token.Type.BAR            && 
+                            tokens.get(k).getType()!=Token.Type.DOUBLE_BAR     && 
+                            (tokens.get(k).getType()!=Token.Type.REPEAT_NUMBER ||                   //REPEAT_NUMBER and getValue()=="[2"
+                            !(tokens.get(k).getValue().contains("2")))        &&
+                            tokens.get(k).getType()!=Token.Type.REPEAT_END     &&
+                            tokens.get(k).getType()!=Token.Type.REPEAT_START)                       //search for one of those Type's that stop a repeat_number
+                        k++;
+                    tok.setOctave(k);                                                           //octave is overloaded to keep the redirection index
+                    tok.setValue("[0");                                                         // "[0" is a "[1" that was passed already
+                    ++i;
+                }
+                else
+                    ++i;                                                                        //No need to handle "[2" as it's handled by "[1"
+                break;
+            case DOUBLE_BAR:
+                song.accidentalAssociator.revert();
+                ++i;
+                break;
+            case REST:
+                song.add(new Rest(tok.getDuration()));
+                ++i;
+                break;
+            default:
+                throw new ParserException("Invalid type found in body");
+            }
+        }
     }
 
     /**
@@ -235,121 +345,5 @@ public class Parser {
      */
     public void parse(ArrayList<Token> tokens){
 
-        //initialize Song
-        song=new Song(); 
-        int i=0;
-
-        while(i<tokens.size()) {
-            Token tok=tokens.get(i);      //current token
-
-            if(tok.getHeader()) {           
-                
-            } else { 
-                //parse body
-                switch(tok.getType()){
-                case BAR:
-                    song.accidentalAssociator.revert(); 											// restore default accidentals for the piece
-                    ++i;
-                    break;
-                case CHORD_END:
-                    ++i;
-                    break;
-                case CHORD_START:
-                    int offset=findNextType(tokens.subList(i,tokens.size()), Token.Type.CHORD_END); //find CHORD_END
-                    if(offset<0)
-                        throw new ParserException("End of Chord not found");
-                    song.add(parseChord(tokens.get(i+1).getDuration(), tokens.subList(i+1, i+offset)));  	//add chord to current song
-                    i+=(offset+1); 																		//skip until the end of the chord
-                    break;
-                case KEYNOTE:
-                    song.add(applyAccidental(
-                            tok.getValue().charAt(0),
-                            tok.getDuration(),
-                            tok.getOctave(),
-                            tok.getAccidental()
-                            ));                                              //apply accidental to token
-                    ++i;
-                    break;
-                case DUPLET_START:
-                    try {
-                        song.add(parseDuplet(tokens.subList(i+1, i+3)));
-                        i+=3; 																			//skip to the next usable token
-                        break;
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new ParserException("Malformed Duplet");
-                    }
-                case TRIPLET_START:
-                    try {
-                        song.add(parseTriplet(tokens.subList(i+1, i+4)));
-                        i+=4;																	//skip to the next usable token
-                        break;
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new ParserException("Malformed Triplet");
-                    }
-                case QUAD_START:
-                    try {
-                        System.out.println(tok.toString());
-                        song.add(parseQuad(tokens.subList(i+1, i+5)));
-                        i+=5; 																			//skip to the next usable token
-                        break;
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new ParserException("Malformed Quadruplet");
-                    }
-                case REPEAT_START:
-                    ++i;																			//do nothing, wait for a REPEAT_END to show up
-                    break;
-                case REPEAT_END:                    
-                    if (tok.getValue().equals("PASS")) {
-                        ++i;
-                        break;
-                    } else {
-                        tok.setValue("PASS");
-                        int j=i-1;
-
-                        while(!(tokens.get(j).getType() == Token.Type.REPEAT_START || 
-                                tokens.get(j).getHeader()== true ||
-                                tokens.get(j).getType() == Token.Type.DOUBLE_BAR)) {
-                            //Look for a repeat_start or a header element in order to start repeating
-                            j--;
-                        }
-
-                        i=j+1;
-                        break;
-                    }
-                case REPEAT_NUMBER:
-                    if(tok.getValue().contains("0"))
-                        i=tok.getOctave();															//Octave is overloaded, look below in the comments
-                    else if(tok.getValue().contains("1")){
-                        int k=i+1;
-                        while(tokens.get(k).getType()!=Token.Type.BAR            && 
-                                tokens.get(k).getType()!=Token.Type.DOUBLE_BAR     && 
-                                (tokens.get(k).getType()!=Token.Type.REPEAT_NUMBER ||					//REPEAT_NUMBER and getValue()=="[2"
-                                !(tokens.get(k).getValue().contains("2")))        &&
-                                tokens.get(k).getType()!=Token.Type.REPEAT_END     &&
-                                tokens.get(k).getType()!=Token.Type.REPEAT_START) 						//search for one of those Type's that stop a repeat_number
-                            k++;
-                        tok.setOctave(k);															//octave is overloaded to keep the redirection index
-                        tok.setValue("[0");															// "[0" is a "[1" that was passed already
-                        ++i;
-                    }
-                    else
-                        ++i;																		//No need to handle "[2" as it's handled by "[1"
-                    break;
-                case DOUBLE_BAR:
-                    song.accidentalAssociator.revert();
-                    ++i;
-                    break;
-                case REST:
-                    song.add(new Rest(tok.getDuration()));
-                    ++i;
-                    break;
-                default:
-                    throw new ParserException("Invalid type found in body");
-                }
-            }
-
-        }
-
     }
-
 }
