@@ -260,7 +260,7 @@ public class Lexer{
         //start lexing the body
         while (bodyMatcher.find()) {
         	matchedChars+=bodyMatcher.group().replaceAll("\\s+", "").length(); //count all matched chars minus whitespace
-        	
+        
         	for(int i=1;i<=bodyMatcher.groupCount();++i)
         		if(bodyMatcher.group(i) != null)
         	
@@ -355,6 +355,7 @@ public class Lexer{
                 Token newToken = new Token(Token.Type.VOICE);
                 newToken.setValue(bodyMatcher.group(bodyMap.get("VOICE")));
                 tokens.add(newToken);
+                matchedChars+=2;
                 continue;
             }
         }

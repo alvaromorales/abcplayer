@@ -35,14 +35,10 @@ public class LexerTest {
        
         expected.add(first);
         expected.add(second);
-
-        
         
         ArrayList<Token> lexx=lexer.lexBody();
  
         assertArrayEquals(expected.toArray(),lexx.toArray());
-
-
 
     }
     
