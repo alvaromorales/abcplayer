@@ -551,4 +551,140 @@ public class ParserTest {
         assertEquals(expected, parser.splitTokensByVoice(tokens));
     }
     
+    /**
+     * Tests parsing a song with a single anonymous voice
+     */
+    @Test
+    public void parseSingleVoiceSongTest() {
+        Token index = new Token(Token.Type.INDEX);
+        index.setValue("8628");
+        
+        Token title = new Token(Token.Type.TITLE);
+        title.setValue("Title");
+        
+        Token key = new Token(Token.Type.KEY);
+        key.setValue("C");
+        
+        Token noteAToken = new Token(Token.Type.KEYNOTE);
+        noteAToken.setAccidental(Integer.MAX_VALUE);
+        noteAToken.setDuration(new RationalNumber(1, 1));
+        noteAToken.setOctave(0);
+        noteAToken.setValue("A");
+        
+        ArrayList<Token> headerTokens = new ArrayList<Token>(0);
+        headerTokens.add(index);
+        headerTokens.add(title);
+        headerTokens.add(key);
+        
+        ArrayList<Token> bodyTokens = new ArrayList<Token>(0);
+        bodyTokens.add(noteAToken);
+        bodyTokens.add(noteAToken);
+        bodyTokens.add(noteAToken);
+        bodyTokens.add(noteAToken);
+        
+        SingleNote noteA = new SingleNote('A', new RationalNumber(1, 1), 0, 0);
+        
+        Song expected = new Song();
+        expected.setIndex(8628);
+        expected.setTitle("Title");
+        expected.setKeySignature("C");
+        
+        System.out.println(expected.accidentalAssociator);
+        expected.add(noteA);
+        expected.add(noteA);
+        expected.add(noteA);
+        expected.add(noteA);
+
+        Parser parser = new Parser();
+        parser.parse(headerTokens, bodyTokens);
+        
+        assertEquals(expected, parser.getSong());
+        
+    }
+    
+    /**
+     * Tests parsing a song with multiple voices
+     */
+    @Test
+    public void multipleVoicesParseTest() {
+        // input
+        
+        Token index = new Token(Token.Type.INDEX);
+        index.setValue("8628");
+        
+        Token title = new Token(Token.Type.TITLE);
+        title.setValue("Title");
+        
+        Token key = new Token(Token.Type.KEY);
+        key.setValue("C");
+        
+        Token voice1Token = new Token(Token.Type.VOICE);
+        voice1Token.setValue("1");
+        
+        Token voice2Token = new Token(Token.Type.VOICE);
+        voice2Token.setValue("2");
+        
+        ArrayList<Token> headerTokens = new ArrayList<Token>(0);
+        headerTokens.add(index);
+        headerTokens.add(title);
+        headerTokens.add(voice1Token);
+        headerTokens.add(voice2Token);
+        headerTokens.add(key);
+        
+        Token noteAToken = new Token(Token.Type.KEYNOTE);
+        noteAToken.setAccidental(Integer.MAX_VALUE);
+        noteAToken.setDuration(new RationalNumber(1, 1));
+        noteAToken.setOctave(0);
+        noteAToken.setValue("A");
+        
+        Token noteBToken = new Token(Token.Type.KEYNOTE);
+        noteBToken.setAccidental(Integer.MAX_VALUE);
+        noteBToken.setDuration(new RationalNumber(1, 1));
+        noteBToken.setOctave(0);
+        noteBToken.setValue("B");
+        
+        ArrayList<Token> bodyTokens = new ArrayList<Token>(0);
+        bodyTokens.add(voice2Token);
+        bodyTokens.add(noteBToken);
+        bodyTokens.add(voice1Token);
+        bodyTokens.add(noteAToken);
+        bodyTokens.add(voice2Token);
+        bodyTokens.add(noteBToken);
+        bodyTokens.add(voice1Token);
+        bodyTokens.add(noteAToken);
+        bodyTokens.add(noteAToken);
+        bodyTokens.add(voice2Token);
+        bodyTokens.add(noteBToken);
+        bodyTokens.add(voice1Token);
+        bodyTokens.add(noteAToken);
+        
+        // expected output
+
+        SingleNote noteA = new SingleNote('A', new RationalNumber(1, 1), 0, 0);
+        SingleNote noteB = new SingleNote('B', new RationalNumber(1, 1), 0, 0);
+        
+        Voice voice1 = new Voice("1");
+        voice1.addNote(noteA);
+        voice1.addNote(noteA);
+        voice1.addNote(noteA);
+        voice1.addNote(noteA);
+
+        Voice voice2 = new Voice("2");
+        voice2.addNote(noteB);
+        voice2.addNote(noteB);
+        voice2.addNote(noteB);
+        
+        Song expected = new Song();
+        expected.setIndex(8628);
+        expected.setTitle("Title");
+        expected.addVoice(voice1);
+        expected.addVoice(voice2);
+        expected.setKeySignature("C");
+        
+        Parser parser = new Parser();
+        parser.parse(headerTokens, bodyTokens);
+        
+        assertEquals(expected, parser.getSong());
+    }
+    
 }

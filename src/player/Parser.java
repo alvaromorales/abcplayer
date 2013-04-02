@@ -379,8 +379,20 @@ public class Parser {
     
     /**
      * Parses the list of tokens produced by the lexer to fill the AST for the song.
+     * @param headerTokens the header tokens, as produced by the Lexer
+     * @param bodyTokens the body tokens, as produced by the Lexer
      */
-    public void parse(ArrayList<Token> tokens){
-
+    public void parse(ArrayList<Token> headerTokens,ArrayList<Token> bodyTokens){
+        parseHeader(headerTokens);
+        if (song.getVoices().isEmpty()) {
+            // no declared voices
+            parseVoice(bodyTokens);
+        } else {
+            HashMap<String, ArrayList<Token>> voicesMap = splitTokensByVoice(bodyTokens);
+            for (Voice v : song.getVoices()) {
+                song.getVoice(v.getName());
+                parseVoice(voicesMap.get(v.getName()));
+            }
+        }
     }
 }
