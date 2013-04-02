@@ -26,7 +26,7 @@ public class Lexer{
  	   	   		 "(?:\\_){1,2}|" 		+			
  	   	   		 	 "(?:\\=))?"		+
  	   	   	 		  "[A-Ga-g]"		+
- 	   	 "(?:(?:\\,*)|(?:\\'*))" 		+			
+ 	   	 "(?:[,']*)" 		+			
  	   	  "(?:[0-9]*/?[0-9]*))|" 		+		
 		    "(z[0-9]*/?[0-9]*)|"		+			//2- add REST
  		  	   "(\\[(?![1-2]))|"		+			//3- add CHORD_START
@@ -51,13 +51,11 @@ public class Lexer{
      * @param s, the input string to be processed
      */
     public Lexer(String s) {
-        checkString(uncomment(s));
+        //checkString(uncomment(s));
         
         this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
         this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
-        
-        System.out.println(this.body);
-        
+                
         headMap=new HashMap<String,Integer>();
         bodyMap=new HashMap<String,Integer>();
 
@@ -236,7 +234,6 @@ public class Lexer{
             }
         }
 
-        System.out.println(tokens.toString());
         return tokens;
     }
     
@@ -258,14 +255,12 @@ public class Lexer{
         while (bodyMatcher.find()) {
         	for(int i=1;i<=bodyMatcher.groupCount();++i)
         		if(bodyMatcher.group(i) != null)
-        			System.out.printf("Matched: %s, group_num=%d\n",bodyMatcher.group(i), i);
         	
             if (bodyMatcher.group(bodyMap.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
                 newToken.setValue(bodyMatcher.group(bodyMap.get("KEYNOTE")));
                 newToken.parseValue();
                 tokens.add(newToken);
-                System.out.println(newToken.toString());
                 continue;
             }
             
@@ -352,7 +347,6 @@ public class Lexer{
                 Token newToken = new Token(Token.Type.VOICE);
                 newToken.setValue(bodyMatcher.group(bodyMap.get("VOICE")));
                 tokens.add(newToken);
-                System.out.println(newToken);
                 continue;
             }
         }

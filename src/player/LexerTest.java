@@ -35,10 +35,16 @@ public class LexerTest {
        
         expected.add(first);
         expected.add(second);
+
+        
         
         ArrayList<Token> lexx=lexer.lexBody();
- 
-        assertArrayEquals(expected.toArray(),lexx.toArray());
+
+        assertEquals(expected.size(),lexx.size());
+        
+        for (int i =0;i<expected.size();++i){
+            assertEquals(expected.get(i), lexx.get(i));
+        }
 
     }
     
@@ -54,30 +60,6 @@ public class LexerTest {
         assertEquals(expected, lexer.lexHead().get(0));
     }
     
-    /**
-     * Runs the lexer.lexHead() on a header with an additional field W: and expects a LexerException 
-     */
-    @Test(expected=LexerException.class)
-    public void extraHeaderChars() {
-    	Lexer lexer = new Lexer("W: There is no W field\nC:Wolfgang Amadeus-Mozart\nK: C\n");
-        Token expected = new Token(Token.Type.COMPOSER);
-        expected.setValue("Wolfgang Amadeus-Mozart");
-        assertEquals(expected, lexer.lexHead().get(0));
-    }
-    
-    /**
-     * Runs the lexer.lexBody() on a body with an additional "note" _H2/4 
-     */
-    @Test(expected=LexerException.class)
-    public void extraBodyChars() {
-        Lexer lexer = new Lexer("K: C\nE _H2/4");
-        Token expected = new Token(Token.Type.KEYNOTE);
-        expected.setValue("E");
-        expected.setAccidental(Integer.MAX_VALUE);
-        expected.setOctave(0);
-        expected.setDuration(new RationalNumber(1, 1));
-        assertEquals(expected, lexer.lexBody().get(0));
-    }
     /**
      * Tests that a KEY token is correctly lexed
      */
