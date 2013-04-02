@@ -7,25 +7,40 @@ import java.util.regex.Matcher;
 
 
 public class Lexer{
+	
     private String s;
+    private final String regexPattern = 
+  			 "((?<=C:)\\s*.+$)|" 		+  			//1- add COMPOSER
+ "((?<=K:)\\s*[A-Ga-g][#b]?m?)|" 		+			//2- add KEY
+   "((?<=L:)\\s*[0-9]+/[0-9]+)|" 		+			//3- add LENGTH
+ "((?<=M:)\\s*(?:\\d+\\/\\d+))|" 		+			//4- add METER
+ 		  "((?<=Q:)\\s*[0-9]+)|"		+			//5- add TEMPO
+ 			 "((?<=T:)\\s*.+$)|" 		+			//6- add TITLE
+ 		   "((?<=X:)\\s*\\d+$)|" 		+			//7- add INDEX
+ 		     "((?<=V:)\\s*.+$)|"		+			//8- add VOICE
+"((?:(?:\\^)|(?:\\^\\^)|(?:\\_)|(?:\\_\\_)|(?:\\=))?[A-Ga-g](?:(?:\\,*)|(?:\\'*))(?:[0-9]*/?[0-9]*)(?!\\:))|" + //9- add KEYNOTE *
+ 		  "(z[0-9 ]*/?[0-9 ]*)|"		+			//10- add REST *
+ 		  	   "(\\[(?![1-2]))|"		+			//11- add CHORD_START
+ 		  	    "((?<!\\|)\\])|"		+			//12- add CHORD_END *
+ 		  			  "(\\(2)|"			+			//13- add DUPLET_START
+ 		  			  "(\\(3)|"			+			//14- add TRIPLET_START
+ 		  			  "(\\(4)|"			+			//15- add QUAD_START
+ 		   "((\\|)(?![\\|:\\]]))|"		+			//16- add BAR
+"((?:\\|\\|)|(?:\\[\\|)|(?:\\|\\]))|"	+			//17- add DOUBLE_BAR *
+						   "(\\|:)|"	+           //18- add REPEAT_START
+					   "(:\\|)|"		+			//19- add REPEAT_END
+				   "(\\[[1-2])";					//20- add REPEAT_NUMBER
+    
+    // Create a map, mapping token types to their numbers in order
+    private static Map<String,Integer> map;
     
     /**
      * Creates a new Lexer object
-     * @param string
+     * @param s, the input string to be processed
      */
     public Lexer(String s) {
-        this.s = s;
-    }
-    
-    // Create a map, mapping token types to their numbers in order
-    private Map<String,Integer> map = new HashMap<String,Integer>();
-    
-    
-    
-    /**
-     * Creates a Map, mapping token types to numbers
-     */
-    private void createTypeMap() {
+        this.s = uncomment(s); 						//remove comments from the abc file
+        map = new HashMap<String,Integer>();
         map.put("COMPOSER", 1);
         map.put("KEY", 2);
         map.put("LENGTH", 3);
@@ -46,89 +61,18 @@ public class Lexer{
         map.put("REPEAT_START", 18);
         map.put("REPEAT_END", 19);
         map.put("REPEAT_NUMBER", 20);
-        map.put("COMMENT", 21);
-        map.put("WHITESPACE", 22);
+        
     }
-
     
     /**
-     * Creates a string for pattern 
-     * @return StringBuffer
+     * Removes comment from a string (comments start with '%' and end with a newline)
+     * @param s, the string to un-comment
+     * @return String, the string without any comments
      */
-    private StringBuffer patternMaker(){
-        StringBuffer tokensBuf = new StringBuffer();
-        //1- add COMPOSER
-        tokensBuf.append("((?<=C:)[A-Z a-z\\.\\-\\']+(?=(?:\\n|%)))");
-        tokensBuf.append("|");
-        //2- add KEY
-        tokensBuf.append("((?<=K:)[A-Ga-g][#b]?m?(?=(?:\\n|%)))");
-        tokensBuf.append("|");
-        //3- add LENGTH
-        tokensBuf.append("((?<=L:)[0-9]+/[0-9]+(?=(?:\\n|%)))");
-        tokensBuf.append("|");
-        //4- add METER
-        tokensBuf.append("((?<=M:)(?:C\\|?|(?:[0-9]+/[0-9]+))(?=(?:\\n|%)))");
-        tokensBuf.append("|");
-        //5- add TEMPO
-        tokensBuf.append("((?<=Q:)[0-9]+(?=(?:\\n|%)))");
-        tokensBuf.append("|");
-        //6- add TITLE
-        tokensBuf.append("((?<=T:)[A-Z a-z\\.\\-\\']+(?=(?:\\n|%)))");
-        tokensBuf.append("|");
-        //7- add INDEX
-        tokensBuf.append("((?<=X:)[0-9]+(?=(?:\\n|%)))");
-        tokensBuf.append("|");
-        //8- add VOICE
-        tokensBuf.append("((?<=V:)[\\-A-Z a-z\\.0-9]+(?=(?:\\n|%)))");
-        tokensBuf.append("|");
-        
-        //9- add KEYNOTE
-        tokensBuf.append("((?:(?:\\^)|(?:\\^\\^)|(?:\\_)|(?:\\_\\_)|(?:\\=))?[A-Ga-g](?:(?:\\,*)|(?:\\'*))(?:[0-9]*/?[0-9]*)(?!:))");
-        tokensBuf.append("|");
-        //    
-        //10- add REST
-        tokensBuf.append("(z[0-9 ]*/?[0-9 ]*)");
-        tokensBuf.append("|");
-        //11- add CHORD_START
-        tokensBuf.append("(\\[(?![1-2]))");
-        tokensBuf.append("|");
-        //12- add CHORD_END
-        tokensBuf.append("(\\])");
-        tokensBuf.append("|");
-        //13- add DUPLET_START 
-        tokensBuf.append("(\\(2)");
-        tokensBuf.append("|");
-        //14- add TRIPLET_START
-        tokensBuf.append("(\\(3)");
-        tokensBuf.append("|");
-        //15- add QUAD_START
-        tokensBuf.append("(\\(4)");
-        tokensBuf.append("|");
-        //16- add BAR
-        tokensBuf.append("(\\|)(?!:)(?!\\|)");
-        tokensBuf.append("|");
-        //17- add DOUBLE_BAR
-        tokensBuf.append("((?:\\|\\|)|(?:\\[\\|)|(?:\\|\\]))");
-        tokensBuf.append("|");
-        //18- add REPEAT_START
-        tokensBuf.append("(\\|:)");
-        tokensBuf.append("|");
-        //19- add REPEAT_END
-        tokensBuf.append("(:\\|)");
-        tokensBuf.append("|");
-        //20- add REPEAT_NUMBER
-        tokensBuf.append("(\\[[1-2])");
-        tokensBuf.append("|");
-        //21- add regex for comment, we won't consider it later
-        tokensBuf.append("(%+.*$)");
-        tokensBuf.append("|");
-        //22- add regex xo whitespace
-        tokensBuf.append("( +)");
-        
-        return tokensBuf;
-
-    }
     
+    public String uncomment(String s){
+    	return new String(s.replaceAll("%.*$", ""));
+    }
     
     /**
      * Creates a list of tokens from the given abc string
@@ -136,31 +80,17 @@ public class Lexer{
      */
     public ArrayList<Token> lex(){
         
-        // create a map
-        createTypeMap();
-        
-        
         // Create a pattern
         ArrayList <Token> tokens = new ArrayList<Token>();
         
-        Pattern tokenPatterns = Pattern.compile(new String(patternMaker()));
+        Pattern tokenPatterns = Pattern.compile(regexPattern);
         
         // Create matcher and start matching to groups 
         Matcher matcher = tokenPatterns.matcher(s);
         
-        
         while (matcher.find()) {
             
-            System.out.println(matcher.group(0));
-            if (matcher.group(map.get("COMMENT")) != null){
-                continue;
-            }
-            
-            else if (matcher.group(map.get("WHITESPACE")) != null) {
-                continue;
-            }
-            
-            else if (matcher.group(map.get("COMPOSER")) != null) {
+            if (matcher.group(map.get("COMPOSER")) != null) {
                 Token newToken = new Token(Token.Type.COMPOSER);
                 newToken.setValue(matcher.group(map.get("COMPOSER")));
                 tokens.add(newToken);
