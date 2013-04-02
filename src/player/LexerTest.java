@@ -60,8 +60,6 @@ public class LexerTest {
         Lexer lexer = new Lexer("C:Wolfgang Amadeus-Mozart\nK: C\n");
         Token expected = new Token(Token.Type.COMPOSER);
         expected.setValue("Wolfgang Amadeus-Mozart");
-        expected.setHeader(true);
-        System.out.println(lexer.lexHead().toString());
         assertEquals(expected, lexer.lexHead().get(0));
     }
     
@@ -73,8 +71,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("X: 1\nT: empty\nK:A#m\n");
         Token expected = new Token(Token.Type.KEY);
         expected.setValue("A#m");
-        expected.setHeader(true);
-        assertEquals(expected, lexer.lexHead().get(0));
+        assertEquals(expected, lexer.lexHead().get(2));
     }
     
     /**
@@ -85,7 +82,6 @@ public class LexerTest {
         Lexer lexer = new Lexer("L:1/8K: C\n");
         Token expected = new Token(Token.Type.LENGTH);
         expected.setValue("1/8");
-        expected.setHeader(true);
         assertEquals(expected, lexer.lexHead().get(0));
     }
     
@@ -97,8 +93,6 @@ public class LexerTest {
         Lexer lexer = new Lexer("M:C|%Comment\nK:C\n");
         Token expected = new Token(Token.Type.METER);
         expected.setValue("C|");
-        expected.setHeader(true);
-        System.out.printf(" orig: %s\n expected: %s\n",lexer.lexHead().toString(),expected.toString());
         assertEquals(expected, lexer.lexHead().get(0));
     }
     
@@ -110,7 +104,6 @@ public class LexerTest {
         Lexer lexer = new Lexer("Q:240%Comment\nK:   C\n");
         Token expected = new Token(Token.Type.TEMPO);
         expected.setValue("240");
-        expected.setHeader(true);
         assertEquals(expected, lexer.lexHead().get(0));
     }
     
@@ -119,10 +112,9 @@ public class LexerTest {
      */
     @Test
     public void titleTest() {
-        Lexer lexer = new Lexer("T:Title of song%Comment\n");
+        Lexer lexer = new Lexer("T:Title of song%Comment\nK: C\n");
         Token expected = new Token(Token.Type.TITLE);
         expected.setValue("Title of song");
-        expected.setHeader(true);
         assertEquals(expected, lexer.lexHead().get(0));
     }
     
@@ -131,10 +123,9 @@ public class LexerTest {
      */
     @Test
     public void indexTest() {
-        Lexer lexer = new Lexer("X:57%Comment\n");
+        Lexer lexer = new Lexer("X:57%Comment\nK: C\n");
         Token expected = new Token(Token.Type.INDEX);
         expected.setValue("57");
-        expected.setHeader(true);
         assertEquals(expected, lexer.lexHead().get(0));
     }
     
@@ -143,10 +134,9 @@ public class LexerTest {
      */
     @Test
     public void voiceTest() {
-        Lexer lexer = new Lexer("V:Voice Number 1\n");
+        Lexer lexer = new Lexer("V:Voice Number 1\nK: C\n");
         Token expected = new Token(Token.Type.VOICE);
         expected.setValue("Voice Number 1");
-        expected.setHeader(true);
         assertEquals(expected, lexer.lexHead().get(0));
     }
     
@@ -155,7 +145,7 @@ public class LexerTest {
      */
     @Test
     public void keynoteFullTest() {
-        Lexer lexer = new Lexer("_E,7");
+        Lexer lexer = new Lexer("K: C\n_E,7");
         Token expected = new Token(Token.Type.KEYNOTE);
         expected.setValue("E");
         expected.setAccidental(-1);
@@ -169,7 +159,7 @@ public class LexerTest {
      */
     @Test
     public void keynoteTest() {
-        Lexer lexer = new Lexer("E");
+        Lexer lexer = new Lexer("K: C\nE");
         Token expected = new Token(Token.Type.KEYNOTE);
         expected.setValue("E");
         expected.setAccidental(Integer.MAX_VALUE);
@@ -183,7 +173,7 @@ public class LexerTest {
      */
     @Test
     public void restTest() {
-        Lexer lexer = new Lexer("z 1/ 2");
+        Lexer lexer = new Lexer("K: C\nz1/2");
         Token expected = new Token(Token.Type.REST);
         expected.setDuration(new RationalNumber(1,2));
         expected.setValue("z");
@@ -195,7 +185,7 @@ public class LexerTest {
      */
     @Test
     public void chordStartTest() {
-        Lexer lexer = new Lexer("[");
+        Lexer lexer = new Lexer("K: C\n[");
         Token expected = new Token(Token.Type.CHORD_START);
         expected.setValue("[");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -206,7 +196,7 @@ public class LexerTest {
      */
     @Test
     public void chordEndTest() {
-        Lexer lexer = new Lexer("]");
+        Lexer lexer = new Lexer("K: C\n]");
         Token expected = new Token(Token.Type.CHORD_END);
         expected.setValue("]");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -217,7 +207,7 @@ public class LexerTest {
      */
     @Test
     public void chordTest() {
-       Lexer lexer = new Lexer("[E16G16]");
+       Lexer lexer = new Lexer("K: C\n[E16G16]");
        ArrayList<Token> expected = new ArrayList<Token>(0);
        Token first = new Token(Token.Type.CHORD_START);
        first.setValue("[");
@@ -250,7 +240,7 @@ public class LexerTest {
      */
     @Test
     public void dupletStartTest() {
-        Lexer lexer = new Lexer("(2");
+        Lexer lexer = new Lexer("K: C\n(2");
         Token expected = new Token(Token.Type.DUPLET_START);
         expected.setValue("(2");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -261,7 +251,7 @@ public class LexerTest {
      */
     @Test
     public void tripletStartTest() {
-        Lexer lexer = new Lexer("(3");
+        Lexer lexer = new Lexer("K: C\n(3");
         Token expected = new Token(Token.Type.TRIPLET_START);
         expected.setValue("(3");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -272,7 +262,7 @@ public class LexerTest {
      */
     @Test
     public void quadStartTest() {
-        Lexer lexer = new Lexer("(4");
+        Lexer lexer = new Lexer("K: C\n(4");
         Token expected = new Token(Token.Type.QUAD_START);
         expected.setValue("(4");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -283,7 +273,7 @@ public class LexerTest {
      */
     @Test
     public void barTest() {
-        Lexer lexer = new Lexer("|");
+        Lexer lexer = new Lexer("K: C\n|");
         Token expected = new Token(Token.Type.BAR);
         expected.setValue("|");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -294,7 +284,7 @@ public class LexerTest {
      */
     @Test
     public void doubleBarTest() {
-        Lexer lexer = new Lexer("||");
+        Lexer lexer = new Lexer("K: C\n||");
         Token expected = new Token(Token.Type.DOUBLE_BAR);
         expected.setValue("||");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -305,7 +295,7 @@ public class LexerTest {
      */
     @Test
     public void repeatStartTest() {
-        Lexer lexer = new Lexer("|:");
+        Lexer lexer = new Lexer("K: C\n|:");
         Token expected = new Token(Token.Type.REPEAT_START);
         expected.setValue("|:");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -316,7 +306,7 @@ public class LexerTest {
      */
     @Test
     public void repeatEndTest() {
-        Lexer lexer = new Lexer(":|");
+        Lexer lexer = new Lexer("K: C\n:|");
         Token expected = new Token(Token.Type.REPEAT_END);
         expected.setValue(":|");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -327,7 +317,7 @@ public class LexerTest {
      */
     @Test
     public void repeatNumber1Test() {
-        Lexer lexer = new Lexer("[1");
+        Lexer lexer = new Lexer("K: C\n[1");
         Token expected = new Token(Token.Type.REPEAT_NUMBER);
         expected.setValue("[1");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -338,7 +328,7 @@ public class LexerTest {
      */
     @Test
     public void repeatNumber2Test() {
-        Lexer lexer = new Lexer("[2");
+        Lexer lexer = new Lexer("K: C\n[2");
         Token expected = new Token(Token.Type.REPEAT_NUMBER);
         expected.setValue("[2");
         assertEquals(expected, lexer.lexBody().get(0));
@@ -352,44 +342,11 @@ public class LexerTest {
      */
     @Test
     public void ignoreWhitespaceTest() {
-        Lexer lexer = new Lexer("T:Paddy O'Rafferty");
-        ArrayList<Token> expected = new ArrayList<Token>();
+        Lexer lexer = new Lexer("T:Paddy O'Rafferty\nK: C\n");
         Token first = new Token(Token.Type.TITLE);
         first.setValue("Paddy O'Rafferty");
         
-        RationalNumber singleDuration = new RationalNumber(1, 1);
-        
-        Token second = new Token(Token.Type.KEYNOTE);
-        second.setValue("D");
-        second.setAccidental(Integer.MAX_VALUE);
-        second.setOctave(1);
-        second.setDuration(singleDuration);
-        
-        Token third = new Token(Token.Type.KEYNOTE);
-        third.setValue("F");
-        third.setAccidental(Integer.MAX_VALUE);
-        third.setOctave(1);
-        third.setDuration(singleDuration);
-        
-        Token fourth = new Token(Token.Type.KEYNOTE);
-        fourth.setValue("C");
-        fourth.setAccidental(Integer.MAX_VALUE);
-        fourth.setOctave(1);
-        fourth.setDuration(singleDuration);
-        
-        Token fifth = new Token(Token.Type.KEYNOTE);
-        fifth.setValue("E");
-        fifth.setAccidental(Integer.MAX_VALUE);
-        fifth.setOctave(1);
-        fifth.setDuration(singleDuration);
-        
-        expected.add(first);
-        expected.add(second);
-        expected.add(third);
-        expected.add(fourth);
-        expected.add(fifth);
-        
-        assertEquals(expected, lexer.lexHead());
+        assertEquals(first, lexer.lexHead().get(0));
     }
     
     /**
@@ -397,7 +354,7 @@ public class LexerTest {
      */
     @Test
     public void repeatLexerTest() {
-        Lexer lexer = new Lexer("|:C:|");
+        Lexer lexer = new Lexer("K: C\n|:C:|");
         
         ArrayList<Token> expected = new ArrayList<Token>();
         Token first = new Token(Token.Type.REPEAT_START);
@@ -424,8 +381,8 @@ public class LexerTest {
      */
     @Test
     public void Test1() {
-        Lexer lexer = new Lexer("V: lower\nC8 C8 | C8 C8 | B,8 B,8 | C8 C8 |]");
-        ArrayList<Token> expected = new ArrayList<Token>();
+        Lexer lexer = new Lexer("K: C\nV: lower\nC8 C8 | C8 C8 | B,8 B,8 | C8 C8 |]");
+        ArrayList<Token> expected = new ArrayList<Token>(0);
         
         
         Token first = new Token(Token.Type.VOICE);
@@ -448,8 +405,8 @@ public class LexerTest {
         third.setDuration(new RationalNumber(8,1));
         
 
-        Token fifth = new Token(Token.Type.CHORD_END);
-        fifth.setValue("]");
+        Token fifth = new Token(Token.Type.DOUBLE_BAR);
+        fifth.setValue("|]");
         
         expected.add(first);
         
@@ -467,7 +424,6 @@ public class LexerTest {
         
         expected.add(second);
         expected.add(second);
-        expected.add(bar);
 
         expected.add(fifth);
         
