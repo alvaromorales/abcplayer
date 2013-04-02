@@ -14,7 +14,7 @@ public class Lexer{
   			 "((?<=C:)\\s*.+)|" 		+  			//1- add COMPOSER
  "((?<=K:)\\s*[A-Ga-g][#b]?m?)|" 		+			//2- add KEY
    "((?<=L:)\\s*[0-9]+/[0-9]+)|" 		+			//3- add LENGTH
- "((?<=M:)\\s*((?:\\d+\\/\\d+)|" 		+			//4- add METER
+ "((?<=M:)\\s*(?:(?:\\d+\\/\\d+)|" 		+			//4- add METER
  			   	  "(?:C\\|?)))|" 		+			//4- still METER
  		  "((?<=Q:)\\s*[0-9]+)|"		+			//5- add TEMPO
  			 "((?<=T:)\\s*.+)|" 		+			//6- add TITLE
@@ -22,7 +22,7 @@ public class Lexer{
  		     "((?<=V:)\\s*.+\\n)" 		;			//8- add VOICE
 
  	private final String regexBody =	   			//One regex for the body
- 		   "(?:(?:(?:\\^){1,2}|" 		+			//1- add KEYNOTE
+ 		   "((?:(?:\\^){1,2}|" 		+			//1- add KEYNOTE
  	   	   		 "(?:\\_){1,2}|" 		+			
  	   	   		 	 "(?:\\=))?"		+
  	   	   	 		  "[A-Ga-g]"		+
@@ -34,8 +34,8 @@ public class Lexer{
  		  			   "(\\(2)|"		+			//5- add DUPLET_START
  		  			   "(\\(3)|"		+			//6- add TRIPLET_START
  		  			   "(\\(4)|"		+			//7- add QUAD_START
- 		   "((\\|)(?![\\|:\\]]))|"		+			//8- add BAR
-"((?:\\|\\|)|(?:\\[\\|)|(?:\\|\\]))|"	+			//9- add DOUBLE_BAR *
+ 		   "((?:\\|)(?![\\|:\\]]))|"		+			//8- add BAR
+"((?:\\|{2})|(?:\\[\\|)|(?:\\|\\]))|"	+			//9- add DOUBLE_BAR *
 						   "(\\|:)|"	+           //10- add REPEAT_START
 					   "(:\\|)|"		+			//11- add REPEAT_END
 				   "(\\[[1-2])|"		+			//12- add REPEAT_NUMBER
@@ -44,6 +44,7 @@ public class Lexer{
     // Create a headMap, headMapping token types to their numbers in order
     private static Map<String,Integer> headMap;
     private static Map<String,Integer> bodyMap;
+    
     
     /**
      * Creates a new Lexer object
@@ -159,7 +160,7 @@ public class Lexer{
      */
     
     public String uncomment(String s){
-    	return new String(s.replaceAll("%.*\\n", ""));
+    	return new String(s.replaceAll("%.*", ""));
     }
     
     /**
@@ -181,7 +182,6 @@ public class Lexer{
             if (headMatcher.group(headMap.get("COMPOSER")) != null) {
                 Token newToken = new Token(Token.Type.COMPOSER);
                 newToken.setValue(headMatcher.group(headMap.get("COMPOSER")));
-                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
@@ -189,7 +189,6 @@ public class Lexer{
             else if (headMatcher.group(headMap.get("KEY")) != null) {
                 Token newToken = new Token(Token.Type.KEY);
                 newToken.setValue(headMatcher.group(headMap.get("KEY")));
-                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
@@ -197,7 +196,6 @@ public class Lexer{
             else if (headMatcher.group(headMap.get("LENGTH")) != null) {
                 Token newToken = new Token(Token.Type.LENGTH);
                 newToken.setValue(headMatcher.group(headMap.get("LENGTH")));
-                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
@@ -205,7 +203,6 @@ public class Lexer{
             else if (headMatcher.group(headMap.get("METER")) != null) {
                 Token newToken = new Token(Token.Type.METER);
                 newToken.setValue(headMatcher.group(headMap.get("METER")));
-                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
@@ -213,7 +210,6 @@ public class Lexer{
             else if (headMatcher.group(headMap.get("TEMPO")) != null) {
                 Token newToken = new Token(Token.Type.TEMPO);
                 newToken.setValue(headMatcher.group(headMap.get("TEMPO")));
-                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
@@ -221,7 +217,6 @@ public class Lexer{
             else if (headMatcher.group(headMap.get("TITLE")) != null) {
                 Token newToken = new Token(Token.Type.TITLE);
                 newToken.setValue(headMatcher.group(headMap.get("TITLE")));
-                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
@@ -229,7 +224,6 @@ public class Lexer{
             else if (headMatcher.group(headMap.get("INDEX")) != null) {
                 Token newToken = new Token(Token.Type.INDEX);
                 newToken.setValue(headMatcher.group(headMap.get("INDEX")));
-                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
@@ -237,7 +231,6 @@ public class Lexer{
             else if (headMatcher.group(headMap.get("VOICE")) != null) {
                 Token newToken = new Token(Token.Type.VOICE);
                 newToken.setValue(headMatcher.group(headMap.get("VOICE")));
-                newToken.setHeader(true);
                 tokens.add(newToken);
                 continue;
             }
@@ -263,10 +256,10 @@ public class Lexer{
         
         //start lexing the body
         while (bodyMatcher.find()) {
-        	System.out.printf("Matched: %s and groups=%d\n",bodyMatcher.group(), bodyMatcher.groupCount() );
         	for(int i=1;i<=bodyMatcher.groupCount();++i)
         		if(bodyMatcher.group(i) != null)
-        			System.out.printf("Matched: %d\n", i);
+        			System.out.printf("Matched: %s, group_num=%d\n",bodyMatcher.group(i), i);
+        	
             if (bodyMatcher.group(bodyMap.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
                 newToken.setValue(bodyMatcher.group(bodyMap.get("KEYNOTE")));
