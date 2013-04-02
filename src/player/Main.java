@@ -47,8 +47,8 @@ public class Main {
     	String input_string=readFile(file);
 
     	Lexer lexer = new Lexer(input_string);
-    	Parser parser = new Parser(lexer);
-    	parser.parse();
+    	Parser parser = new Parser();
+    	parser.parse(lexer.lex());
         
     	System.out.println(parser.getSong().toString()); //debugging only
     	
