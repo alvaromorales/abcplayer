@@ -124,6 +124,19 @@ public class Token {
      */
         
     public RationalNumber getRationalValue(){
+        // if the token is METER and its C or C| we need to return constant rational number
+        if (this.getType() == Token.Type.METER){
+            if (this.getValue().charAt(0) == 'C'){
+                if (this.getValue().length() == 1){
+                    return new RationalNumber(4,4);
+                } else
+                    return new RationalNumber(2,2);
+            }
+        }
+        
+        
+        // getting rational number for every other type of token
+        
         int nominator = 0, denominator = 0;
         int index = -1;
         
@@ -200,6 +213,8 @@ public class Token {
             
         }
         
+        
+        
         if (!isRational && nominator != 0)
             denominator = 1;
         if (denominator == 0 && isRational)
@@ -230,7 +245,7 @@ public class Token {
      * @param value
      */
     public void setValue(String value){
-        this.value = value;
+        this.value = value.trim();
     }
     
     

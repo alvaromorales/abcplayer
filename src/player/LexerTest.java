@@ -15,6 +15,41 @@ import org.junit.Test;
  */
 public class LexerTest {
 
+    
+    /**
+     * Tests that a comment is ignored
+     */
+    @Test
+    public void ignoreCommentTest() {
+        Lexer lexer = new Lexer("G,,8\n%comment\nV:1\n");
+        ArrayList<Token> expected = new ArrayList<Token>(0);
+        Token first = new Token(Token.Type.KEYNOTE);
+        first.setValue("G");
+        first.setOctave(-2);
+        first.setAccidental(Integer.MAX_VALUE);
+        first.setDuration(new RationalNumber(8, 1));
+        
+        Token second = new Token(Token.Type.VOICE);
+        second.setValue("1");
+        
+        expected.add(first);
+        expected.add(second);
+        
+        
+        ArrayList<Token> lexx=lexer.lex();
+        System.out.println();
+        System.out.println(lexx.toString());
+        System.out.println(expected.toString());
+        
+        assertEquals(expected.size(),lexx.size());
+        
+        for (int i =0;i<expected.size();++i){
+            assertEquals(expected.get(i), lexx.get(i));
+        }
+
+    }
+    
+    
     /**
      * Tests that a COMPOSER token is correctly lexed
      */
@@ -298,34 +333,7 @@ public class LexerTest {
         assertEquals(expected, lexer.lex().get(0));
     }
     
-    /**
-     * Tests that a comment is ignored
-     */
-    @Test
-    public void ignoreCommentTest() {
-        Lexer lexer = new Lexer("G,,8\n%comment\nV:1\n");
-        ArrayList<Token> expected = new ArrayList<Token>(0);
-        Token first = new Token(Token.Type.KEYNOTE);
-        first.setValue("G");
-        first.setOctave(-2);
-        first.setAccidental(Integer.MAX_VALUE);
-        first.setDuration(new RationalNumber(8, 1));
-        
-        Token second = new Token(Token.Type.VOICE);
-        second.setValue("1");
-        
-        expected.add(first);
-        expected.add(second);
-        
-        
-        ArrayList<Token> lexx=lexer.lex();
-        assertEquals(expected.size(),lexx.size());
-        
-        for (int i =0;i<expected.size();++i){
-            assertEquals(expected.get(i), lexx.get(i));
-        }
-
-    }
+    
     
     /**
      * Tests that whitespace is ignored
@@ -410,7 +418,7 @@ public class LexerTest {
         
         
         Token first = new Token(Token.Type.VOICE);
-        first.setValue(" lower");
+        first.setValue("lower");
         
         
         Token second = new Token(Token.Type.KEYNOTE);
