@@ -138,7 +138,6 @@ public class Parser {
      * @return a new Quadruplet with the appropriate notes 
      */
     public Quadruplet parseQuad(List<Token> tokens){
-        System.out.println(tokens.toString());
         SingleNote note1 = applyAccidental(tokens.get(0).getValue().charAt(0), 
                 tokens.get(0).getDuration().mul(new RationalNumber(3, 4)), 
                 tokens.get(0).getOctave(), 
@@ -280,7 +279,6 @@ public class Parser {
                 }
             case QUAD_START:
                 try {
-                    System.out.println(tok.toString());
                     song.add(parseQuad(tokens.subList(i+1, i+5)));
                     i+=5;                                                                           //skip to the next usable token
                     break;
@@ -290,7 +288,8 @@ public class Parser {
             case REPEAT_START:
                 ++i;                                                                            //do nothing, wait for a REPEAT_END to show up
                 break;
-            case REPEAT_END:                    
+            case REPEAT_END:   
+                song.accidentalAssociator.revert();
                 if (tok.getValue().equals("PASS")) {
                     ++i;
                     break;
@@ -298,24 +297,30 @@ public class Parser {
                     tok.setValue("PASS");
                     int j=i-1;
 
-                    while(!(tokens.get(j).getType() == Token.Type.REPEAT_START || 
+                    while(!(j == 0 ||
+                            tokens.get(j).getType() == Token.Type.REPEAT_START || 
                             tokens.get(j).getType() == Token.Type.DOUBLE_BAR)) {
                         //Look for a repeat_start or a header element in order to start repeating
                         j--;
                     }
 
-                    i=j+1;
+                    if (j == 0) {
+                        i = 0;
+                    } else {
+                        i=j;
+                    }
+                    
                     break;
                 }
             case REPEAT_NUMBER:
-                if(tok.getValue().contains("0"))
+                if(tok.getValue().equals("[0"))
                     i=tok.getOctave();                                                          //Octave is overloaded, look below in the comments
-                else if(tok.getValue().contains("1")){
+                else if(tok.getValue().equals("[1")){
                     int k=i+1;
                     while(tokens.get(k).getType()!=Token.Type.BAR            && 
                             tokens.get(k).getType()!=Token.Type.DOUBLE_BAR     && 
                             (tokens.get(k).getType()!=Token.Type.REPEAT_NUMBER ||                   //REPEAT_NUMBER and getValue()=="[2"
-                            !(tokens.get(k).getValue().contains("2")))        &&
+                            !(tokens.get(k).getValue().equals("[2")))        &&
                             tokens.get(k).getType()!=Token.Type.REPEAT_END     &&
                             tokens.get(k).getType()!=Token.Type.REPEAT_START)                       //search for one of those Type's that stop a repeat_number
                         k++;

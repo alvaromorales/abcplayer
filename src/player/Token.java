@@ -133,6 +133,7 @@ public class Token {
      * parses the octave, accidental, key , and duration from value
      */
     public void parseValue(){
+        
         int octave = 0;
         int accidental = 0;
         char keynote = 'z', c;

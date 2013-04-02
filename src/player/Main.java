@@ -43,21 +43,19 @@ public class Main {
      * @param file the name of input abc file
      */
     public static void play(String file) throws IOException {
-
     	String input_string=readFile(file);
 
     	Lexer lexer = new Lexer(input_string);
     	Parser parser = new Parser();
-    	parser.parse(lexer.lex());
-        
-    	System.out.println(parser.getSong().toString()); //debugging only
-    	
+    	parser.parse(lexer.lexHead(),lexer.lexBody());
+            	
     	DurationVisitor durationV = new DurationVisitor();
         durationV.visit(parser.getSong());
         
-        PlayerVisitor visitor = new PlayerVisitor(140, durationV.getTicksPerQuarter());
+        PlayerVisitor visitor = new PlayerVisitor(durationV.getTicksPerQuarter(),parser.getSong().getTempo(),parser.getSong().getDefaultNoteLength());
         visitor.visit(parser.getSong());
         SequencePlayer player = visitor.getPlayer();
+        
         try {
             player.play();
         } catch (MidiUnavailableException e) {
@@ -67,16 +65,13 @@ public class Main {
     }
     
     public static void main(String[] args){
-        String filename="sample_abc/scale.abc";
+        String filename="sample_abc/fur_elise.abc";
         try{
         	play(filename);
         }
         catch(IOException e){
-        	System.err.println(e.getMessage());
-        	System.exit(-1);
+        	throw new RuntimeException("Error reading file");
         }
-        
-        
        
     }
 }
