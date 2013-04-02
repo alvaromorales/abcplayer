@@ -102,6 +102,7 @@ public class AST {
                     + ", octave=" + octave + ", accidental=" + accidental + "]";
         }
         
+
     }
     
     /**
@@ -519,7 +520,7 @@ public class AST {
     public static class Voice implements NoteElement {
         private List<NoteElement> notes = new ArrayList<NoteElement>();
         private String name;
-
+        
         /**
          * Creates a Voice object
          * @param name, the name of the voice
@@ -619,10 +620,8 @@ public class AST {
         private RationalNumber defaultNoteLength;
         private RationalNumber meter;
         private int tempo;
-
         private String title;
         private int index;
-
         public AccidentalAssociationMaker accidentalAssociator=new AccidentalAssociationMaker();
         
         /**
@@ -886,7 +885,6 @@ public class AST {
                     + defaultNoteLength + ", meter=" + meter + ", tempo="
                     + tempo + ", title=" + title + ", index=" + index + "\nvoices=" + voices + "]";
         }
-        
         
     }
 

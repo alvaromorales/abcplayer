@@ -43,11 +43,8 @@ public class Token {
      */
     public Token(Type type){
         this.type = type;
-
     }
-    
-    
-    
+
     /**
      * Gets whether this is a header token or not.
      * @return A boolean, true if this is a header token or false otherwise.
@@ -149,7 +146,6 @@ public class Token {
         return Integer.parseInt(value);
     }
     
-
     /**
      * parses the octave, accidental, key , and duration from value
      */
@@ -226,9 +222,7 @@ public class Token {
         this.value = Character.toString(keynote);
         
 
-    }
-    
-    
+    }  
 
     /**
      * Sets the value of Token
