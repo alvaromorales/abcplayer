@@ -98,20 +98,22 @@ public class Parser {
 
     /**
      * Create a duplet from a list of Tokens
-     * @param inp, a list of tokens, inp.size()==2
+     * @param tokens, a list of tokens, tokens.size()==2
      * @return duplet, a new duplet 
      */
-    public Duplet parseDuplet(List<Token> inp){
+    public Duplet parseDuplet(List<Token> tokens){
         try{
-            SingleNote note1=applyAccidental(inp.get(0).getValue().charAt(0), 
-                    inp.get(0).getDuration().mul(new RationalNumber(3, 2)), 
-                    inp.get(0).getOctave(), 
-                    inp.get(0).getAccidental());
+            SingleNote note1 = applyAccidental(
+                    tokens.get(0).getValue().charAt(0), 
+                    tokens.get(0).getDuration().mul(new RationalNumber(3, 2)), 
+                    tokens.get(0).getOctave(), 
+                    tokens.get(0).getAccidental());
 
-            SingleNote note2=new SingleNote(inp.get(1).getValue().charAt(0), 
-                    inp.get(1).getDuration().mul(new RationalNumber(3, 2)), 
-                    inp.get(1).getOctave(), 
-                    inp.get(1).getAccidental());
+            SingleNote note2 = applyAccidental(
+                    tokens.get(1).getValue().charAt(0), 
+                    tokens.get(1).getDuration().mul(new RationalNumber(3, 2)), 
+                    tokens.get(1).getOctave(), 
+                    tokens.get(1).getAccidental());
 
             return new Duplet(note1 , note2);
 
@@ -250,29 +252,41 @@ public class Parser {
                     ++i;
                     break;
                 case CHORD_START:
-                    int offset=findNextType(tokens.subList(i,tokens.size()-1), Token.Type.CHORD_END); //find CHORD_END
+                    int offset=findNextType(tokens.subList(i,tokens.size()), Token.Type.CHORD_END); //find CHORD_END
                     if(offset<0)
                         throw new ParserException("End of Chord not found");
-                    song.add(parseChord(tokens.get(i+1).getDuration(), tokens.subList(i+1, i+offset-1)));  	//add chord to current song
+                    song.add(parseChord(tokens.get(i+1).getDuration(), tokens.subList(i+1, i+offset)));  	//add chord to current song
                     i+=(offset+1); 																		//skip until the end of the chord
                     break;
-                case DUPLET_START:
-                    song.add(parseDuplet(tokens.subList(i+1, i+3)));
-                    i+=3; 																			//skip to the next usable token
-                    break;
-                case TRIPLET_START:
-                    song.add(parseTriplet(tokens.subList(i+1, i+4)));
-                    i+=4;																	//skip to the next usable token
-                    break;
                 case KEYNOTE:
-                    song.add(applyAccidental(it));												//apply accidental to token
+                    song.add(applyAccidental(it));                                              //apply accidental to token
                     ++i;
                     break;
+                case DUPLET_START:
+                    try {
+                        song.add(parseDuplet(tokens.subList(i+1, i+3)));
+                        i+=3; 																			//skip to the next usable token
+                        break;
+                    } catch (IndexOutOfBoundsException e) {
+                        throw new ParserException("Malformed Duplet");
+                    }
+                case TRIPLET_START:
+                    try {
+                        song.add(parseTriplet(tokens.subList(i+1, i+4)));
+                        i+=4;																	//skip to the next usable token
+                        break;
+                    } catch (IndexOutOfBoundsException e) {
+                        throw new ParserException("Malformed Triplet");
+                    }
                 case QUAD_START:
-                    System.out.println(it.toString());
-                    song.add(parseQuad(tokens.subList(i+1, i+5)));
-                    i+=5; 																			//skip to the next usable token
-                    break;
+                    try {
+                        System.out.println(it.toString());
+                        song.add(parseQuad(tokens.subList(i+1, i+5)));
+                        i+=5; 																			//skip to the next usable token
+                        break;
+                    } catch (IndexOutOfBoundsException e) {
+                        throw new ParserException("Malformed Quadruplet");
+                    }
                 case REPEAT_START:
                     ++i;																			//do nothing, wait for a REPEAT_END to show up
                     break;

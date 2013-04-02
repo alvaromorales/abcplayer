@@ -1,5 +1,6 @@
 package player;
 
+import java.util.ArrayList;
 import org.junit.Test;
 import player.AST.*;
 import static org.junit.Assert.*;
@@ -10,11 +11,12 @@ import static org.junit.Assert.*;
  *  - test parsing of header
  *  - test parsing of individual tokens into the appropriate NoteElements
  *  - test parsing of a song with multiple voices
+ *  - test repeats
  *  - test ParserExceptions
  */
 public class ParserTest {
 
-    private final String correctHeader = "X:0\nT:t\nK:Cm"; // used for parser tests as the parser requires a correct header
+    private final String correctHeader = "X:0\nT:t\nK:Cm\n"; // used for parser tests as the parser requires a correct header
     
     /**
      * Returns a Song with the header information from correctHeader
@@ -74,10 +76,10 @@ public class ParserTest {
     }
     
     /**
-     * Test the parsing of a KEYNOTE token
+     * Test the parsing of a SingleNote
      */
-    @Test
-    public void keynoteTokenTest() {
+    //@Test
+    public void parseSingleNoteTest() {
         Lexer lexer = new Lexer(correctHeader + "^G,,8");
         Parser parser = new Parser(lexer);
         parser.parse();
@@ -87,6 +89,133 @@ public class ParserTest {
         assertEquals(expected, parser.getSong());
     }
     
+    /**
+     * Test the parsing of a Rest
+     */
+    //@Test
+    public void parseRestTest() {
+        Lexer lexer = new Lexer(correctHeader + "z/");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+        
+        Song expected = makeSongFromCorrectHeader();
+        expected.add(new Rest(new RationalNumber(1, 2)));
+        assertEquals(expected, parser.getSong());
+    }
     
+    /**
+     * Test the parsing of a Chord
+     */
+    //@Test
+    public void parseChordTest() {
+        Lexer lexer = new Lexer(correctHeader + "[E16G16]");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+        
+        Song expected = makeSongFromCorrectHeader();
+        ArrayList<NoteElement> notes = new ArrayList<NoteElement>();
+        notes.add(new SingleNote('E',new RationalNumber(16, 1),0,0));
+        notes.add(new SingleNote('G',new RationalNumber(16, 1),0,0));
+
+        expected.add(new Chord(new RationalNumber(16, 1),notes));
+        assertEquals(expected, parser.getSong());
+    }
+    
+    /**
+     * Test the parsing of a Duplet
+     */
+    //@Test
+    public void parseDupletTest() {
+        Lexer lexer = new Lexer(correctHeader + "(2GG");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+        
+        Song expected = makeSongFromCorrectHeader();
+        
+        SingleNote dupletNote = new SingleNote('G', new RationalNumber(3, 2), 0, 0);       
+        expected.add(new Duplet(dupletNote,dupletNote));
+
+        assertEquals(expected, parser.getSong());
+    }
+    
+    /**
+     * Test the parsing of a malformed Duplet
+     */
+    //@Test(expected = ParserException.class)
+    public void parseIncorrectDuplet() {
+        Lexer lexer = new Lexer(correctHeader + "(2G");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+    }
+    
+    /**
+     * Tests the parsing of a Triplet
+     */
+    //@Test
+    public void parseTripletTest() {
+        Lexer lexer = new Lexer(correctHeader + "(3GGG");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+        
+        Song expected = makeSongFromCorrectHeader();
+        
+        SingleNote tripletNote = new SingleNote('G', new RationalNumber(2, 3), 0, 0);       
+        expected.add(new Triplet(tripletNote,tripletNote,tripletNote));
+
+        assertEquals(expected, parser.getSong());
+    }
+    
+    /**
+     * Test the parsing of a malformed Triplet
+     */
+    //@Test(expected = ParserException.class)
+    public void parseIncorrectTriplet() {
+        Lexer lexer = new Lexer(correctHeader + "(3GG");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+    }
+    
+    /**
+     * Tests the parsing of a Quadruplet
+     */
+    //@Test
+    public void parseQuadrupletTest() {
+        Lexer lexer = new Lexer(correctHeader + "(4GGGG");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+        
+        Song expected = makeSongFromCorrectHeader();
+        
+        SingleNote quadNote = new SingleNote('G', new RationalNumber(3, 4), 0, 0);       
+        expected.add(new Quadruplet(quadNote,quadNote,quadNote,quadNote));
+
+        assertEquals(expected, parser.getSong());
+    }
+    
+    /**
+     * Test the parsing of a malformed Quadruplet
+     */
+    //@Test(expected = ParserException.class)
+    public void parseIncorrectQuadruplet() {
+        Lexer lexer = new Lexer(correctHeader + "(4GGG");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+    }
+    
+    /**
+     * Test the parsing of a song with repeats
+     */
+    @Test
+    public void parseRepeatsTest() {
+        Lexer lexer = new Lexer(correctHeader + "|:GG:|");
+        Parser parser = new Parser(lexer);
+        parser.parse();
+        
+        Song expected = makeSongFromCorrectHeader();
+        SingleNote repeated = new SingleNote('G', new RationalNumber(1, 1), 0, 0);
+        expected.add(repeated);
+        expected.add(repeated);
+        assertEquals(expected, parser.getSong());
+    }
     
 }

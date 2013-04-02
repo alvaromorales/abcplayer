@@ -166,6 +166,39 @@ public class LexerTest {
     }
     
     /**
+     * Tests that a chord is lexed correctly
+     */
+    @Test
+    public void chordTest() {
+       Lexer lexer = new Lexer("[E16G16]");
+       ArrayList<Token> expected = new ArrayList<Token>(0);
+       Token first = new Token(Token.Type.CHORD_START);
+       first.setValue("[");
+       
+       Token second = new Token(Token.Type.KEYNOTE);
+       second.setAccidental(Integer.MAX_VALUE);
+       second.setDuration(new RationalNumber(16, 1));
+       second.setOctave(0);
+       second.setValue("E");
+       
+       Token third = new Token(Token.Type.KEYNOTE);
+       third.setAccidental(Integer.MAX_VALUE);
+       third.setDuration(new RationalNumber(16, 1));
+       third.setOctave(0);
+       third.setValue("G");
+       
+       Token fourth = new Token(Token.Type.CHORD_END);
+       fourth.setValue("]");
+    
+       expected.add(first);
+       expected.add(second);
+       expected.add(third);
+       expected.add(fourth);
+       
+       assertEquals(expected, lexer.lex());
+    }
+    
+    /**
      * Tests that a DUPLET_START token is correctly lexed
      */
     @Test
@@ -339,7 +372,32 @@ public class LexerTest {
         assertEquals(expected, lexer.lex());
     }
     
-
+    /**
+     * Tests that a repeated expression is correctly lexed
+     */
+    @Test
+    public void repeatLexerTest() {
+        Lexer lexer = new Lexer("|:C:|");
+        
+        ArrayList<Token> expected = new ArrayList<Token>();
+        Token first = new Token(Token.Type.REPEAT_START);
+        first.setValue("|:");
+        expected.add(first);
+        
+        Token second = new Token(Token.Type.KEYNOTE);
+        second.setValue("C");
+        second.setDuration(new RationalNumber(1, 1));
+        second.setOctave(0);
+        second.setAccidental(Integer.MAX_VALUE);
+        expected.add(second);
+        
+        Token third = new Token(Token.Type.REPEAT_END);
+        third.setValue(":|");
+        expected.add(third);
+        
+        assertEquals(expected, lexer.lex());
+    }
+    
             
     /**
      * extra test

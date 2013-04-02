@@ -201,10 +201,11 @@ public class Token {
         if (nominator == 0 && denominator == 0)
             nominator = denominator = 1;
         
-        if (isNeutral)
+        if (isNeutral) {
             accidental = 0;
-        else if (accidental == 0)
+        } else if (accidental == 0) {
             accidental = Integer.MAX_VALUE;
+        }
         
         this.setOctave(octave);
         this.setAccidental(accidental);
