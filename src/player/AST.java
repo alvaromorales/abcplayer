@@ -619,7 +619,6 @@ public class AST {
         private RationalNumber defaultNoteLength;
         private RationalNumber meter;
         private int tempo;
-        private int headerCount = 0;
 
         private String title;
         private int index;
@@ -657,21 +656,6 @@ public class AST {
         	currentVoice.addNote(e);
         }
         
-        /**
-         * Returns the header counter, which counts how many header fields have been set already.
-         * @return headerCount, the number of header fields set already
-         */
-        public int getHeaderCount(){
-        	return this.headerCount;
-        }
-        
-        /**
-         * Sets the header counter to -2^31. To be used when K: matches, 
-         * to make sure that no other header field is read after it.
-         */
-        public void minimizeHeaderCount(){
-        	this.headerCount=Integer.MIN_VALUE;
-        }
         /**
          * Adds a Voice to the song
          * @param v the Voice to add
@@ -728,7 +712,6 @@ public class AST {
          * @param composer the name of the composer of the song.
          */
         public void setComposer(String composer){
-        	this.headerCount++;
             this.composer = composer;
         }
 
@@ -747,7 +730,6 @@ public class AST {
          * @param keySignature the key signature of the song.
          */
         public void setKeySignature(String keySignature) {
-        	this.headerCount++;
             this.keySignature = keySignature;
             this.accidentalAssociator=new player.AccidentalAssociationMaker(keySignature);
         }
@@ -767,7 +749,6 @@ public class AST {
          * @param defaultNoteLength the default note length of the song.
          */
         public void setDefaultDuration(RationalNumber defaultNoteLength) {
-        	this.headerCount++;
             this.defaultNoteLength = defaultNoteLength;
         }
 
@@ -786,7 +767,6 @@ public class AST {
          * @param meter the meter of the song
          */
         public void setMeter(RationalNumber meter) {
-        	this.headerCount++;
             this.meter = meter;
         }
 
@@ -805,7 +785,6 @@ public class AST {
          * @param tempo the tempo of the song.
          */
         public void setTempo(int tempo) {
-        	this.headerCount++;
             this.tempo = tempo;
         }
 
@@ -824,7 +803,6 @@ public class AST {
          * @param title the title of the song
          */
         public void setTitle(String title) {
-        	this.headerCount++;
             this.title = title;
         }
 
@@ -843,10 +821,8 @@ public class AST {
          * @param index the index of the song.
          */
         public void setIndex(int index) {
-        	this.headerCount++;
             this.index = index;
         }
-
 
         /**
          * Checks if a Song is equal to another Song

@@ -39,26 +39,6 @@ public class Parser {
         return -1;
     }
 
-//    /**
-//     * Apply accidental association table to a token to get a SingleNote
-//     * @param tok, the token to parse into a KeyNote. 
-//     * Token.Type must be KEYNOTE. Not modified by this method.
-//     * @return the new SingleNote with the correct accidentals applied
-//     */
-//    public SingleNote applyAccidental(Token tok){
-//        // no accidental, fetch it from the Associator
-//        if(tok.getAccidental() == Integer.MAX_VALUE) {
-//            return new AST.SingleNote(
-//                    tok.getValue().charAt(0), 
-//                    tok.getDuration(), 
-//                    tok.getOctave(), 
-//                    song.accidentalAssociator.getAccidental(tok.getValue().charAt(0))); //fetch default from table
-//        }
-//
-//        song.accidentalAssociator.setAccidental(tok.getValue().charAt(0), tok.getAccidental());
-//        return new SingleNote(tok.getValue().charAt(0), tok.getDuration(), tok.getOctave(), tok.getAccidental());
-//    }
-
     /**
      * Apply accidental association table to a note's attributes to get new a SingleNote
      * @param pitch, the pitch of the to-be-created SingleNote
@@ -180,18 +160,76 @@ public class Parser {
 
         return new Quadruplet(note1,note2, note3, note4);
     }
-      
+
     /**
      * Parses the header tokens
      * @param headerTokens the header tokens the Lexer lexed
      * @return a new Song, with the header information
      */
     public Song parseHeader(ArrayList<Token> headerTokens) {
-        Song s = new Song();
-        int i = 0;
-        return s;
+        if (headerTokens.size() < 3) {
+            throw new ParserException("Incomplete Header: The header must contain X, T, K at the very minimum");
+        }
+
+        Song song = new Song();        
+
+        // Parse the "X:" token
+        Token index = headerTokens.get(0);
+        if (index.getType() != Token.Type.INDEX) {
+            throw new ParserException("Malformed Header: The header must have X as the first field");
+        } else {
+            song.setIndex(index.getIntValue());
+        }
+
+        //Parse the "T:" token
+        Token title = headerTokens.get(1);
+        if (title.getType() != Token.Type.TITLE) {
+            throw new ParserException("Malformed Header: The header must have T as the second field");
+        } else {
+            song.setTitle(title.getValue());
+        }
+
+        //Parse the rest of the header tokens
+        for (int i=2;i<headerTokens.size()-1;i++) {
+            Token tok = headerTokens.get(i);      //current token
+            switch(tok.getType()){
+            case COMPOSER:
+                song.setComposer(tok.getValue());
+                break;
+            case LENGTH:
+                song.setDefaultDuration(tok.getRationalValue());
+                break;
+            case METER:
+                song.setMeter(tok.getRationalValue());
+                break;
+            case TEMPO:
+                song.setTempo(tok.getIntValue());
+                break;
+            case VOICE:
+                song.getVoice(tok.getValue());
+                break;
+            case KEY:
+                throw new ParserException("Malformed Header: K must be the last header field");
+            case TITLE:
+                throw new ParserException("Malformed Header: Duplicate T header field");
+            case INDEX:
+                throw new ParserException("Malformed Header: Duplicate X header field");
+            default:  //add parserexception to default
+                throw new ParserException("Invalid field found in header");
+            }
+        }
+        
+        //Parse the "K:" token
+        Token key = headerTokens.get(headerTokens.size()-1);
+        if (key.getType() != Token.Type.KEY) {
+            throw new ParserException("Malformed Header: The header must have K as the last field");
+        } else {
+            song.setKeySignature(key.getValue());
+        }
+
+        return song;
     }
-    
+
     /**
      * Parses the list of tokens produced by the lexer to fill the AST for the song.
      */
@@ -203,53 +241,9 @@ public class Parser {
 
         while(i<tokens.size()) {
             Token tok=tokens.get(i);      //current token
-            
+
             if(tok.getHeader()) {           
-                //parse header
-                ++i;
-                switch(tok.getType()){
-                case COMPOSER:
-                    if(song.getHeaderCount()<0)
-                        throw new ParserException("Header field found after KEY");
-                    song.setComposer(tok.getValue());
-                    break;
-                case KEY:
-                    if(song.getHeaderCount()<0)
-                        throw new ParserException("Duplicate KEY found in header");
-                    song.minimizeHeaderCount();
-                    song.setKeySignature(tok.getValue());
-                    break;
-                case LENGTH:
-                    if(song.getHeaderCount()<0)
-                        throw new ParserException("LENGTH Header field found after KEY");
-                    song.setDefaultDuration(tok.getRationalValue());
-                    break;
-                case METER:
-                    if(song.getHeaderCount()<0)
-                        throw new ParserException("METER Header field found after KEY");
-                    song.setMeter(tok.getRationalValue());
-                    break;
-                case TEMPO:
-                    if(song.getHeaderCount()<0)
-                        throw new ParserException("TEMPO Header field found after KEY");
-                    song.setTempo(tok.getIntValue());
-                    break;
-                case TITLE:
-                    if(song.getHeaderCount()!=1)
-                        throw new ParserException("Second header field is not the title");
-                    song.setTitle(tok.getValue());
-                    break;
-                case INDEX:
-                    if(song.getHeaderCount()!=0)
-                        throw new ParserException("First header field is not the index");
-                    song.setIndex(tok.getIntValue());
-                    break;
-                case VOICE:
-                    song.getVoice(tok.getValue());
-                    break;
-                default:  //add parserexception to default
-                    throw new ParserException("Invalid type found in body");
-                }
+                
             } else { 
                 //parse body
                 switch(tok.getType()){
@@ -311,14 +305,14 @@ public class Parser {
                     } else {
                         tok.setValue("PASS");
                         int j=i-1;
-                        
+
                         while(!(tokens.get(j).getType() == Token.Type.REPEAT_START || 
                                 tokens.get(j).getHeader()== true ||
                                 tokens.get(j).getType() == Token.Type.DOUBLE_BAR)) {
                             //Look for a repeat_start or a header element in order to start repeating
                             j--;
                         }
-                        
+
                         i=j+1;
                         break;
                     }
