@@ -15,9 +15,26 @@ import static org.junit.Assert.*;
  *  - test ParserExceptions
  */
 public class ParserTest {
-
-    private final String correctHeader = "X:0\nT:t\nK:Cm\n"; // used for parser tests as the parser requires a correct header
     
+    private ArrayList<Token> makeTokensFromCorrectHeader() {
+        //Header: "X:0\nT:t\nK:Cm\n"
+        
+        Token first = new Token(Token.Type.INDEX);
+        first.setValue("0");
+        
+        Token second = new Token(Token.Type.TITLE);
+        second.setValue("t");
+
+        Token third = new Token(Token.Type.KEY);
+        third.setValue("Cm");
+        
+        ArrayList<Token> tokens = new ArrayList<Token>(0);
+        tokens.add(first);
+        tokens.add(second);
+        tokens.add(third);
+        
+        return tokens;
+    }
     
     /**
      * Returns a Song with the header information from correctHeader
@@ -25,6 +42,8 @@ public class ParserTest {
      * @return a Song with the header information from correctHeader
      */
     private Song makeSongFromCorrectHeader() {
+        //Header: "X:0\nT:t\nK:Cm\n"
+        
         Song s = new Song();
         s.setIndex(0);
         s.setTitle("t");
@@ -32,58 +51,67 @@ public class ParserTest {
         return s;
     }
     
-    /**
-     * Tests the parsing of the header
-     */
-    @Test
-    public void headerTest() {
-        Lexer lexer = new Lexer("X:8628\nT:Title\nC:Johann Sebastian Bach\nM:4/4\nL:1/16\nQ:280\nV:1\nV:2\nV:3\nK:C\n");
-        Parser parser = new Parser(lexer);
-        parser.parse();
-
-        Song expected = new Song();
-        expected.setIndex(8628);
-        expected.setTitle("Title");
-        expected.setComposer("Johann Sebastian Bach");
-        expected.setMeter(new RationalNumber(4, 4));
-        expected.setDefaultDuration(new RationalNumber(1, 16));
-        expected.setTempo(280);
-        expected.addVoice(new Voice("1"));
-        expected.addVoice(new Voice("2"));
-        expected.addVoice(new Voice("3"));
-        expected.setKeySignature("C");
-        
-        assertEquals(expected,parser.getSong());
-    }
-    
-    /**
-     * Tests the parsing of a song with a complete header in an incorrect order
-     */
-    @Test(expected = ParserException.class)
-    public void incorrectHeaderTest() {
-        Lexer lexer = new Lexer("K:Me\nX:500\nT:1\nGGG");
-        Parser parser = new Parser(lexer);
-        parser.parse();
-    }
-    
-    /**
-     * Test the parsing of a song with an incomplete header
-     */
-    @Test(expected = ParserException.class)
-    public void incompleteHeaderTest() {
-        Lexer lexer = new Lexer("C:Me\nQ:500\nGGG");
-        Parser parser = new Parser(lexer);
-        parser.parse();
-    }
+//    /**
+//     * Tests the parsing of the header
+//     */
+//    @Test
+//    public void headerTest() {
+//        Lexer lexer = new Lexer("X:8628\nT:Title\nC:Johann Sebastian Bach\nM:4/4\nL:1/16\nQ:280\nV:1\nV:2\nV:3\nK:C\n");
+//        Parser parser = new Parser(lexer);
+//        parser.parse();
+//
+//        Song expected = new Song();
+//        expected.setIndex(8628);
+//        expected.setTitle("Title");
+//        expected.setComposer("Johann Sebastian Bach");
+//        expected.setMeter(new RationalNumber(4, 4));
+//        expected.setDefaultDuration(new RationalNumber(1, 16));
+//        expected.setTempo(280);
+//        expected.addVoice(new Voice("1"));
+//        expected.addVoice(new Voice("2"));
+//        expected.addVoice(new Voice("3"));
+//        expected.setKeySignature("C");
+//        
+//        assertEquals(expected,parser.getSong());
+//    }
+//    
+//    /**
+//     * Tests the parsing of a song with a complete header in an incorrect order
+//     */
+//    @Test(expected = ParserException.class)
+//    public void incorrectHeaderTest() {
+//        Lexer lexer = new Lexer("K:Me\nX:500\nT:1\nGGG");
+//        Parser parser = new Parser(lexer);
+//        parser.parse();
+//    }
+//    
+//    /**
+//     * Test the parsing of a song with an incomplete header
+//     */
+//    @Test(expected = ParserException.class)
+//    public void incompleteHeaderTest() {
+//        Lexer lexer = new Lexer("C:Me\nQ:500\nGGG");
+//        Parser parser = new Parser(lexer);
+//        parser.parse();
+//    }
     
     /**
      * Test the parsing of a SingleNote
      */
     @Test
     public void parseSingleNoteTest() {
-        Lexer lexer = new Lexer(correctHeader + "^G,,8");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "^G,,8"
+        Token keyNote = new Token(Token.Type.KEYNOTE);
+        keyNote.setAccidental(1);
+        keyNote.setDuration(new RationalNumber(8, 1));
+        keyNote.setOctave(-2);
+        keyNote.setValue("G");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(keyNote);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
         
         Song expected = makeSongFromCorrectHeader();
         expected.add(new SingleNote('G',new RationalNumber(8, 1),-2,1));
@@ -95,9 +123,15 @@ public class ParserTest {
      */
     @Test
     public void parseRestTest() {
-        Lexer lexer = new Lexer(correctHeader + "z/");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "z/"
+        Token rest = new Token(Token.Type.REST);
+        rest.setDuration(new RationalNumber(1, 2));
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(rest);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
         
         Song expected = makeSongFromCorrectHeader();
         expected.add(new Rest(new RationalNumber(1, 2)));
@@ -109,9 +143,33 @@ public class ParserTest {
      */
     @Test
     public void parseChordTest() {
-        Lexer lexer = new Lexer(correctHeader + "[E16G16]");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "[E16G16]"
+        Token chordStart = new Token(Token.Type.CHORD_START);
+        chordStart.setValue("[");
+        
+        Token firstNote = new Token(Token.Type.KEYNOTE);
+        firstNote.setAccidental(Integer.MAX_VALUE);
+        firstNote.setDuration(new RationalNumber(16, 1));
+        firstNote.setOctave(0);
+        firstNote.setValue("E");
+        
+        Token secondNote = new Token(Token.Type.KEYNOTE);
+        secondNote.setAccidental(Integer.MAX_VALUE);
+        secondNote.setDuration(new RationalNumber(16, 1));
+        secondNote.setOctave(0);
+        secondNote.setValue("G");
+        
+        Token chordEnd = new Token(Token.Type.CHORD_END);
+        chordStart.setValue("]");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(chordStart);
+        tokens.add(firstNote);
+        tokens.add(secondNote);
+        tokens.add(chordEnd);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
         
         Song expected = makeSongFromCorrectHeader();
         ArrayList<NoteElement> notes = new ArrayList<NoteElement>();
@@ -127,9 +185,23 @@ public class ParserTest {
      */
     @Test
     public void parseDupletTest() {
-        Lexer lexer = new Lexer(correctHeader + "(2GG");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "(2GG"
+        Token dupletStart = new Token(Token.Type.DUPLET_START);
+        dupletStart.setValue("(2");
+        
+        Token note = new Token(Token.Type.KEYNOTE);
+        note.setAccidental(Integer.MAX_VALUE);
+        note.setDuration(new RationalNumber(1, 1));
+        note.setOctave(0);
+        note.setValue("G");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(dupletStart);
+        tokens.add(note);
+        tokens.add(note);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
         
         Song expected = makeSongFromCorrectHeader();
         
@@ -144,22 +216,50 @@ public class ParserTest {
      */
     @Test(expected = ParserException.class)
     public void parseIncorrectDuplet() {
-        Lexer lexer = new Lexer(correctHeader + "(2G");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "(2G"
+        Token dupletStart = new Token(Token.Type.DUPLET_START);
+        dupletStart.setValue("(2");
+        
+        Token note = new Token(Token.Type.KEYNOTE);
+        note.setAccidental(Integer.MAX_VALUE);
+        note.setDuration(new RationalNumber(1, 1));
+        note.setOctave(0);
+        note.setValue("G");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(dupletStart);
+        tokens.add(note);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
     }
-    
+
     /**
      * Tests the parsing of a Triplet
      */
     @Test
     public void parseTripletTest() {
-        Lexer lexer = new Lexer(correctHeader + "(3GGG");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "(3GGG"
+        Token tripletStart = new Token(Token.Type.TRIPLET_START);
+        tripletStart.setValue("(3");
         
+        Token note = new Token(Token.Type.KEYNOTE);
+        note.setAccidental(Integer.MAX_VALUE);
+        note.setDuration(new RationalNumber(1, 1));
+        note.setOctave(0);
+        note.setValue("G");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(tripletStart);
+        tokens.add(note);
+        tokens.add(note);
+        tokens.add(note);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
+
         Song expected = makeSongFromCorrectHeader();
-        
+
         SingleNote tripletNote = new SingleNote('G', new RationalNumber(2, 3), 0, 0);       
         expected.add(new Triplet(tripletNote,tripletNote,tripletNote));
 
@@ -171,9 +271,23 @@ public class ParserTest {
      */
     @Test(expected = ParserException.class)
     public void parseIncorrectTriplet() {
-        Lexer lexer = new Lexer(correctHeader + "(3GG");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "(3GG"
+        Token tripletStart = new Token(Token.Type.TRIPLET_START);
+        tripletStart.setValue("(3");
+        
+        Token note = new Token(Token.Type.KEYNOTE);
+        note.setAccidental(Integer.MAX_VALUE);
+        note.setDuration(new RationalNumber(1, 1));
+        note.setOctave(0);
+        note.setValue("G");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(tripletStart);
+        tokens.add(note);
+        tokens.add(note);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
     }
     
     /**
@@ -181,9 +295,25 @@ public class ParserTest {
      */
     @Test
     public void parseQuadrupletTest() {
-        Lexer lexer = new Lexer(correctHeader + "(4GGGG");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "(4GGGG"
+        Token quadStart = new Token(Token.Type.QUAD_START);
+        quadStart.setValue("(4");
+        
+        Token note = new Token(Token.Type.KEYNOTE);
+        note.setAccidental(Integer.MAX_VALUE);
+        note.setDuration(new RationalNumber(1, 1));
+        note.setOctave(0);
+        note.setValue("G");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(quadStart);
+        tokens.add(note);
+        tokens.add(note);
+        tokens.add(note);
+        tokens.add(note);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
         
         Song expected = makeSongFromCorrectHeader();
         
@@ -198,20 +328,51 @@ public class ParserTest {
      */
     @Test(expected = ParserException.class)
     public void parseIncorrectQuadruplet() {
-        Lexer lexer = new Lexer(correctHeader + "(4GGG");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "(4GGG"
+        Token quadStart = new Token(Token.Type.QUAD_START);
+        quadStart.setValue("(4");
+        
+        Token note = new Token(Token.Type.KEYNOTE);
+        note.setAccidental(Integer.MAX_VALUE);
+        note.setDuration(new RationalNumber(1, 1));
+        note.setOctave(0);
+        note.setValue("G");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(quadStart);
+        tokens.add(note);
+        tokens.add(note);
+        tokens.add(note);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
     }
     
     /**
      * Test the parsing of a song with repeats
      */
-    //@Test
-    //TODO should work when Lexer works
+    @Test
     public void parseRepeatsTest() {
-        Lexer lexer = new Lexer(correctHeader + "|:G:|");
-        Parser parser = new Parser(lexer);
-        parser.parse();
+        //Parse "|:G:|"
+        Token repeatStart = new Token(Token.Type.REPEAT_START);
+        repeatStart.setValue("|:");
+        
+        Token note = new Token(Token.Type.KEYNOTE);
+        note.setAccidental(Integer.MAX_VALUE);
+        note.setDuration(new RationalNumber(1, 1));
+        note.setOctave(0);
+        note.setValue("G");
+        
+        Token repeatEnd = new Token(Token.Type.REPEAT_END);
+        repeatEnd.setValue(":|");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(repeatStart);
+        tokens.add(note);
+        tokens.add(repeatEnd);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
         
         Song expected = makeSongFromCorrectHeader();
         SingleNote repeated = new SingleNote('G', new RationalNumber(1, 1), 0, 0);

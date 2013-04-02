@@ -2,20 +2,18 @@ package player;
 
 import java.util.ArrayList;
 import java.util.List;
-import player.Lexer;
 import player.AST.*;
 
 public class Parser {
 
-    private Lexer lexer;
     private Song song;
 
     /**
      * Constructor, attaches lexer to parser, assuming lexer is initialized
      * @param lexer, an initialized lexer instance
      */
-    public Parser(Lexer lexer){
-        this.lexer = lexer;
+    public Parser(){
+
     }
 
     /**
@@ -186,8 +184,7 @@ public class Parser {
     /**
      * Parses the list of tokens produced by the lexer to fill the AST for the song.
      */
-    public void parse(){
-        ArrayList<Token> tokens = lexer.lex();
+    public void parse(ArrayList<Token> tokens){
 
         //initialize Song
         song=new Song(); 
