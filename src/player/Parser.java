@@ -180,7 +180,18 @@ public class Parser {
 
         return new Quadruplet(note1,note2, note3, note4);
     }
-       
+      
+    /**
+     * Parses the header tokens
+     * @param headerTokens the header tokens the Lexer lexed
+     * @return a new Song, with the header information
+     */
+    public Song parseHeader(ArrayList<Token> headerTokens) {
+        Song s = new Song();
+        int i = 0;
+        return s;
+    }
+    
     /**
      * Parses the list of tokens produced by the lexer to fill the AST for the song.
      */
