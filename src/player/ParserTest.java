@@ -381,6 +381,67 @@ public class ParserTest {
         assertEquals(expected, parser.getSong());
     }
     
-    
+    /**
+     * Test the parsing of a song with numbered repeats
+     */
+    @Test
+    public void parseNumberedRepeatsTest() {
+        //Parse "|:A[1G:|[2C"
+        // should be parsed as AGAC
+        
+        Token repeatStart = new Token(Token.Type.REPEAT_START);
+        repeatStart.setValue("|:");
+        
+        Token repeatEnd = new Token(Token.Type.REPEAT_END);
+        repeatEnd.setValue(":|");
+        
+        Token repeat1 = new Token(Token.Type.REPEAT_NUMBER);
+        repeat1.setValue("[1");
+        
+        Token repeat2 = new Token(Token.Type.REPEAT_NUMBER);
+        repeat2.setValue("[2");
+        
+        Token noteA = new Token(Token.Type.KEYNOTE);
+        noteA.setAccidental(Integer.MAX_VALUE);
+        noteA.setDuration(new RationalNumber(1, 1));
+        noteA.setOctave(0);
+        noteA.setValue("A");
+        
+        Token noteC = new Token(Token.Type.KEYNOTE);
+        noteC.setAccidental(Integer.MAX_VALUE);
+        noteC.setDuration(new RationalNumber(1, 1));
+        noteC.setOctave(0);
+        noteC.setValue("C");
+        
+        Token noteG = new Token(Token.Type.KEYNOTE);
+        noteG.setAccidental(Integer.MAX_VALUE);
+        noteG.setDuration(new RationalNumber(1, 1));
+        noteG.setOctave(0);
+        noteG.setValue("G");
+        
+        ArrayList<Token> tokens = makeTokensFromCorrectHeader();
+        tokens.add(repeatStart);
+        tokens.add(noteA);
+        tokens.add(repeat1);
+        tokens.add(noteG);
+        tokens.add(repeatEnd);
+        tokens.add(repeat2);
+        tokens.add(noteC);
+        
+        Parser parser = new Parser();
+        parser.parse(tokens);
+        
+        Song expected = makeSongFromCorrectHeader();
+        SingleNote parsedG = new SingleNote('G', new RationalNumber(1, 1), 0, 0);
+        SingleNote parsedA = new SingleNote('A', new RationalNumber(1, 1), 0, 0);
+        SingleNote parsedC = new SingleNote('C', new RationalNumber(1, 1), 0, 0);
+
+        expected.add(parsedA);
+        expected.add(parsedG);
+        expected.add(parsedA);
+        expected.add(parsedC);
+
+        assertEquals(expected, parser.getSong());
+    }
     
 }
