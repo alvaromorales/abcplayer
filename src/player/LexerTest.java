@@ -55,7 +55,7 @@ public class LexerTest {
      */
     @Test
     public void composerTest() {
-        Lexer lexer = new Lexer("C:Wolfgang Amadeus-Mozart\n");
+        Lexer lexer = new Lexer("C:Wolfgang Amadeus-Mozart\nK: C\n");
         Token expected = new Token(Token.Type.COMPOSER);
         expected.setValue("Wolfgang Amadeus-Mozart");
         assertEquals(expected, lexer.lex().get(0));
@@ -66,7 +66,7 @@ public class LexerTest {
      */
     @Test
     public void keyTest() {
-        Lexer lexer = new Lexer("K:A#m\n");
+        Lexer lexer = new Lexer("X: 1\nT: empty\nK:A#m\n");
         Token expected = new Token(Token.Type.KEY);
         expected.setValue("A#m");
         assertEquals(expected, lexer.lex().get(0));

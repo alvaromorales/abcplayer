@@ -14,8 +14,8 @@ public class Lexer{
   			 "((?<=C:)\\s*.+$)|" 		+  			//1- add COMPOSER
  "((?<=K:)\\s*[A-Ga-g][#b]?m?)|" 		+			//2- add KEY
    "((?<=L:)\\s*[0-9]+/[0-9]+)|" 		+			//3- add LENGTH
-  "((?<=M:)\\s*(?:\\d+\\/\\d+)|" 		+			//4- add METER
- 				   "(?:C\\|?))|" 		+			//4- still METER
+ "((?<=M:)\\s*((?:\\d+\\/\\d+)|" 		+			//4- add METER
+ 			   	  "(?:C\\|?)))|" 		+			//4- still METER
  		  "((?<=Q:)\\s*[0-9]+)|"		+			//5- add TEMPO
  			 "((?<=T:)\\s*.+$)|" 		+			//6- add TITLE
  		   "((?<=X:)\\s*\\d+$)|" 		+			//7- add INDEX
@@ -53,6 +53,11 @@ public class Lexer{
         this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
         this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
         
+        System.out.println(this.head);
+        
+        headMap=new HashMap<String,Integer>();
+        bodyMap=new HashMap<String,Integer>();
+
         //regex group headMappings for header
         headMap = new HashMap<String,Integer>();
         headMap.put("COMPOSER", 1);
@@ -137,18 +142,15 @@ public class Lexer{
      * Creates a list of tokens from the given abc string
      * @return ArrayList
      */
-    public ArrayList<Token> lex(){
+    public ArrayList<Token> lexHead(){
         
         // Create patterns
         ArrayList <Token> tokens = new ArrayList<Token>(0);
         
-        Pattern bodyPattern = Pattern.compile(this.regexBody);
         Pattern headPattern = Pattern.compile(this.regexHeader);
         
         // Create headMatchers and start matching to groups 
         Matcher headMatcher = headPattern.matcher(this.head);
-        Matcher bodyMatcher = bodyPattern.matcher(this.body);
-
         
         while (headMatcher.find()) {
             
@@ -216,100 +218,118 @@ public class Lexer{
                 continue;
             }
         }
+
+        System.out.println(tokens.toString());
+        return tokens;
+    }
+    
+    /**
+     * Creates a list of body tokens from the given abc string
+     * @return ArrayList, list of body Tokens
+     */
+    public ArrayList<Token> lexBody(){
+        
+        // Create patterns
+        ArrayList <Token> tokens = new ArrayList<Token>(0);
+        
+        Pattern bodyPattern = Pattern.compile(this.regexBody);
+ 
+        
+        // Create Matcher and start matching to groups 
+        Matcher bodyMatcher = bodyPattern.matcher(this.body);
         
         //start lexing the body
         while (bodyMatcher.find()) {
-            if (headMatcher.group(headMap.get("KEYNOTE")) != null) {
+            if (bodyMatcher.group(bodyMap.get("KEYNOTE")) != null) {
                 Token newToken = new Token(Token.Type.KEYNOTE);
-                newToken.setValue(headMatcher.group(headMap.get("KEYNOTE")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("KEYNOTE")));
                 newToken.parseValue();
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("REST")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("REST")) != null) {
                 Token newToken = new Token(Token.Type.REST);
-                newToken.setValue(headMatcher.group(headMap.get("REST")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("REST")));
                 newToken.parseValue();
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("CHORD_START")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("CHORD_START")) != null) {
                 Token newToken = new Token(Token.Type.CHORD_START);
-                newToken.setValue(headMatcher.group(headMap.get("CHORD_START")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("CHORD_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("CHORD_END")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("CHORD_END")) != null) {
                 Token newToken = new Token(Token.Type.CHORD_END);
-                newToken.setValue(headMatcher.group(headMap.get("CHORD_END")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("CHORD_END")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("DUPLET_START")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("DUPLET_START")) != null) {
                 Token newToken = new Token(Token.Type.DUPLET_START);
-                newToken.setValue(headMatcher.group(headMap.get("DUPLET_START")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("DUPLET_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("TRIPLET_START")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("TRIPLET_START")) != null) {
                 Token newToken = new Token(Token.Type.TRIPLET_START);
-                newToken.setValue(headMatcher.group(headMap.get("TRIPLET_START")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("TRIPLET_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("QUAD_START")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("QUAD_START")) != null) {
                 Token newToken = new Token(Token.Type.QUAD_START);
-                newToken.setValue(headMatcher.group(headMap.get("QUAD_START")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("QUAD_START")));
                 tokens.add(newToken);
                 continue;
             }
             
             
-            else if (headMatcher.group(headMap.get("DOUBLE_BAR")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("DOUBLE_BAR")) != null) {
                 Token newToken = new Token(Token.Type.DOUBLE_BAR);
-                newToken.setValue(headMatcher.group(headMap.get("DOUBLE_BAR")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("DOUBLE_BAR")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("REPEAT_START")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("REPEAT_START")) != null) {
                 Token newToken = new Token(Token.Type.REPEAT_START);
-                newToken.setValue(headMatcher.group(headMap.get("REPEAT_START")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("REPEAT_START")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("REPEAT_END")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("REPEAT_END")) != null) {
                 Token newToken = new Token(Token.Type.REPEAT_END);
-                newToken.setValue(headMatcher.group(headMap.get("REPEAT_END")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("REPEAT_END")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("REPEAT_NUMBER")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("REPEAT_NUMBER")) != null) {
                 Token newToken = new Token(Token.Type.REPEAT_NUMBER);
-                newToken.setValue(headMatcher.group(headMap.get("REPEAT_NUMBER")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("REPEAT_NUMBER")));
                 tokens.add(newToken);
                 continue;
             }
             
-            else if (headMatcher.group(headMap.get("BAR")) != null) {
+            else if (bodyMatcher.group(bodyMap.get("BAR")) != null) {
                 Token newToken = new Token(Token.Type.BAR);
-                newToken.setValue(headMatcher.group(headMap.get("BAR")));
+                newToken.setValue(bodyMatcher.group(bodyMap.get("BAR")));
                 tokens.add(newToken);
                 continue;
             }
         }
 
-        
+        System.out.println(tokens.toString());
         return tokens;
     }
-    
     
 }
