@@ -576,18 +576,26 @@ public class AST {
          * @return true if equal, else false
          */
         @Override
-        public boolean equals(Object o) {
-            if (this == o) { // quick check
+        public boolean equals(Object obj) {
+            if (this == obj)
                 return true;
-            }
-
-            if (o == null || !(o instanceof Voice)) {
+            if (obj == null)
                 return false;
-            }
-
-            Voice other = (Voice)o;
-            return this.name.equals(other.name) && this.notes.equals(other.notes);
-        }
+            if (getClass() != obj.getClass())
+                return false;
+            Voice other = (Voice) obj;
+            if (name == null) {
+                if (other.name != null)
+                    return false;
+            } else if (!name.equals(other.name))
+                return false;
+            if (notes == null) {
+                if (other.notes != null)
+                    return false;
+            } else if (!notes.equals(other.notes))
+                return false;
+            return true;
+        }       
 
         /**
          * Gets the string representation of a voice
@@ -900,7 +908,7 @@ public class AST {
         public String toString() {
             return "Song [composer=" + composer + ", keySignature=" + keySignature + ", defaultNoteLength="
                     + defaultNoteLength + ", meter=" + meter + ", tempo="
-                    + tempo + ", title=" + title + ", index=" + index + "voices=" + voices + "]";
+                    + tempo + ", title=" + title + ", index=" + index + "\nvoices=" + voices + "]";
         }
         
         
