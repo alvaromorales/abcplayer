@@ -19,10 +19,12 @@ public class DurationVisitorTest {
     @Test
     public void emptySongTest() {
         Song s = new Song();
+        //default note length is 1/8, so ticksPerQuarter should be 8
+        
         s.addVoice(new Voice());
         DurationVisitor visitor = new DurationVisitor();
         visitor.visit(s);
-        assertEquals(0,visitor.getTicksPerQuarter());
+        assertEquals(8,visitor.getTicksPerQuarter());
     }
     
     /**
