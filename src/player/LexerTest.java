@@ -56,6 +56,7 @@ public class LexerTest {
         Lexer lexer = new Lexer("M:C|%Comment\n");
         Token expected = new Token(Token.Type.METER);
         expected.setValue("C|");
+        System.out.printf(" orig: %s\n expected: %s\n",lexer.lex().toString(),expected.toString());
         assertEquals(expected, lexer.lex().get(0));
     }
     

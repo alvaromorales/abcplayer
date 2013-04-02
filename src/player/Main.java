@@ -67,6 +67,7 @@ public class Main {
     }
     
     public static void main(String[] args){
+    	
         String filename="sample_abc/piece1.abc";
         try{
         	play(filename);
