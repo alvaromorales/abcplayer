@@ -22,7 +22,7 @@ public class PlayerTest {
      * This file tests chords nested in tuples
      */
     @Test
-    public void playFurEliseTest() {
+    public void playPokemonTest() {
         String filename="sample_abc/pokemon.abc";
         try{
             Main.play(filename);
@@ -38,7 +38,7 @@ public class PlayerTest {
      * This file tests playing a song with different voices and repeats
      */
     @Test
-    public void playInventionTest() {
+    public void playZeldaTest() {
         String filename="sample_abc/zelda.abc";
         try{
             Main.play(filename);
@@ -54,7 +54,7 @@ public class PlayerTest {
      * This file tests numbered repeats
      */
     @Test
-    public void playLittleNightMusicTest() {
+    public void playJackTest() {
         String filename="sample_abc/jack.abc";
         try{
             Main.play(filename);
