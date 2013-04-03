@@ -3,7 +3,7 @@ package player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import player.AST.*;
+import ast.*;
 
 public class Parser {
 
@@ -50,7 +50,7 @@ public class Parser {
      */
     public SingleNote applyAccidental(char pitch, RationalNumber duration, int octave, int accidental){
         if(accidental == Integer.MAX_VALUE) {
-            return new AST.SingleNote(pitch, 
+            return new SingleNote(pitch, 
                     duration, 
                     octave, 
                     song.accidentalAssociator.getAccidental(pitch)); //if no accidental set fetch default from table

@@ -1,9 +1,10 @@
 package player;
+
 import java.util.ArrayList;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
-import player.AST.*;
-import player.NoteElement.Visitor;
+import ast.*;
+import ast.NoteElement.Visitor;
 import sound.Pitch;
 import sound.SequencePlayer;
 

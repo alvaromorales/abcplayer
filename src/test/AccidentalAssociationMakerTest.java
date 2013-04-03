@@ -1,5 +1,6 @@
-package player;
+package test;
 
+import player.AccidentalAssociationMaker;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

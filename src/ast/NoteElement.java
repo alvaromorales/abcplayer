@@ -1,6 +1,10 @@
-package player;
-import player.AST.*;
+package ast;
 
+import player.RationalNumber;
+
+/**
+ * Interface to represent all playable abc NoteElements
+ */
 public interface NoteElement {
     
     /**

@@ -1,11 +1,14 @@
-package player;
+package test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import org.junit.Test;
-import player.AST.*;
 import static org.junit.Assert.*;
+import player.Token;
+import player.ParserException;
+import player.Parser;
+import player.RationalNumber;
+import ast.*;
 
 /**
  * Tests the Parser

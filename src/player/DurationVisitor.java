@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import player.AST.*;
-import player.NoteElement.Visitor;
+import ast.*;
+import ast.NoteElement.Visitor;
 
 public class DurationVisitor implements Visitor<Void> {
     private Set<Integer> denominators = new HashSet<Integer>();

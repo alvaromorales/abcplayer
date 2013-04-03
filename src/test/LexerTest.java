@@ -1,8 +1,11 @@
-package player;
+package test;
 
 import static org.junit.Assert.*;
 import java.util.ArrayList;
 import org.junit.Test;
+import player.Token;
+import player.Lexer;
+import player.RationalNumber;
 
 /**
  * Tests the Lexer class
@@ -14,7 +17,6 @@ import org.junit.Test;
  *  - Characters outside the grammar throw exceptions
  */
 public class LexerTest {
-
     
     /**
      * Tests that a comment is ignored

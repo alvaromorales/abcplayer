@@ -1,6 +1,8 @@
-package player;
+package test;
+
 import java.io.IOException;
 import org.junit.Test;
+import player.Main;
 
 /**
  * Tests the PlayerVisitor class
