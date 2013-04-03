@@ -65,7 +65,7 @@ public class Main {
     }
     
     public static void main(String[] args){
-        String filename="sample_abc/Pokemon.abc";
+        String filename="sample_abc/fur_elise.abc";
         try{
         	play(filename);
         }

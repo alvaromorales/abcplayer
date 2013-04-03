@@ -70,10 +70,11 @@ public class Parser {
             if(j.getType() != Token.Type.KEYNOTE)
                 throw new ParserException("Found non-single note inside a chord");
 
-            buffer.add(applyAccidental(j.getValue().charAt(0), j.getDuration(), j.getOctave(), j.getAccidental()));
+            buffer.add(applyAccidental(j.getValue().charAt(0), duration, j.getOctave(), j.getAccidental()));
         }
         return new Chord(duration,buffer);
     }
+    
 
     /**
      * Adds a tuple to the current voice and advances the index of the current token being parsed
@@ -134,12 +135,7 @@ public class Parser {
         // tuplet-element ::= tuplet-spec note-element+
         
         while (i < tokens.size()) {
-            Token tok;
-            try {
-                tok = tokens.get(i);
-            } catch (IndexOutOfBoundsException e) {
-                throw new ParserException("Undexpected end of tuple");
-            }
+            Token tok = tokens.get(i);
 
             switch(tok.getType()){
             case KEYNOTE:
@@ -153,8 +149,6 @@ public class Parser {
             case REST:
                 notes.add(new Rest(tok.getDuration().mul(adjustedLength)));
                 return i+1;
-            case CHORD_END:
-                return i+1;
             case CHORD_START:
                 int offset=findNextType(tokens.subList(i,tokens.size()), Token.Type.CHORD_END); //find CHORD_END
 
@@ -163,8 +157,7 @@ public class Parser {
                 }
 
                 notes.add(parseChord(tokens.get(i+1).getDuration().mul(adjustedLength), tokens.subList(i+1, i+offset)));     //add chord to current song
-                i+=(offset+1);                                                                      //skip until the end of the chord
-                break;
+                return i+(offset+1);                                                                      //skip until the end of the chord
             default:
                 throw new ParserException("Invalid type found in a tuple: " + tok.getType());
             }
@@ -354,7 +347,7 @@ public class Parser {
         if (!repeatsBalanced) {
             throw new ParserException("Malformed Body: Repeats are not balanced");
         }       
-
+        
     }
 
     /**
