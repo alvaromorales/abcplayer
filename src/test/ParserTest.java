@@ -137,7 +137,7 @@ public class ParserTest {
     /**
      * Test the parsing of a SingleNote
      */
-    //@Test
+    @Test
     public void parseSingleNoteTest() {
         //Parse "^G,,8"
         Token keyNote = new Token(Token.Type.KEYNOTE);
@@ -482,6 +482,34 @@ public class ParserTest {
         expected.add(parsedC);
 
         assertEquals(expected, parser.getSong());
+    }
+    
+    /**
+     * Tests the parsing of an expression with unbalanced repeats
+     */
+    @Test(expected = ParserException.class)
+    public void balancedRepeatTest() {
+        Token repeatStart = new Token(Token.Type.REPEAT_START);
+        repeatStart.setValue("|:");
+        
+        Token note = new Token(Token.Type.KEYNOTE);
+        note.setAccidental(Integer.MAX_VALUE);
+        note.setDuration(new RationalNumber(1, 1));
+        note.setOctave(0);
+        note.setValue("G");
+        
+        Token doubleBar = new Token(Token.Type.DOUBLE_BAR);
+        repeatStart.setValue("||");
+        
+        ArrayList<Token> tokens = new ArrayList<Token>(0);
+        tokens.add(repeatStart);
+        tokens.add(note);
+        tokens.add(note);
+        tokens.add(note);
+        tokens.add(doubleBar);
+        
+        Parser parser = new Parser();
+        parser.parseVoice(tokens);
     }
     
     /**

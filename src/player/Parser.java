@@ -232,6 +232,7 @@ public class Parser {
      */
     public void parseVoice(ArrayList<Token> tokens) {
         int i=0;
+        boolean repeatsBalanced = true;
 
         while(i<tokens.size()) {
             Token tok = tokens.get(i);
@@ -286,10 +287,17 @@ public class Parser {
                     throw new ParserException("Malformed Quadruplet");
                 }
             case REPEAT_START:
+                if (!repeatsBalanced) {
+                    throw new ParserException("Malformed Body: Repeats are not balanced");
+                }
+                
+                repeatsBalanced = false;
                 ++i;                                                                            //do nothing, wait for a REPEAT_END to show up
                 break;
             case REPEAT_END:   
                 song.accidentalAssociator.revert();
+                repeatsBalanced = true;
+                
                 if (tok.getValue().equals("PASS")) {
                     ++i;
                     break;
@@ -343,6 +351,11 @@ public class Parser {
                 throw new ParserException("Invalid type found in body");
             }
         }
+        
+        if (!repeatsBalanced) {
+            throw new ParserException("Malformed Body: Repeats are not balanced");
+        }       
+        
     }
 
     /**
