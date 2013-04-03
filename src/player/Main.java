@@ -68,7 +68,7 @@ public class Main {
     }
     
     public static void main(String[] args){
-        String filename="sample_abc/fur_elise.abc";
+        String filename="sample_abc/jack.abc";
         try{
         	play(filename);
         }

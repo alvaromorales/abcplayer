@@ -5,23 +5,25 @@ import org.junit.Test;
 import player.Main;
 
 /**
- * Tests the PlayerVisitor class by testing the entire system together (Integration Testing)
+ * Tests the entire system together (Integration Testing)
  * Main.play uses the Lexer, Parser, DurationVisitor and PlayerVisitor to play a song
+ * We wrote the abc files from sheet music found www.gamemusicthemes.com
  * 
  * Testing Strategy
- *  - play fur_elise.abc
- *  - play invention.abc
- *  - play little_night_music.abc
+ *  - play pokemon.abc
+ *  - play zelda.abc
+ *  - play jack.abc
  *  @category no_didit
  */
-public class PlayerVisitorTest {
+public class PlayerTest {
     
     /**
-     * Plays fur_elise.abc
+     * Plays pokemon.abc, the Pokemon Blue and Red gameboy theme
+     * This file tests chords nested in tuples
      */
     @Test
     public void playFurEliseTest() {
-        String filename="sample_abc/fur_elise.abc";
+        String filename="sample_abc/pokemon.abc";
         try{
             Main.play(filename);
         }
@@ -32,11 +34,12 @@ public class PlayerVisitorTest {
     }
     
     /**
-     * Plays invention.abc
+     * Plays zelda.abc, the Song of Storms from Zelda Ocarina of Time
+     * This file tests playing a song with different voices and repeats
      */
     @Test
     public void playInventionTest() {
-        String filename="sample_abc/invention.abc";
+        String filename="sample_abc/zelda.abc";
         try{
             Main.play(filename);
         }
@@ -47,11 +50,12 @@ public class PlayerVisitorTest {
     }
     
     /**
-     * Plays little_night_music.abc
+     * Plays jack.abc, Hit the Road Jack
+     * This file tests numbered repeats
      */
     @Test
     public void playLittleNightMusicTest() {
-        String filename="sample_abc/little_night_music.abc";
+        String filename="sample_abc/jack.abc";
         try{
             Main.play(filename);
         }
