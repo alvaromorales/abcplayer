@@ -45,13 +45,29 @@ public class Lexer{
     private static Map<String,Integer> headMap;
     private static Map<String,Integer> bodyMap;
     
+    /**
+     * Returns this.head
+     * @return String, the header of the piece
+     */
+    
+    public String getHead(){
+    	return this.head;
+    }
+    
+    /**
+     * Returns this.body
+     * @return String, the body of the piece
+     */
+    
+    public String getBody(){
+    	return this.body;
+    }
     
     /**
      * Creates a new Lexer object
      * @param s, the input string to be processed
      */
     public Lexer(String s) {
-        //checkString(uncomment(s));
         
         this.head=uncomment(makeHeader(s)); //head of the piece, no comments 
         this.body=uncomment(makeBody(s)); 	//body of the piece, no comments
@@ -129,27 +145,6 @@ public class Lexer{
     	return s.substring(splitIndex+1);
     }
     
-    /**
-     * Checks if the given string is valid or contains some illegal characters
-     * @param s
-     * @return
-     */
-    public void checkString(String s){
-        StringBuffer regexBuf = new StringBuffer();
-        regexBuf.append("(");
-        regexBuf.append(regexHeader);
-        regexBuf.append(regexBody);
-        regexBuf.append(")+");
-        
-        String regex = new String(regexBuf);
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(s);
-        
-        if (!matcher.matches()){
-            throw new LexerException("There is illegal character in the input file");
-        }
-    }
-    
     
     /**
      * Removes comment from a string (comments start with '%' and end with a newline)
@@ -174,6 +169,7 @@ public class Lexer{
         
         // Create headMatchers and start matching to groups 
         Matcher headMatcher = headPattern.matcher(this.head);
+        
         
         while (headMatcher.find()) {
             

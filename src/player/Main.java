@@ -46,6 +46,9 @@ public class Main {
     	String input_string=readFile(file);
 
     	Lexer lexer = new Lexer(input_string);
+    	//print header
+    	System.out.print(lexer.getHead());
+    	
     	Parser parser = new Parser();
     	parser.parse(lexer.lexHead(),lexer.lexBody());
             	
