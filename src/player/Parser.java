@@ -76,90 +76,104 @@ public class Parser {
     }
 
     /**
-     * Create a duplet from a list of Tokens
-     * @param tokens, a list of tokens, tokens.size()==2
-     * @return duplet, a new duplet 
+     * Adds a tuple to the current voice and advances the index of the current token being parsed
+     * @param tokens the voice tokens
+     * @param tupleStart the index of the start of the tuple
+     * @param tupleLength the length of the tuple
+     * @return the index after the end of the tuple
      */
-    public Duplet parseDuplet(List<Token> tokens){
-        try{
-            SingleNote note1 = applyAccidental(
-                    tokens.get(0).getValue().charAt(0), 
-                    tokens.get(0).getDuration().mul(new RationalNumber(3, 2)), 
-                    tokens.get(0).getOctave(), 
-                    tokens.get(0).getAccidental());
+    public int parseTuple(ArrayList<Token> tokens, int tupleStart, int tupleLength) {
+        int i = tupleStart;
 
-            SingleNote note2 = applyAccidental(
-                    tokens.get(1).getValue().charAt(0), 
-                    tokens.get(1).getDuration().mul(new RationalNumber(3, 2)), 
-                    tokens.get(1).getOctave(), 
-                    tokens.get(1).getAccidental());
+        ArrayList<NoteElement> notes = new ArrayList<NoteElement>(0);
 
-            return new Duplet(note1 , note2);
-
+        RationalNumber adjustedLength;
+        
+        switch (tupleLength) {
+        case 2:            
+            adjustedLength = new RationalNumber(3, 2);
+            break;
+        case 3:
+            adjustedLength = new RationalNumber(2, 3);
+            break;
+        case 4:
+            adjustedLength = new RationalNumber(3, 4);
+            break;
+        default:
+            throw new ParserException("Invalid Tuple Length: " + tupleLength);
         }
-        catch(ArrayIndexOutOfBoundsException e){ // in case i+1 or i+2 fails
-            throw new ParserException(e.getMessage()); //throw ParserException
+        
+        while (notes.size() < tupleLength) {
+            i = parseTupleElement(tokens, notes, i,adjustedLength);
+        }
+        
+        switch (tupleLength) {
+        case 2:            
+            song.add(new Duplet(notes.get(0), notes.get(1)));
+            return i;
+        case 3:
+            song.add(new Triplet(notes.get(0), notes.get(1),notes.get(2)));
+            return i;
+        case 4:
+            song.add(new Quadruplet(notes.get(0), notes.get(1),notes.get(2),notes.get(3)));
+            return i;
+        default:
+            throw new ParserException("Invalid Tuple Length: " + tupleLength);
         }
     }
 
     /**
-     * Create a triplet from a list of Tokens
-     * @param inp, a list of tokens, inp.size()==3
-     * @return triplet, a new triplet 
+     * Adds NoteElement to a list of tuple notes
+     * @param tokens the voice tokens
+     * @param notes the tuple notes list. Should be empty.
+     * @param i the index of the current token being parsed
+     * @return the index after where a NoteElement was added to the tuple
      */
-    public Triplet parseTriplet(List<Token> inp){
-        try{
-            SingleNote note1=applyAccidental(inp.get(0).getValue().charAt(0), 
-                    inp.get(0).getDuration().mul(new RationalNumber(2, 3)), 
-                    inp.get(0).getOctave(), 
-                    inp.get(0).getAccidental());
+    public int parseTupleElement(ArrayList<Token> tokens, ArrayList<NoteElement> notes, int i,RationalNumber adjustedLength) {
 
-            SingleNote note2=applyAccidental(inp.get(1).getValue().charAt(0), 
-                    inp.get(1).getDuration().mul(new RationalNumber(2, 3)), 
-                    inp.get(1).getOctave(), 
-                    inp.get(1).getAccidental());
+        // tuplet-element ::= tuplet-spec note-element+
+        
+        while (i < tokens.size()) {
+            Token tok;
+            try {
+                tok = tokens.get(i);
+            } catch (IndexOutOfBoundsException e) {
+                throw new ParserException("Undexpected end of tuple");
+            }
 
-            SingleNote note3=applyAccidental(inp.get(1).getValue().charAt(0), 
-                    inp.get(2).getDuration().mul(new RationalNumber(2, 3)), 
-                    inp.get(2).getOctave(), 
-                    inp.get(2).getAccidental());
+            switch(tok.getType()){
+            case KEYNOTE:
+                notes.add(applyAccidental(
+                        tok.getValue().charAt(0),
+                        tok.getDuration().mul(adjustedLength),
+                        tok.getOctave(),
+                        tok.getAccidental()
+                        ));                                              //apply accidental to token
+                return i+1;
+            case REST:
+                notes.add(new Rest(tok.getDuration().mul(adjustedLength)));
+                return i+1;
+            case CHORD_END:
+                return i+1;
+            case CHORD_START:
+                int offset=findNextType(tokens.subList(i,tokens.size()), Token.Type.CHORD_END); //find CHORD_END
 
-            return new Triplet(note1 , note2, note3);
+                if(offset<0) {
+                    throw new ParserException("End of Chord not found");
+                }
 
+                notes.add(parseChord(tokens.get(i+1).getDuration().mul(adjustedLength), tokens.subList(i+1, i+offset)));     //add chord to current song
+                i+=(offset+1);                                                                      //skip until the end of the chord
+                break;
+            default:
+                throw new ParserException("Invalid type found in a tuple: " + tok.getType());
+            }
         }
-        catch(ArrayIndexOutOfBoundsException e){ // in case 0, 1 or 2 fails
-            throw new ParserException(e.getMessage()); //throw ParserException
-        }
+
+        //if nothing has been returned, there was an unexpected end of the tuple
+        throw new ParserException("Undexpected end of tuple");
     }
 
-    /**
-     * Create a Quadruplet from a list of Tokens
-     * @param tokens, a list of tokens, where token.size()==4
-     * @return a new Quadruplet with the appropriate notes 
-     */
-    public Quadruplet parseQuad(List<Token> tokens){
-        SingleNote note1 = applyAccidental(tokens.get(0).getValue().charAt(0), 
-                tokens.get(0).getDuration().mul(new RationalNumber(3, 4)), 
-                tokens.get(0).getOctave(), 
-                tokens.get(0).getAccidental());
-
-        SingleNote note2 = applyAccidental(tokens.get(1).getValue().charAt(0), 
-                tokens.get(1).getDuration().mul(new RationalNumber(3, 4)), 
-                tokens.get(1).getOctave(), 
-                tokens.get(1).getAccidental());
-
-        SingleNote note3 = applyAccidental(tokens.get(2).getValue().charAt(0), 
-                tokens.get(2).getDuration().mul(new RationalNumber(3, 4)), 
-                tokens.get(2).getOctave(), 
-                tokens.get(2).getAccidental());
-
-        SingleNote note4 = applyAccidental(tokens.get(3).getValue().charAt(0), 
-                tokens.get(3).getDuration().mul(new RationalNumber(3, 4)), 
-                tokens.get(3).getOctave(), 
-                tokens.get(3).getAccidental());
-
-        return new Quadruplet(note1,note2, note3, note4);
-    }
 
     /**
      * Parses the header tokens
@@ -263,41 +277,26 @@ public class Parser {
                 ++i;
                 break;
             case DUPLET_START:
-                try {
-                    song.add(parseDuplet(tokens.subList(i+1, i+3)));
-                    i+=3;                                                                           //skip to the next usable token
-                    break;
-                } catch (IndexOutOfBoundsException e) {
-                    throw new ParserException("Malformed Duplet");
-                }
+                i = parseTuple(tokens, i+1, 2);
+                break;
             case TRIPLET_START:
-                try {
-                    song.add(parseTriplet(tokens.subList(i+1, i+4)));
-                    i+=4;                                                                   //skip to the next usable token
-                    break;
-                } catch (IndexOutOfBoundsException e) {
-                    throw new ParserException("Malformed Triplet");
-                }
+                i = parseTuple(tokens, i+1, 3);
+                break;
             case QUAD_START:
-                try {
-                    song.add(parseQuad(tokens.subList(i+1, i+5)));
-                    i+=5;                                                                           //skip to the next usable token
-                    break;
-                } catch (IndexOutOfBoundsException e) {
-                    throw new ParserException("Malformed Quadruplet");
-                }
+                i = parseTuple(tokens, i+1, 4);
+                break;
             case REPEAT_START:
                 if (!repeatsBalanced) {
                     throw new ParserException("Malformed Body: Repeats are not balanced");
                 }
-                
+
                 repeatsBalanced = false;
                 ++i;                                                                            //do nothing, wait for a REPEAT_END to show up
                 break;
             case REPEAT_END:   
                 song.accidentalAssociator.revert();
                 repeatsBalanced = true;
-                
+
                 if (tok.getValue().equals("PASS")) {
                     ++i;
                     break;
@@ -317,7 +316,7 @@ public class Parser {
                     } else {
                         i=j;
                     }
-                    
+
                     break;
                 }
             case REPEAT_NUMBER:
@@ -351,11 +350,11 @@ public class Parser {
                 throw new ParserException("Invalid type found in body");
             }
         }
-        
+
         if (!repeatsBalanced) {
             throw new ParserException("Malformed Body: Repeats are not balanced");
         }       
-        
+
     }
 
     /**
@@ -367,33 +366,33 @@ public class Parser {
         if (tokens.get(0).getType() != Token.Type.VOICE) {
             throw new ParserException("Malformed body: Body starts with an undeclared voice");
         }
-        
+
         // initialize the voice map
         HashMap<String, ArrayList<Token>> voiceMap = new HashMap<String, ArrayList<Token>>();
         for (Voice v: song.getVoices()) {
             voiceMap.put(v.getName(), new ArrayList<Token>(0));
         }
-        
+
         String currentVoice = tokens.get(0).getValue();
         for (int i=1;i<tokens.size();i++) {
             Token tok = tokens.get(i);
-            
+
             //switch the currentVoice and keep going
             if (tok.getType() == Token.Type.VOICE) {
                 currentVoice = tok.getValue();
                 continue;
             }
-            
+
             if (voiceMap.get(currentVoice) != null) {
                 voiceMap.get(currentVoice).add(tok);
             } else {
                 throw new ParserException("Malformed body: Undeclared voice " + tok.getValue());
             }
         }
-        
+
         return voiceMap;
     }
-    
+
     /**
      * Parses the list of tokens produced by the lexer to fill the AST for the song.
      * @param headerTokens the header tokens, as produced by the Lexer

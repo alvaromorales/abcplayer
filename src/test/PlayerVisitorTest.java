@@ -5,8 +5,9 @@ import org.junit.Test;
 import player.Main;
 
 /**
- * Tests the PlayerVisitor class by testing the entire system together
+ * Tests the PlayerVisitor class by testing the entire system together (Integration Testing)
  * Main.play uses the Lexer, Parser, DurationVisitor and PlayerVisitor to play a song
+ * 
  * Testing Strategy
  *  - play fur_elise.abc
  *  - play invention.abc
