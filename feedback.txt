@@ -1,0 +1,45 @@
+Project 1: abc Music Player		alvarom, elefthei, mari
+===========================		(grader: Sunila)
+
+Team contract: 5 / 5
+
+Design: 24 / 25
+  Milestone design: 14 / 15
+  Revised design: 10 / 10
+
+Implementation: 50 / 50
+  Warmup: 5 / 5
+  Code readability: 8 / 8
+  Specifications: 7 / 7
+  Functionality: 15 / 15
+  Our tests: 15 / 15
+    Tuplets: 2 / 2
+    Chords: 2 / 2
+    Repeats: 2 / 2
+    Voices: 2 / 2
+    Key signature: 2 / 2
+    Accidentals: 2 / 2
+    Rhythm: 3 / 3
+
+Testing: 12 / 15
+  Unit tests: 4 / 6
+  Integration tests: 6 / 6
+  Custom abc files: 2 / 3
+
+TOTAL TEAM SCORE: 91 / 95
+
+(Individual scores will include 5 points for the reflection assignment,
+ and will be posted on Stellar.)
+
+Feedback
+--------
+
+you guys did a great job. 
+here are my observations and feedback on few things you could improve: 
+
+SPECS AND TESTS: your specs are very well written and are consistent in style throughout the project. You documented rep invariant for Rational number class, that’s good. But if you could also put your argument of how rep invariant is preserved, that would have been better. The way you documented the reg ex in lexer is applaudable . And your code presentation is also great for readability. 
+In testing, however, you can do better. You did test major components (like lexer and parser) and critical tiny pieces (like fractional and accidentalassociationmarker) and you have an end to end test for the whole system. But you didn't test AST components, even though their equals() method deserves to be tested. Also in your lexer test you did not test for invalid token, to see what kind of error your system throws. You did test for semantic errors in parser. 
+
+IMPLEMENTATION: You carried out implementation very well, and your program works for all the tests we tested it against, good job there. Implementing Visitor pattern was a good choice considering your AST. But the reason for defining public visitor interface inside the noteElement class, if there is any, is not obvious. Plus more specific name than “visitor” should have been used.  
+
+DOCUMENTATION: your initial design document touched all the important components data types, parser functionality and tests but it was missing system architecture description in either verbal or diagrammatic form. And it was only implicit that you are using the given grammar without changing it, since you didn’t mention any modifications to it, it should have been explicitly mentioned. In final document you do have a better system description and your design revisions are very clearly documented. It is definitely an improvement, but you can still do better by increasing overall coherency of the document.
